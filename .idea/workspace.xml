@@ -87,6 +87,7 @@
       <workItem from="1714299285195" duration="4353000" />
       <workItem from="1714306135187" duration="1071000" />
       <workItem from="1714307264138" duration="654000" />
+      <workItem from="1714307979164" duration="1295000" />
     </task>
     <task id="LOCAL-00001" summary="[紧急]init">
       <created>1714304800050</created>
@@ -154,7 +155,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="llamaIndex_master" />
+                        <option value="llama_index_main" />
                       </list>
                     </value>
                   </entry>
@@ -178,7 +179,6 @@
         </option>
         <option name="isMavenProject" value="false" />
         <option name="jdkVersion" value="" />
-        <option name="workspaceFileType" value="Markdown" />
       </WebViewProjectConfig>
     </option>
   </component>
