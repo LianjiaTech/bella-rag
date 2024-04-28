@@ -1,0 +1,16 @@
+# Python version: python3.6.0
+# Use pip3 install -r requirements.txt -i https://pypi.douban.com/simple
+######################################################################
+Django==2.2.10
+django-cors-headers==3.0.1
+
+PyMySQL==0.9.3
+mysqlclient==1.4.5
+
+redis==2.10.6
+django-redis==4.10.0
+
+
+# start gunicore
+gunicorn==19.9.0
+eventlet==0.25.1

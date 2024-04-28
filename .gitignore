@@ -1,0 +1,20 @@
+# 通用
+all_models/*
+.idea/*
+uploads/*
+__pycache__/*
+*/__pycache__/*
+*.pyc
+*.log
+*.log.*
+/rootlog/*.log*
+*/*.apk
+*/*.zip
+*.lock
+*.out
+*.pkl
+tmpcode/*
+tmplog/*
+/venv/
+
+.DS_Store
