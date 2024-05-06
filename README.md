@@ -8,7 +8,13 @@
 LlamaIndex (GPT Index) is a data framework for your LLM application. Building with LlamaIndex typically involves working with LlamaIndex core and a chosen set of integrations (or plugins). There are two ways to start building with LlamaIndex in
 Python:
 
-1. **Starter**: `llama-index` (https://pypi.org/project/llama-index/). A starter Python package that includes core LlamaIndex as well as a selection of integrations.
+# 包管理
+## 新建
+新建子包，选择创建readers或者index下的子包，子包名称为demo_package，里面包含一个demo_package文件和一个__init__.py文件
+并会在tests目录下对应的readers或者index下，新建一个test_demo_package.py文件
+```sh
+python bin/packageManage.py create index demo_package
+python bin/packageManage.py create readers demo_package
 
 2. **Customized**: `llama-index-core` (https://pypi.org/project/llama-index-core/). Install core LlamaIndex and add your chosen LlamaIndex integration packages ([temporary registry](https://pretty-sodium-5e0.notion.site/ce81b247649a44e4b6b35dfb24af28a6?v=53b3c2ced7bb4c9996b81b83c9f01139))
    that are required for your application. There are over 300 LlamaIndex integration
@@ -31,7 +37,11 @@ from llama_index.core.llms import LLM
 from llama_index.llms.openai import OpenAI
 ```
 
-### Important Links
+## 删除
+删除子模块，选择删除readers或者index下的子包，子包名称为demo_package，会将子包及其测试文件进行删除
+```sh
+python bin/packageManage.py delete index demo_package
+python bin/packageManage.py delete readers demo_package
 
 LlamaIndex.TS (Typescript/Javascript): https://github.com/run-llama/LlamaIndexTS.
 
