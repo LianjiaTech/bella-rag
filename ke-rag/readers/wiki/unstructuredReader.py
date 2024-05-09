@@ -5,17 +5,16 @@
 # @File: unstructuredReader.py
 
 from llama_index.readers.web import UnstructuredURLLoader
+import unstructured
 
 def unstructuredReader():
     urls = [
-        "https://www.understandingwar.org/backgrounder/russian-offensive-campaign-assessment-february-8-2023",
-        "https://www.understandingwar.org/backgrounder/russian-offensive-campaign-assessment-february-9-2023",
-    ]
+        "http://scm.ke.com/api/v1/wiki/confluence/page/content?wikiUrl=https://wiki.lianjia.com/pages/viewpage.action?pageId=1240439072"    ]
 
-    loader = UnstructuredURLLoader(
-        urls=urls, continue_on_failure=False, headers={"User-Agent": "value"}
+    reader = UnstructuredURLLoader(
+        urls=urls, continue_on_failure=False, headers={"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"}
     )
-    loader.load_data()
+    return reader.load_data()
 
 if __name__ == "__main__":
-    unstructuredReader()
+    print(unstructuredReader())
