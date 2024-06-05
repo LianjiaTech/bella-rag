@@ -1,7 +1,5 @@
 import redis
 
-from common.tool.common_func import *
-
 
 class RedisTool(object):
     def __init__(self, host="", port=0, db=0, password=""):
@@ -11,7 +9,7 @@ class RedisTool(object):
             self.db = int(db)
             self.password = password
         except:
-            raise "<ERROR: port 和 db 必须是数字>"
+            raise TypeError("<ERROR: port 和 db 必须是数字>")
 
     def init_redis_conf(self):
         if not hasattr(self, 'pool'):

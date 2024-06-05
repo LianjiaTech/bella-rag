@@ -1,8 +1,8 @@
+import time
+
 from kafka import KafkaConsumer
 from kafka import KafkaProducer
 from kafka import TopicPartition
-from kafka.structs import OffsetAndMetadata
-import time
 
 
 class KafkaTool(object):
@@ -16,8 +16,6 @@ class KafkaTool(object):
         self.enable_auto_commit = True
         self.auto_commit_interval_ms = 0
         self.consumer_timeout_ms = 0
-        # self.consumer = None
-        # self.producer = None
 
     def create_consumer(self):
         kwargs = {}
@@ -88,9 +86,7 @@ class KafkaTool(object):
             except Exception as e:
                 print(e)
             finally:
-                if hasattr(self, "producer"):
-                    break
-                else:
+                if not hasattr(self, "producer"):
                     time.sleep(1)
 
         if topic:
@@ -201,9 +197,7 @@ class NewKafkaTool(object):
             except Exception as e:
                 print(e)
             finally:
-                if hasattr(self, "producer"):
-                    break
-                else:
+                if not hasattr(self, "producer"):
                     time.sleep(1)
 
         if topic:

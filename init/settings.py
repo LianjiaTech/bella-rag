@@ -11,16 +11,16 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import json
+import logging
+import logging.config
+import logging.handlers
 import os
 import sys
-import logging.config
-import logging
-import logging.handlers
 
 from common.tool.common_func import *
 from common.tool.config import Config
-from init.const import *
 from init.config import *
+from init.const import *
 
 SERVER_START_TIME = get_current_time()
 CURRENT_DATE = get_current_date()
@@ -109,7 +109,7 @@ if is_linux():
         'handlers': {
             # 默认日志
             'default': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'common.logging_handler.redis_user_handler.RedisLoggingUserHandler',  # 保存到文件，自动切
                 'formatter': 'datestart_with_USERLOGGER',
                 'encoding': 'utf-8',
@@ -123,28 +123,28 @@ if is_linux():
             },
             # 流量日志
             'traffic': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'common.logging_handler.redis_traffic_handler.RedisLoggingTrafficHandler',  # 保存到文件，自动切
                 'formatter': 'datestart',
                 'encoding': 'utf-8',
             },
             # sql日志
             'sql': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'common.logging_handler.redis_sql_handler.RedisLoggingSqlHandler',  # 保存到文件，自动切
                 'formatter': 'datestart',
                 'encoding': 'utf-8',
             },
             # 函数耗时日志
             'elapsed': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'common.logging_handler.redis_elapsed_handler.RedisLoggingElapsedHandler',  # 保存到文件，自动切
                 'formatter': 'datestart_with_ELAPSEDLOGGER',
                 'encoding': 'utf-8',
             },
             # 函数耗时日志
             'kafkaasync': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'common.logging_handler.redis_kafkaasync_handler.RedisLoggingKafkaasyncHandler',  # 保存到文件，自动切
                 'formatter': 'datestart_with_KAFKAASYNCLOGGER',
                 'encoding': 'utf-8',
@@ -153,32 +153,32 @@ if is_linux():
         'loggers': {
             'userlog': {
                 'handlers': ['default'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'errorlog': {
                 'handlers': ['error'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'trafficlog': {
                 'handlers': ['traffic'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'sqllog': {
                 'handlers': ['sql'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'elapsedlog': {
                 'handlers': ['elapsed'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'kafkaasynclog': {
                 'handlers': ['kafkaasync'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
         },
@@ -209,7 +209,7 @@ else:
             },
             # 默认日志
             'default': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
                 'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
@@ -232,7 +232,7 @@ else:
             },
             # 流量日志
             'traffic': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 # 'class': 'common.logging_handler.kafka_logging_handler.KafkaLoggingTrafficHandler',  # 保存到文件，自动切
                 # 'class': 'common.logging_handler.redis_traffic_handler.RedisLoggingTrafficHandler',  # 保存到文件，自动切
 
@@ -246,7 +246,7 @@ else:
             },
             # sql日志
             'sql': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 # 'class': 'common.logging_handler.redis_sql_handler.RedisLoggingSqlHandler',  # 保存到文件，自动切
 
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
@@ -259,7 +259,7 @@ else:
             },
             # 函数耗时日志
             'elapsed': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
                 'filename': os.path.join(log_root, "django_elapsed.log"),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
@@ -269,7 +269,7 @@ else:
             },
             # 函数耗时日志
             'kafkaasync': {
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
                 'filename': os.path.join(log_root, "django_kafkaasync.log"),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
