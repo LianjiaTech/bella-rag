@@ -37,7 +37,7 @@ print("DB_HOST[%s] DB_PORT[%s] DB_USERNAME[%s] DB_PASSWORD[%s] DB_NAME[%s]" % (
 
 dirfile_key = 'DIRFILE'
 dirfile_log = conf_dict[dirfile_key]['logroot']
-applogsdir = os.getenv("MATRIX_APPLOGS_DIR")
+applogsdir = os.getenv("MATRIX_APPLOGS_DIR", "/tmp/applogs")
 if applogsdir and os.path.isdir(applogsdir):
     log_root = applogsdir.rstrip("/")
 else:
@@ -409,13 +409,13 @@ CACHES = {
     }
 }
 print(CACHES)
-REDIS_TIMEOUT = 7*24*60*60
-CUBES_REDIS_TIMEOUT = 60*60
-NEVER_REDIS_TIMEOUT = 365*24*60*60
-from django_redis import get_redis_connection
-django_redis_default_conn = get_redis_connection("default")
-from common.tool.my_redis_cache import MyRedisCache
-redis_handle = MyRedisCache(django_redis_default_conn)
+REDIS_TIMEOUT = 7 * 24 * 60 * 60
+CUBES_REDIS_TIMEOUT = 60 * 60
+NEVER_REDIS_TIMEOUT = 365 * 24 * 60 * 60
+# from django_redis import get_redis_connection
+# django_redis_default_conn = get_redis_connection("default")
+# from common.tool.my_redis_cache import MyRedisCache
+# redis_handle = MyRedisCache(django_redis_default_conn)
 
 # 跨域增加忽略
 CORS_ALLOW_CREDENTIALS = True
