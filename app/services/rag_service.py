@@ -69,7 +69,11 @@ def rag(query: str):
     query_engine = RetrieverQueryEngine(
         retriever=retriever,
         response_synthesizer=response_synthesizer,
-        node_postprocessors=[SimilarityPostprocessor(similarity_cutoff=score), CompletePostprocessor(),
+        node_postprocessors=[SimilarityPostprocessor(similarity_cutoff=score),
+                             CompletePostprocessor(chunk_max_length=_chunk_max_tokens(model_name=model,
+                                                                                      system_prompt=instructions,
+                                                                                      query=query),
+                                                   model=model),
                              RerankPostprocessor()],
     )
 
