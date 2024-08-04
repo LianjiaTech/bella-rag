@@ -7,13 +7,39 @@ from llama_index.core.schema import NodeWithScore, QueryBundle
 class RerankPostprocessor(BaseNodePostprocessor):
     """Rerank postprocessor."""
 
+    rerank: Rerank
+
+    # 不走rerank的阈值
+    rerank_threshold: float = 0.99
+
     def _postprocess_nodes(
             self,
             nodes: List[NodeWithScore],
             query_bundle: Optional[QueryBundle] = None,
     ) -> List[NodeWithScore]:
         """Postprocess nodes."""
+        if self.rerank is None or self._need_not_rerank(nodes):
+            return nodes
+        index_node_map = {}
+        docs = []
+        for i, n in enumerate(nodes):
+            index_node_map[i] = n
+            docs.append(n.node.get_content())
+
+        rerank_resp = self.rerank.rerank(query_bundle.query_str, docs)
+        rerank_items = rerank_resp.results
+        # 更新节点重排后的score
+        for item in rerank_items:
+            index_node_map[item.index].score = item.relevance_score
+        # 重新排序
+        nodes = sorted(nodes, key=lambda x: x.score, reverse=True)
         return nodes
+
+    def _need_not_rerank(self, nodes: List[NodeWithScore]) -> bool:
+        """Check if rerank is needed."""
+        if len(nodes) == 0 or nodes[0].score > self.rerank_threshold:
+            return True
+        return False
 
 
 class CompletePostprocessor(BaseNodePostprocessor):
