@@ -30,7 +30,7 @@ class RerankPostprocessor(BaseNodePostprocessor):
         rerank_items = rerank_resp.results
         # 更新节点重排后的score
         for item in rerank_items:
-            index_node_map[item.index].score = item.relevance_score
+            index_node_map[item["index"]].score = item["relevance_score"]
         # 重新排序
         nodes = sorted(nodes, key=lambda x: x.score, reverse=True)
         return nodes
