@@ -19,6 +19,7 @@ import sys
 
 from common.tool.common_func import *
 from common.tool.config import Config
+from common.tool.my_redis_cache import MyRedisCache
 from init.config import *
 from init.const import *
 
@@ -412,10 +413,12 @@ print(CACHES)
 REDIS_TIMEOUT = 7 * 24 * 60 * 60
 CUBES_REDIS_TIMEOUT = 60 * 60
 NEVER_REDIS_TIMEOUT = 365 * 24 * 60 * 60
-# from django_redis import get_redis_connection
-# django_redis_default_conn = get_redis_connection("default")
-# from common.tool.my_redis_cache import MyRedisCache
-# redis_handle = MyRedisCache(django_redis_default_conn)
+from django_redis import get_redis_connection
+
+django_redis_default_conn = get_redis_connection("default")
+from common.tool.my_redis_cache import MyRedisCache
+#
+redis_handle = MyRedisCache(django_redis_default_conn)
 
 # 跨域增加忽略
 CORS_ALLOW_CREDENTIALS = True
