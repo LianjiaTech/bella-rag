@@ -1,9 +1,7 @@
 import os
-import sys
-import traceback
 
-from common.tool.config import Config
 from common.tool.common_func import *
+from common.tool.config import Config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace("\\", "/")
 print("BASE_DIR: %s" % BASE_DIR)
@@ -16,13 +14,11 @@ print("BASE_DIR: %s" % BASE_DIR)
 # release_appid的值应该设置为线上目录的最后一级目录的名称
 # 例如线上的 MATRIX_CODE_DIR=/data0/www/htdocs/api.ones.ke.com，
 # 那么 release_appid="api.ones.ke.com"
-default_release_appid = "api.ones.ke.com"
-RELEASE_DIR = "/data0/www/htdocs/%s" % os.getenv("release_appid", default_release_appid)
-print("线上路径：%s" % RELEASE_DIR)
+# default_release_appid = "ke-rag"
+# RELEASE_DIR = "/data0/www/htdocs/%s" % os.getenv("release_appid", default_release_appid)
+# print("线上路径：%s" % RELEASE_DIR)
 
-isRelease = False
-if BASE_DIR == RELEASE_DIR:
-    isRelease = True
+isRelease = os.getenv("ENVTYPE") == "prod"
 print("线上环境：%s" % isRelease)
 
 conf_dict = {}
