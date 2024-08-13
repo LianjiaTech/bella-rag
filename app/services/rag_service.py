@@ -18,6 +18,7 @@ from init.settings import OPENAPI, TENCENT_VECTOR_DB
 from ke_rag.llm.openapi import OpenAPIEmbedding, OpenAPI
 from ke_rag.postprocessor.node import RerankPostprocessor, CompletePostprocessor
 from ke_rag.response_synthesizers.response_synthesizer_factory import get_llm_response_synthesizer
+from ke_rag.schema.nodes import BaseNode
 from ke_rag.transformations.factory import TransformationFactory
 from ke_rag.utils.file_util import get_file_type, get_file_name
 
@@ -86,5 +87,62 @@ def getDocumentMetadata(file_id: str, file_path: str, city_list: List):
     return {"source_id": file_id, "source_name": get_file_name(file_path), "extra": extra}
 
 
-def getDocumentMetadata(file_id: str, file_path: str):
-    return {"source_id": file_id, "extra": [f"doc_name:{get_file_name(file_path)}"]}
+def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int) -> FileRetrieve:
+    user_logger.info(f"retrieval start, query : {query}, file_ids : {file_ids}, top_k : {top_k}")
+    metadata_filter = MetadataFilters(
+        filters=[MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)])
+
+    retriever = VectorIndexRetriever(
+        index=index,
+        similarity_top_k=top_k,
+        filters=metadata_filter,
+        vector_store_kwargs={"index": ke_index_structure, "index_extend": ChunkContentAttachedIndexExtend()},
+    )
+
+    # 检索
+    score_nodes = retriever._retrieve(query_bundle=QueryBundle(query_str=query))
+
+    # 还原节点关系
+    rebuild = RebuildRelationPostprocessor()
+    nodes = rebuild.postprocess_nodes(nodes=score_nodes, query_str=query)
+
+    # 补全, 默认token数
+    complete = CompletePostprocessor(chunk_max_length=max_tokens, model="gpt-4")
+    nodes = complete.postprocess_nodes(nodes=nodes, query_str=query)
+    items = []
+    for score_node in nodes:
+        item = FileItem(
+            id=score_node.node_id,
+            file_id=score_node.metadata[ke_index_structure.doc_id_key],
+            file_name=score_node.metadata[ke_index_structure.doc_name_key],
+            score=score_node.score,
+            chunk_id=score_node.node_id,
+            content=score_node.get_content() if not isinstance(score_node.node, BaseNode) else score_node.node.get_complete_content(),
+            file_tag=score_node.metadata[ke_index_structure.doc_type_key]
+        )
+        items.append(item)
+
+    res = FileRetrieve(id=str(uuid.uuid4()), created_at=int(time.time()), object="file_retrieve", list=items)
+    user_logger.info(f"retrieval result : {json.dumps(res.to_dict(), ensure_ascii=False)}")
+    return res
+
+
+def delete_file(file_id: str) -> None:
+    user_logger.info(f'start delete file : {file_id}')
+    # 删除mysql数据
+    deleted, _ = ChunkContentAttachedMapper.delete_by_source_id(source_id=file_id)
+    if not deleted:
+        # todo: 细分一下异常？
+        raise Exception(f"delete file {file_id} failed")
+    # 删除向量库数据
+    vector_store.delete(ref_doc_id=file_id, delete_key=ke_index_structure.doc_id_key)
+
+
+def rename_file(file_id: str, file_name: str):
+    user_logger.info(f'start rename file : {file_id} to {file_name}')
+    # 1. 更新向量库的标量字段
+    doc = Document()
+    doc.__dict__[ke_index_structure.doc_name_key] = file_name
+    condition = "source_id=\"{}\"".format(file_id)
+    vector_filter = Filter(cond=condition)
+    vector_store.collection.update(data=doc, filter=vector_filter)
