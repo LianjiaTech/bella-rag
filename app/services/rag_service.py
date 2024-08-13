@@ -77,7 +77,13 @@ def rag(query: str):
                              RerankPostprocessor(rerank=rerank, rerank_threshold=0.99)],
     )
 
-    return query_engine.query(query)
+
+def getDocumentMetadata(file_id: str, file_path: str, city_list: List):
+    extra = []
+    if city_list:
+        for city in city_list:
+            extra.append(f"city_list:{city}")
+    return {"source_id": file_id, "source_name": get_file_name(file_path), "extra": extra}
 
 
 def getDocumentMetadata(file_id: str, file_path: str):
