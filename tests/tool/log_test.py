@@ -1,10 +1,3 @@
-import os
-
-import django
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "init.settings")  # 替换为你的 Django 项目的设置模块
-django.setup()
-print("@@@@@@@@@@@@@@@@@@@@@@@@@ ★★★INIT DJANGO SETTINGS★★★ @@@@@@@@@@@@@@@@@@@@@@@@@")
 from ke_rag.utils.trace_log_util import trace_log, trace_context
 
 
