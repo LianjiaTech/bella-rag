@@ -90,6 +90,9 @@ log_formaters = {
         'datestart_with_USERLOGGER': {
             'format': '%(asctime)s USERLOGGER %(levelname)s %(module)s %(process)d %(thread)d %(message)s'
         },
+        'datestart_with_TRACELOGGER': {
+            'format': '%(message)s'
+        },
         'datestart_with_ELAPSEDLOGGER': {
             'format': '%(asctime)s ELAPSEDLOGGER %(message)s'
         },
@@ -111,35 +114,59 @@ if is_linux():
             # 默认日志
             'default': {
                 'level': 'DEBUG',
-                'class': 'common.logging_handler.redis_user_handler.RedisLoggingUserHandler',  # 保存到文件，自动切
+                'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+                'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart_with_USERLOGGER',
+                'encoding': 'utf-8',
+            },
+            'trace': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+                'filename': os.path.join(log_root, "trace_info.log"),  # 日志文件
+                'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+                'backupCount': 3,  # 最多备份几个
+                'formatter': 'datestart_with_TRACELOGGER',
                 'encoding': 'utf-8',
             },
             # 错误日志
             'error': {
                 'level': 'ERROR',
-                'class': 'common.logging_handler.redis_error_handler.RedisLoggingErrorHandler',  # 保存到文件，自动切
+                'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+                'backupCount': 3,  # 最多备份几个
                 'formatter': 'verbose',
                 'encoding': 'utf-8',
             },
             # 流量日志
             'traffic': {
                 'level': 'DEBUG',
-                'class': 'common.logging_handler.redis_traffic_handler.RedisLoggingTrafficHandler',  # 保存到文件，自动切
+                'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+                'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart',
                 'encoding': 'utf-8',
             },
             # sql日志
             'sql': {
                 'level': 'DEBUG',
-                'class': 'common.logging_handler.redis_sql_handler.RedisLoggingSqlHandler',  # 保存到文件，自动切
+                'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+                'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart',
                 'encoding': 'utf-8',
             },
             # 函数耗时日志
             'elapsed': {
                 'level': 'DEBUG',
-                'class': 'common.logging_handler.redis_elapsed_handler.RedisLoggingElapsedHandler',  # 保存到文件，自动切
+                'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+                'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart_with_ELAPSEDLOGGER',
                 'encoding': 'utf-8',
             },
@@ -182,6 +209,11 @@ if is_linux():
                 'level': 'DEBUG',
                 'propagate': True,
             },
+            'tracelog': {
+                'handlers': ['trace', 'console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            }
         },
     }
 else:
@@ -216,6 +248,15 @@ else:
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart_with_USERLOGGER',
+                'encoding': 'utf-8',
+            },
+            'trace': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+                'filename': os.path.join(log_root, "trace_info.log"),  # 日志文件
+                'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+                'backupCount': 3,  # 最多备份几个
+                'formatter': 'datestart_with_TRACELOGGER',
                 'encoding': 'utf-8',
             },
             # 错误日志
@@ -310,6 +351,11 @@ else:
                 'level': 'DEBUG' if isRelease else 'DEBUG',
                 'propagate': True,
             },
+            'tracelog':{
+                'handlers': ['trace', 'console'],
+                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'propagate': True,
+            }
         },
     }
 
@@ -450,6 +496,7 @@ CORS_ALLOW_HEADERS = (
     'x-requested-with',
 )
 
+trace_logger = logging.getLogger('tracelog')
 user_logger = logging.getLogger('userlog')
 error_logger = logging.getLogger('errorlog')
 traffic_logger = logging.getLogger('trafficlog')
