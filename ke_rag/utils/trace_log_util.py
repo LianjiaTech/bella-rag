@@ -1,4 +1,5 @@
 import contextvars
+import json
 import time
 
 from init.settings import trace_logger
@@ -32,8 +33,9 @@ def trace_log(step):
     return decorator
 
 def build_trace_json(step, trace_id, cost, start_time, result, error_msg, *args, **kwargs):
-    trace_log = dict()
+    log_json = None
     try:
+        trace_log = dict()
         params = []
         for arg in args:
             params.append(arg)
@@ -52,7 +54,8 @@ def build_trace_json(step, trace_id, cost, start_time, result, error_msg, *args,
             trace_log['errorCode'] = "0"
         trace_log['errorMsg'] = error_msg
         trace_log['updateTime'] = start_time
+        log_json = json.dumps(trace_log)
     except Exception:
         mg = traceback.format_exc()
         logger.info(mg)
-    return trace_log
+    return log_json
