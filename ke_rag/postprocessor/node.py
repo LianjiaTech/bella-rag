@@ -28,12 +28,14 @@ class RerankPostprocessor(BaseNodePostprocessor):
 
         rerank_resp = self.rerank.rerank(query_bundle.query_str, docs)
         rerank_items = rerank_resp.results
-        # 更新节点重排后的score
+        rerank_score_map = {}
+        # 记录节点重排后的score，不改变节点检索分值
         for item in rerank_items:
-            index_node_map[item["index"]].score = item["relevance_score"]
+            rerank_score_map[index_node_map[item["index"]].node_id] = item["relevance_score"]
         # 重新排序
-        nodes = sorted(nodes, key=lambda x: x.score, reverse=True)
-        return nodes
+        nodes = sorted(nodes, key=lambda x: rerank_score_map.get(x.node_id), reverse=True)
+
+        return nodes[0: self.top_k - 1]
 
     def _need_not_rerank(self, nodes: List[NodeWithScore]) -> bool:
         """Check if rerank is needed."""
