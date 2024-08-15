@@ -46,7 +46,7 @@ def build_trace_json(step, trace_id, cost, start_time, result, error_msg, *args,
         trace_log['params'] = params
         trace_log['cost'] = cost
         trace_log['startTime'] = start_time
-        trace_log['runId'] = trace_id
+        trace_log['traceId'] = trace_id
         trace_log['result'] = result
         if error_msg:
             trace_log['errorCode'] = "500"
