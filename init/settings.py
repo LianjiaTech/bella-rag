@@ -210,7 +210,7 @@ if is_linux():
                 'propagate': True,
             },
             'tracelog': {
-                'handlers': ['trace', 'console'],
+                'handlers': ['trace'],
                 'level': 'DEBUG',
                 'propagate': True,
             }
