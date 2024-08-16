@@ -51,6 +51,8 @@ print("log_root:%s" % log_root)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'ovjmbwl$ses4)++0+@mp79^8v27n+5&p*8pq32cr*0*or6migi'
 
+DJANGO_INFO_LOG= "django_info.log"
+
 if isRelease:
     DEBUG = False
 else:
@@ -115,7 +117,7 @@ if is_linux():
             'default': {
                 'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'filename': os.path.join(log_root, DJANGO_INFO_LOG),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart_with_USERLOGGER',
@@ -134,7 +136,7 @@ if is_linux():
             'error': {
                 'level': 'ERROR',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'filename': os.path.join(log_root, DJANGO_INFO_LOG),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'verbose',
@@ -144,7 +146,7 @@ if is_linux():
             'traffic': {
                 'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'filename': os.path.join(log_root, DJANGO_INFO_LOG),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart',
@@ -154,7 +156,7 @@ if is_linux():
             'sql': {
                 'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'filename': os.path.join(log_root, DJANGO_INFO_LOG),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart',
@@ -164,7 +166,7 @@ if is_linux():
             'elapsed': {
                 'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'filename': os.path.join(log_root, DJANGO_INFO_LOG),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart_with_ELAPSEDLOGGER',
@@ -244,7 +246,7 @@ else:
             'default': {
                 'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-                'filename': os.path.join(log_root, "django_info.log"),  # 日志文件
+                'filename': os.path.join(log_root, DJANGO_INFO_LOG),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'datestart_with_USERLOGGER',
@@ -323,37 +325,37 @@ else:
         'loggers': {
             'userlog': {
                 'handlers': ['console', 'default'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'errorlog': {
                 'handlers': ['console', 'error'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'trafficlog': {
                 'handlers': ['traffic'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'sqllog': {
                 'handlers': ['sql'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'elapsedlog': {
                 'handlers': ['elapsed'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'kafkaasynclog': {
                 'handlers': ['console','kafkaasync'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             },
             'tracelog':{
                 'handlers': ['trace', 'console'],
-                'level': 'DEBUG' if isRelease else 'DEBUG',
+                'level': 'DEBUG',
                 'propagate': True,
             }
         },
