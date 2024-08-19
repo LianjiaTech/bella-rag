@@ -9,6 +9,9 @@ class RerankPostprocessor(BaseNodePostprocessor):
 
     rerank: Rerank
 
+    # rerank比较节点个数
+    rerank_num: int = 20
+
     # 不走rerank的阈值
     rerank_threshold: float = 0.99
 
@@ -22,6 +25,9 @@ class RerankPostprocessor(BaseNodePostprocessor):
             return nodes
         index_node_map = {}
         docs = []
+        # rerank尽量输入
+        nodes = nodes[0: max(self.rerank_num, self.top_k)]
+
         for i, n in enumerate(nodes):
             index_node_map[i] = n
             docs.append(n.node.get_content())

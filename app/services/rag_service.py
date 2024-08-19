@@ -75,7 +75,7 @@ def rag(query: str):
                                                                                       system_prompt=instructions,
                                                                                       query=query),
                                                    model=model),
-                             RerankPostprocessor(rerank=rerank, rerank_threshold=0.99)],
+                             RerankPostprocessor(rerank=rerank, rerank_num=20, rerank_threshold=0.99, top_k=top_k)],
     )
 
 
