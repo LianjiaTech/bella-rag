@@ -153,6 +153,56 @@ class NewKafkaTool(object):
                     msg = next(self.consumer)
                     if msg == -1:
                         break
+                    msg = self.consumer.poll(1.0)
+                if msg is None:
+                    continue
+                if msg.error():
+                    if msg.error().code() == KafkaError._PARTITION_EOF:
+                        logger.info("consume_messages PARTITION_EOF topic=%s msg=%s code=%s ",
+                                    msg.topic(),
+                                    msg.partition(),
+                                    msg.error().code())
+                    else:
+                        logger.error("consume_messages error topic=%s msg=%s code=%s ",
+                                     msg.topic(),
+                                     msg.partition(),
+                                     msg.error().code())
+                else:
+                    message_value = msg.value().decode("utf-8")
+                    logger.info("Received topic: [%s] message: %s", self.topic, message_value)
+                    err_cnt = 0
+                    while err_cnt < self.err_cnt_max:
+                        try:
+                            # 调用注册的回调方法
+                            if self.callback(message_value):
+                                # 手动提交偏移量
+                                self.consumer.commit(msg)
+                                logger.info("consumer topic: [%s] message: %s 消费成功", self.topic, message_value)
+                                break
+                            else:
+                                err_cnt += 1
+                                logger.info("consumer topic: [%s] message: %s  retry=%s", self.topic, message_value,
+                                            err_cnt)
+                        except Exception as e:
+                            err_cnt += 1
+                            logger.info("consumer  topic: [%s]  message: %s  retry=%s e=%s", self.topic, message_value,
+                                        err_cnt, e)
+                    if err_cnt == self.err_cnt_max:
+                        logger.error("consumer fail 需要研发关注补偿: %s", message_value)
+                        self.consumer.commit(msg)
+        except KeyboardInterrupt:
+            logger.error("用户中断")
+        except KafkaError as e:
+            logger.error("Kafka 错误: %s", e)
+        except Exception as e:
+            if e.args and e.args[0] == 'Consumer closed' and self.__closed:
+                logger.info("Consumer closed topic: [%s]", self.topic)
+            else:
+                logger.error("Exception 错误: topic: [%s] error: %s", self.topic, e)
+        finally:
+            if not self.__closed:
+                logger.info("workers topic = %s final close", self.topic)
+                self.consumer.close()
 
                     yield msg
                     consume_count += 1
