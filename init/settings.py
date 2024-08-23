@@ -52,6 +52,7 @@ print("log_root:%s" % log_root)
 SECRET_KEY = 'ovjmbwl$ses4)++0+@mp79^8v27n+5&p*8pq32cr*0*or6migi'
 
 DJANGO_INFO_LOG= "django_info.log"
+DJANGO_ERROR_LOG= "django_error.log"
 
 if isRelease:
     DEBUG = False
@@ -136,7 +137,7 @@ if is_linux():
             'error': {
                 'level': 'ERROR',
                 'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
-                'filename': os.path.join(log_root, DJANGO_INFO_LOG),  # 日志文件
+                'filename': os.path.join(log_root, DJANGO_ERROR_LOG),  # 日志文件
                 'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
                 'backupCount': 3,  # 最多备份几个
                 'formatter': 'verbose',
