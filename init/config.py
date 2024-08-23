@@ -1,5 +1,7 @@
 import os
 
+from settings.ini_config import config
+
 from common.tool.common_func import *
 from common.tool.config import Config
 
@@ -21,27 +23,30 @@ print("BASE_DIR: %s" % BASE_DIR)
 isRelease = os.getenv("ENVTYPE") == "prod"
 print("线上环境：%s" % isRelease)
 
-conf_dict = {}
+conf_file = ""
 if isRelease:
     # 线上环境
-    conf_dict = Config().get_conf_dict_by_file("%s/conf/config_release.ini" % BASE_DIR)  # 初始化配置文件
+    conf_file = "%s/conf/config_release.ini" % BASE_DIR
     print("读取配置文件：config_release.ini")
 elif os.getenv("CONFIG_FILE"):
     # 指定了CONFIG FILE
-    conf_dict = Config().get_conf_dict_by_file("%s/conf/%s" % (BASE_DIR, os.getenv("CONFIG_FILE")))  # 初始化配置文件
+    conf_file = "%s/conf/%s" % (BASE_DIR, os.getenv("CONFIG_FILE"))
     print("读取配置文件：%s" % os.getenv("CONFIG_FILE"))
 elif is_linux():
     # 测试环境 linux电脑
-    conf_dict = Config().get_conf_dict_by_file("%s/conf/config_test.ini" % BASE_DIR)  # 初始化配置文件
+    conf_file = "%s/conf/config_test.ini" % BASE_DIR
     print("读取配置文件：config_test.ini")
 elif is_windows():
     # 测试环境 windows 电脑 配置文件
-    conf_dict = Config().get_conf_dict_by_file("%s/conf/config_local.ini" % BASE_DIR)  # 初始化配置文件
+    conf_file = "%s/conf/config_local.ini" % BASE_DIR
     print("读取配置文件：config_local.ini")
 else:
     # 测试环境 mac电脑 读取配置文件
-    conf_dict = Config().get_conf_dict_by_file("%s/conf/config_local_mac.ini" % BASE_DIR)  # 初始化配置文件
+    conf_file = "%s/conf/config_local_mac.ini" % BASE_DIR
     print("读取配置文件：config_local_mac.ini")
+
+conf_dict = Config().get_conf_dict_by_file(conf_file)  # 初始化配置文件
+config.read(conf_file)  # 文档解析配置，现在这种方式不好，需要document_parse提供新的入口方法，把组件注进去
 
 print("配置：conf_dict: \n%s" % conf_dict)
 print("################################################################################################")
