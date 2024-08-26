@@ -41,6 +41,28 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
         3. Parse Document to BaseNode
         4. Indexing
     '''
+    user_logger.info(f'start indexing file : {file_id}, path : {file_path}, city_list:{city_list}')
+    chubao = ChuBaoFSTool()
+    stream = chubao.read_file(file_path)
+    file_type = get_file_type(file_path)
+
+    # docx文件转为pdf处理（短期内）
+    if file_type in ["doc", "docx"]:
+        stream = convert_docx_to_pdf_in_memory(stream)
+        file_type = "pdf"
+
+    documents = TransformationFactory.get_reader(file_type).load_data(stream)
+
+    transforms = [TransformationFactory.get_parser(file_type=file_type, custom_parser={"csv": BellaCsvParser()}),
+                  ChunkContentAttachedIndexExtend()]
+    storage_context = StorageContext.from_defaults(vector_store=vector_store)
+    VectorStoreIndex.from_documents(
+        documents, storage_context=storage_context, transformations=transforms, embed_model=embed_model,
+        metadata=getDocumentMetadata(file_id=file_id, file_path=file_path, city_list=city_list)
+    )
+
+    if callback:
+        requests.post(callback, json={"file_id": file_id, "status": "success"})
 
 
 def rag(query: str):
