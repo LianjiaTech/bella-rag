@@ -396,10 +396,11 @@ DATABASES = {
         'CONN_MAX_AGE': 800,  # 保持当前连接800s，线上是900s超时
         'OPTIONS': {
             'charset': 'utf8mb4',
-            'pool': {
-                'max_connections': 10,  # 连接池的最大连接数
-                'stale_timeout': 300,   # 连接池中连接超时时间（秒）
-            },
+        },
+        'POOL_OPTIONS': {
+            'MAX_CONNS': 10,  # 连接池的最大连接数
+            'STALE_TIMEOUT': 300,  # 连接池中连接超时时间（秒）
+            'RECYCLE': 300,
         },
     },
     'offline-readonly': {
@@ -412,10 +413,11 @@ DATABASES = {
         'CONN_MAX_AGE': 800,  # 保持当前连接800s，线上是900s超时
         'OPTIONS': {
             'charset': 'utf8mb4',
-            'pool': {
-                'max_connections': 10,  # 连接池的最大连接数
-                'stale_timeout': 300,   # 连接池中连接超时时间（秒）
-            },
+        },
+        'POOL_OPTIONS': {
+            'MAX_CONNS': 10,  # 连接池的最大连接数
+            'STALE_TIMEOUT': 300,  # 连接池中连接超时时间（秒）
+            'RECYCLE': 300,
         },
     }
 }
