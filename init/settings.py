@@ -387,37 +387,33 @@ WSGI_APPLICATION = 'init.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'dj_db_conn_pool.backends.mysql',
         'NAME': DB_NAME,
         'USER': DB_USERNAME,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
         'PORT': DB_PORT,
-        'CONN_MAX_AGE': 800,  # 保持当前连接800s，线上是900s超时
+        'CONN_MAX_AGE': 300,  # 保持当前连接800s，线上是900s超时
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
         'POOL_OPTIONS': {
-            'MAX_CONNS': 10,  # 连接池的最大连接数
-            'STALE_TIMEOUT': 300,  # 连接池中连接超时时间（秒）
-            'RECYCLE': 300,
+            'RECYCLE': 600,
         },
     },
     'offline-readonly': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'dj_db_conn_pool.backends.mysql',
         'NAME': DB_NAME,
         'USER': DB_USERNAME,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
         'PORT': DB_PORT,
-        'CONN_MAX_AGE': 800,  # 保持当前连接800s，线上是900s超时
+        'CONN_MAX_AGE': 300,  # 保持当前连接800s，线上是900s超时
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
         'POOL_OPTIONS': {
-            'MAX_CONNS': 10,  # 连接池的最大连接数
-            'STALE_TIMEOUT': 300,  # 连接池中连接超时时间（秒）
-            'RECYCLE': 300,
+            'RECYCLE': 600,
         },
     }
 }
