@@ -103,18 +103,21 @@ class KafkaTool(object):
             return False
 
 
-class NewKafkaTool(object):
-    def __init__(self, bootstrap_servers, topic=None, partition=None, group_id=None, enable_auto_commit=False):
-        # 消费者相关的属性
-        self.topic = topic if not isinstance(topic, str) else [topic]
-        self.bootstrap_servers = bootstrap_servers
-        self.group_id = group_id if group_id else ""
-        self.client_id = ""
-        self.auto_offset_reset = "latest"
-        self.enable_auto_commit = enable_auto_commit
-        self.auto_commit_interval_ms = 0
-        self.consumer_timeout_ms = 0
-        self.partition = partition
+class KafkaConsumer:
+    def __init__(self, bootstrap_servers, group_id, topic, callback):
+        self.consumer = Consumer({
+            'bootstrap.servers': bootstrap_servers,
+            'group.id': group_id,
+            'auto.offset.reset': 'earliest',  # 可以是 'earliest', 'latest', 'none'
+            'enable.auto.commit': False,  # 禁用自动提交
+            'max.poll.interval.ms': 600000,  # 10分钟,避免_MAX_POLL_EXCEEDED
+        })
+        self.topic = topic
+        self.consumer.subscribe([self.topic])
+        self.callback = callback
+        self.err_cnt_max = 3
+        self.__closed = False
+        self.lock = threading.Lock()
 
     def create_consumer(self):
         kwargs = {}
