@@ -387,7 +387,7 @@ WSGI_APPLICATION = 'init.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'dj_db_conn_pool.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': DB_NAME,
         'USER': DB_USERNAME,
         'PASSWORD': DB_PASSWORD,
@@ -395,13 +395,10 @@ DATABASES = {
         'PORT': DB_PORT,
         'OPTIONS': {
             'charset': 'utf8mb4',
-        },
-        'POOL_OPTIONS': {
-            'RECYCLE': 600,
-        },
+        }
     },
     'offline-readonly': {
-        'ENGINE': 'dj_db_conn_pool.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': DB_NAME,
         'USER': DB_USERNAME,
         'PASSWORD': DB_PASSWORD,
@@ -409,10 +406,7 @@ DATABASES = {
         'PORT': DB_PORT,
         'OPTIONS': {
             'charset': 'utf8mb4',
-        },
-        'POOL_OPTIONS': {
-            'RECYCLE': 600,
-        },
+        }
     }
 }
 
