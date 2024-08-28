@@ -393,7 +393,6 @@ DATABASES = {
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
         'PORT': DB_PORT,
-        'CONN_MAX_AGE': 300,  # 保持当前连接800s，线上是900s超时
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
@@ -408,7 +407,6 @@ DATABASES = {
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
         'PORT': DB_PORT,
-        'CONN_MAX_AGE': 300,  # 保持当前连接800s，线上是900s超时
         'OPTIONS': {
             'charset': 'utf8mb4',
         },
