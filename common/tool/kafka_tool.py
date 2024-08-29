@@ -28,7 +28,8 @@ class KafkaTool(object):
         if self.bootstrap_servers:
             kwargs["bootstrap_servers"] = self.bootstrap_servers
         else:
-            return False
+            logger.info("发送消息成功  topic: [%s] partition:[%s] message: %s", msg.topic(), msg.partition(), msg.value().decode("utf-8"))
+            future.set_result(True)
 
         if self.topics:
             pass
