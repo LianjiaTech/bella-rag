@@ -161,18 +161,15 @@ class KafkaConsumer:
                     continue
                 if msg.error():
                     if msg.error().code() == KafkaError._PARTITION_EOF:
-                        logger.info("consume_messages PARTITION_EOF topic=%s msg=%s code=%s ",
-                                    msg.topic(),
-                                    msg.partition(),
-                                    msg.error().code())
+                        logger.info("consume_messages PARTITION_EOF topic=%s partition=%s code=%s ",
+                                    msg.topic(), msg.partition(), msg.error().code())
                     else:
-                        logger.error("consume_messages error topic=%s msg=%s code=%s ",
-                                     msg.topic(),
-                                     msg.partition(),
-                                     msg.error().code())
+                        logger.error("consume_messages error topic=%s partition=%s code=%s ",
+                                     msg.topic(), msg.partition(), msg.error().code())
                 else:
                     message_value = msg.value().decode("utf-8")
-                    logger.info("Received topic: [%s] message: %s", self.topic, message_value)
+                    logger.info("Received topic: [%s] partition:[%s] message: %s",
+                                self.topic, msg.partition(), message_value)
                     err_cnt = 0
                     while err_cnt < self.err_cnt_max:
                         try:
@@ -180,18 +177,21 @@ class KafkaConsumer:
                             if self.callback(message_value):
                                 # 手动提交偏移量
                                 self.consumer.commit(msg)
-                                logger.info("consumer topic: [%s] message: %s 消费成功", self.topic, message_value)
+                                logger.info("consumer topic: [%s] partition:[%s] message: %s 消费成功",
+                                            self.topic, msg.partition(), message_value)
                                 break
                             else:
                                 err_cnt += 1
-                                logger.info("consumer topic: [%s] message: %s  retry=%s", self.topic, message_value,
-                                            err_cnt)
+                                logger.info("consumer topic: [%s] partition:[%s] message: %s  retry=%s",
+                                            self.topic, msg.partition(), message_value, err_cnt)
                         except Exception as e:
                             err_cnt += 1
-                            logger.info("consumer  topic: [%s]  message: %s  retry=%s e=%s", self.topic, message_value,
-                                        err_cnt, e)
+                            logger.info("consumer  topic: [%s] partition:[%s] message: %s  retry=%s e=%s",
+                                        self.topic, msg.partition(), message_value, err_cnt, e)
+                            logger.exception(e)
                     if err_cnt == self.err_cnt_max:
-                        logger.error("consumer fail 需要研发关注补偿: %s", message_value)
+                        logger.error("consumer fail topic: [%s] partition:[%s] 需要研发关注补偿: %s",
+                                     self.topic, msg.partition(), message_value)
                         self.consumer.commit(msg)
         except KeyboardInterrupt:
             logger.error("用户中断")
