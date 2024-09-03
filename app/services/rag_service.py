@@ -41,6 +41,22 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
         3. Parse Document to BaseNode
         4. Indexing
     '''
+
+    redis_client = redis.Redis(connection_pool=redis_pool)
+    redis_key_prefix = "file_indexing_success_"
+    has_done = redis_client.get(redis_key_prefix + file_id)
+    if has_done:
+        logger.info("已经消费完成，不需要再次消费 file_id = %s", file_id)
+
+    if callback:
+        register_callback(callback)
+
+    redis_client = redis.Redis(connection_pool=redis_pool)
+    redis_key_prefix = "file_indexing_success_"
+    has_done = redis_client.get(redis_key_prefix + file_id)
+    if has_done:
+        logger.info("已经消费完成，不需要再次消费 file_id = %s", file_id)
+
     user_logger.info(f'start indexing file : {file_id}, path : {file_path}, city_list:{city_list}')
     chubao = ChuBaoFSTool()
     stream = chubao.read_file(file_path)
