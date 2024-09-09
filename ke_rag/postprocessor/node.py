@@ -30,7 +30,7 @@ class RerankPostprocessor(BaseNodePostprocessor):
 
         for i, n in enumerate(nodes):
             index_node_map[i] = n
-            docs.append(n.node.get_content())
+            docs.append(n.node.get_complete_content())
 
         rerank_resp = self.rerank.rerank(query_bundle.query_str, docs)
         rerank_items = rerank_resp.results
