@@ -60,6 +60,9 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
     if file_type in ["doc", "docx"]:
         stream = convert_docx_to_pdf_in_memory(stream)
         file_type = "pdf"
+    # csv中的cityList等元素从条目中获取
+    if file_type == "csv":
+        city_list = []
 
     documents = TransformationFactory.get_reader(file_type).load_data(stream)
 
