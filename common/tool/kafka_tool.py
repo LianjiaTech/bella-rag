@@ -165,8 +165,8 @@ class KafkaConsumer:
                         logger.info("consume_messages PARTITION_EOF topic=%s partition=%s code=%s ",
                                     msg.topic(), msg.partition(), msg.error().code())
                     else:
-                        logger.error("consume_messages error topic=%s partition=%s code=%s ",
-                                     msg.topic(), msg.partition(), msg.error().code())
+                        logger.error("consume_messages error topic=%s partition=%s code=%s message: %s",
+                                     msg.topic(), msg.partition(), msg.error().code(), msg.value().decode("utf-8") if msg.value() else "None")
                 else:
                     message_value = msg.value().decode("utf-8")
                     logger.info("Received topic: [%s] partition:[%s] message: %s",

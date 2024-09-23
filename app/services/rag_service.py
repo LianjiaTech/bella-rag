@@ -47,9 +47,11 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
     has_done = redis_client.get(redis_key_prefix + file_id)
     if has_done:
         logger.info("已经消费完成，不需要再次消费 file_id = %s", file_id)
+        return
 
     if callback:
         register_callback(callback)
+
 
     user_logger.info(f'start indexing file : {file_id}, path : {file_path}, city_list:{city_list}')
     chubao = ChuBaoFSTool()
