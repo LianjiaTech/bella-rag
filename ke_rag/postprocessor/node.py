@@ -3,6 +3,16 @@ from typing import Optional, List
 from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.schema import NodeWithScore, QueryBundle
 
+from app.services import ke_index_structure
+from init.settings import user_logger
+from ke_rag.llm.openapi import Rerank
+from ke_rag.schema.nodes import BaseNode, StructureNode, QaNode
+from ke_rag.utils.complete_util import small2big, Small2BigModes
+from ke_rag.utils.schema_util import restore_relationships
+from ke_rag.utils.trace_log_util import trace
+
+logger = user_logger
+
 
 class RerankPostprocessor(BaseNodePostprocessor):
     """Rerank postprocessor."""
@@ -20,28 +30,39 @@ class RerankPostprocessor(BaseNodePostprocessor):
             nodes: List[NodeWithScore],
             query_bundle: Optional[QueryBundle] = None,
     ) -> List[NodeWithScore]:
-        """Postprocess nodes."""
+        """
+        RerankPostprocessor nodes.
+        rerank逻辑：
+        1. 先按文件得分（文件内检索节点的最大分值）排序
+        2. 按照节点的pos排序
+        """
         if self.rerank is None or self._need_not_rerank(nodes):
-            return nodes
-        index_node_map = {}
-        docs = []
-        # rerank尽量输入
-        nodes = nodes[0: max(self.rerank_num, self.top_k)]
+            rerank_score_map = {x.node_id: x.score for x in nodes[:self.top_k]}
+        else:
+            nodes = nodes[:max(self.rerank_num, self.top_k)]
+            index_node_map = {i: n for i, n in enumerate(nodes)}
+            docs = [n.node.get_complete_content() for n in nodes]
 
-        for i, n in enumerate(nodes):
-            index_node_map[i] = n
-            docs.append(n.node.get_complete_content())
+            rerank_resp = self.rerank.rerank(query_bundle.query_str, docs)
+            rerank_score_map = {index_node_map[item["index"]].node_id: item["relevance_score"] for item in
+                                rerank_resp.results}
 
-        rerank_resp = self.rerank.rerank(query_bundle.query_str, docs)
-        rerank_items = rerank_resp.results
-        rerank_score_map = {}
-        # 记录节点重排后的score，不改变节点检索分值
-        for item in rerank_items:
-            rerank_score_map[index_node_map[item["index"]].node_id] = item["relevance_score"]
-        # 重新排序
-        nodes = sorted(nodes, key=lambda x: rerank_score_map.get(x.node_id), reverse=True)
+        return self._rerank_and_sort_nodes(nodes, rerank_score_map)
 
-        return nodes[0: self.top_k - 1]
+    def _rerank_and_sort_nodes(self, nodes: List[NodeWithScore], rerank_score_map: dict) -> List[NodeWithScore]:
+        rerank_score_map_new = {}
+        file_index_map = {}
+        for sindex, x in enumerate(nodes[:self.top_k]):
+            if isinstance(x.node, QaNode):
+                rerank_score_map_new[x.node_id] = [rerank_score_map.get(x.node_id), x.node.pos]
+                continue
+            doc_id = x.metadata[ke_index_structure.doc_id_key]
+            if doc_id not in file_index_map:
+                file_index_map[doc_id] = rerank_score_map.get(x.node_id)
+            rerank_score_map_new[x.node_id] = [file_index_map[doc_id], x.node.pos]
+
+        return sorted(nodes[:self.top_k],
+                      key=lambda x: (-rerank_score_map_new[x.node_id][0], rerank_score_map_new[x.node_id][1]))
 
     def _need_not_rerank(self, nodes: List[NodeWithScore]) -> bool:
         """Check if rerank is needed."""
