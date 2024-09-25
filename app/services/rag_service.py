@@ -68,10 +68,18 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
 
     documents = TransformationFactory.get_reader(file_type).load_data(stream)
 
-    transforms = [TransformationFactory.get_parser(file_type=file_type, custom_parser={"csv": BellaCsvParser()}),
-                  ChunkContentAttachedIndexExtend()]
-    storage_context = StorageContext.from_defaults(vector_store=vector_store)
-    VectorStoreIndex.from_documents(
+    transforms = []
+    storage_context = None
+    # 先这样分叉，以后看llamaIndex有没有提供更好的方式
+    if file_type == "csv":
+        storage_context = StorageContext.from_defaults(vector_store=questions_vector_store)
+        transforms = [BellaCsvParser(file_id=file_id), QuestionAnswerAttachedIndexExtend()]
+    else:
+        storage_context = StorageContext.from_defaults(vector_store=vector_store)
+        transforms = [TransformationFactory.get_parser(file_type=file_type),
+                      ChunkContentAttachedIndexExtend()]
+
+    ManyVectorStoreIndex.from_documents(
         documents, storage_context=storage_context, transformations=transforms, embed_model=embed_model,
         metadata=getDocumentMetadata(file_id=file_id, file_path=file_path, city_list=city_list)
     )
