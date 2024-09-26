@@ -8,8 +8,11 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.response_synthesizers import ResponseMode
 from llama_index.core.vector_stores import MetadataFilters, MetadataFilter
 
-from app.prompts.rag import bella_template
-from app.schema.index import KeIndex
+from app.controllers.response.tool_rag_response import FileItem, FileRetrieve, Content, Text, \
+    RagResponse, DataItem, ToolRagResponse
+from app.prompts.rag import get_rag_template
+from app.services import ke_index_structure, embed_model
+from app.services.chunk_content_attached_service import ChunkContentAttachedService
 from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend
 from app.utils.docx2pdf_util import convert_docx_to_pdf_in_memory
 from common.tool.chubaofs_tool import ChuBaoFSTool
@@ -116,9 +119,8 @@ def rag(query: str):
         retriever=retriever,
         response_synthesizer=response_synthesizer,
         node_postprocessors=[SimilarityPostprocessor(similarity_cutoff=score),
-                             CompletePostprocessor(chunk_max_length=_chunk_max_tokens(model_name=model,
-                                                                                      system_prompt=instructions,
-                                                                                      query=query),
+                             RebuildRelationPostprocessor(),
+                             CompletePostprocessor(chunk_max_length=RETRIEVAL['COMPLETE_MAX_TOKEN'],
                                                    model=model),
                              RerankPostprocessor(rerank=rerank, rerank_num=20, rerank_threshold=0.99, top_k=top_k)],
     )
@@ -147,9 +149,15 @@ def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int) -> F
     # 检索
     score_nodes = retriever._retrieve(query_bundle=QueryBundle(query_str=query))
 
-    # 还原节点关系
-    rebuild = RebuildRelationPostprocessor()
-    nodes = rebuild.postprocess_nodes(nodes=score_nodes, query_str=query)
+    node_postprocessors = [SimilarityPostprocessor(similarity_cutoff=score),
+                           RebuildRelationPostprocessor(),
+                           CompletePostprocessor(chunk_max_length=max_tokens, model="gpt-4"),
+                           RerankPostprocessor(rerank=rerank, rerank_num=int(RERANK['RERANK_NUM']),
+                                               rerank_threshold=float(RERANK['RERANK_THRESHOLD']),
+                                               top_k=top_k)]
+
+    for postprocessor in node_postprocessors:
+        score_nodes = postprocessor.postprocess_nodes(nodes=score_nodes, query_str=query)
 
     # 补全, 默认token数
     complete = CompletePostprocessor(chunk_max_length=max_tokens, model="gpt-4")
