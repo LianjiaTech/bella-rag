@@ -139,12 +139,11 @@ def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int) -> F
     metadata_filter = MetadataFilters(
         filters=[MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)])
 
-    retriever = VectorIndexRetriever(
-        index=index,
-        similarity_top_k=top_k,
-        filters=metadata_filter,
-        vector_store_kwargs={"index": ke_index_structure, "index_extend": ChunkContentAttachedIndexExtend()},
-    )
+    retrievers = [create_base_vector_retriever(index, metadata_filters, chunk_index_extend),
+                  create_base_vector_retriever(question_index, metadata_filters, question_answer_extend)]
+
+    retriever = SimilarQueryFusionRetriever(retrievers=retrievers,
+                                            similarity_top_k=int(RETRIEVAL['RETRIEVAL_NUM']))
 
     # 检索
     score_nodes = retriever._retrieve(query_bundle=QueryBundle(query_str=query))
