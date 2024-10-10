@@ -87,8 +87,11 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
         metadata=getDocumentMetadata(file_id=file_id, file_path=file_path, city_list=city_list)
     )
 
-    if callback:
-        requests.post(callback, json={"file_id": file_id, "status": "success"})
+    # 发送文件处理完成的消息
+    from app.workers import knowledge_file_index_done_producer
+    knowledge_file_index_done_msg = {"file_id": file_id, "request_id": trace_context.get(), "file_path": file_path}
+    knowledge_file_index_done_producer.sync_send_message(json.dumps(knowledge_file_index_done_msg))
+    user_logger.info(f'finish indexing file : {file_id}')
 
 
 def rag(query: str):
