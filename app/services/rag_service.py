@@ -13,13 +13,17 @@ from app.controllers.response.tool_rag_response import FileItem, FileRetrieve, C
 from app.prompts.rag import get_rag_template
 from app.services import ke_index_structure, embed_model
 from app.services.chunk_content_attached_service import ChunkContentAttachedService
-from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend
-from app.utils.docx2pdf_util import convert_docx_to_pdf_in_memory
-from common.tool.chubaofs_tool import ChuBaoFSTool
-from common.tool.vector_db_tool import vector_store
-from init.settings import OPENAPI, TENCENT_VECTOR_DB
-from ke_rag.llm.openapi import OpenAPIEmbedding, OpenAPI
-from ke_rag.postprocessor.node import RerankPostprocessor, CompletePostprocessor
+from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend, \
+    QuestionAnswerAttachedIndexExtend
+from app.transformations.parser import BellaCsvParser
+from app.utils.convert import build_annotation_from_score_node
+from common.tool.vector_db_tool import vector_store, questions_vector_store, chunk_index_extend, question_answer_extend
+from init.settings import OPENAPI, user_logger, RERANK, RETRIEVAL
+from ke_rag.callbacks.manager import register_callback
+from ke_rag.handler import streaming_handler
+from ke_rag.llm.openapi import OpenAPI, Rerank
+from ke_rag.postprocessor.node import RerankPostprocessor, CompletePostprocessor, RebuildRelationPostprocessor
+from ke_rag.preprocessor.ProcessorGenerators import StandardAnswerGenerator
 from ke_rag.response_synthesizers.response_synthesizer_factory import get_llm_response_synthesizer
 from ke_rag.schema.nodes import BaseNode
 from ke_rag.transformations.factory import TransformationFactory
