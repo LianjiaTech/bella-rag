@@ -98,13 +98,183 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
     user_logger.info(f'finish indexing file : {file_id}')
 
 
-def rag(query: str):
-    # todo： 参数补充
-    '''
-        1. Parse query to BaseNode
-        2. Indexing
-    '''
-    pass
+
+def async_file_indexing(file_id: str, file_path: str, metadata: dict, callback: str = None, ucid: str = None):
+    thread = Thread(
+        target=lambda: file_indexing(file_id=file_id, file_path=file_path, metadata=metadata, callback=callback,
+                                     ucid=ucid))
+    thread.start()
+
+
+@deprecated(version='1.0', reason="旧版rag，协议优化后切换下线")
+def rag(query: str,
+        # 检索参数
+        top_k: int = 3,
+        file_ids: List[str] = None,
+        score: float = 0.8,
+        # 模型生成参数
+        api_key: str = "",
+        model: str = "c4ai-command-r-plus",
+        instructions: str = "",
+        top_p: int = 1,
+        temperature: float = 0.01,
+        max_tokens: int = None,
+        metadata_filter: List[MetadataFilter] = [], ) -> ToolRagResponse:
+    query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
+                                    model=model, instructions=instructions, metadata_filter=metadata_filter,
+                                    top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=False)
+    res = query_engine.query(query)
+    response_data = DataItem(value=res.response,
+                             annotations=build_annotation_from_score_node(res.source_nodes, ke_index_structure))
+    return ToolRagResponse(data_items=[response_data])
+
+
+# todo 后续rag协议切过来后,调整命名
+def rag_v2(query: str,
+           retrieval_param: dict,
+           generate_param: dict,
+           api_key: str = "") -> RagResponse:
+    # 检索参数
+    top_k = retrieval_param.get('top_k', 3)
+    file_ids = retrieval_param.get('file_ids', [])
+    score = retrieval_param.get('score', 0.8)
+    metadata_filter = retrieval_param.get('metadata_filter', [])
+    # 生成参数
+    model = generate_param.get('model', 'c4ai-command-r-plus')
+    instructions = generate_param.get('instructions', '')
+    top_p = generate_param.get('top_p', 1)
+    temperature = generate_param.get('temperature', 0.8)
+    max_tokens = generate_param.get('max_tokens', None)
+
+    query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
+                                    model=model, instructions=instructions, metadata_filter=metadata_filter,
+                                    top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=False)
+    res = query_engine.query(query)
+    content = Content(index=0, type='text', text=Text(value=res.response,
+                                                      annotations=build_annotation_from_score_node(res.source_nodes,
+                                                                                                   ke_index_structure)))
+    return RagResponse(content=[content])
+
+
+@deprecated(version='1.0', reason="旧版rag，协议优化后切换下线")
+def rag_streaming(
+        query: str,
+        # 检索参数
+        top_k: int = 3,
+        file_ids: List[str] = None,
+        score: float = 0.8,
+        # 模型生成参数
+        api_key: str = "",
+        model: str = "c4ai-command-r-plus",
+        instructions: str = "",
+        top_p: int = 1,
+        temperature: float = 0.01,
+        max_tokens: int = None,
+        metadata_filter: List[MetadataFilter] = []):
+    def yield_event(event: str, data: Any):
+        yield f"event: {event}\n"
+        yield f"data: {json.dumps(data.json_response(), ensure_ascii=False)}\n\n"
+
+    query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
+                                    model=model, instructions=instructions, metadata_filter=metadata_filter,
+                                    top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=True)
+
+    streaming_response = query_engine.query(query)
+    aid = str(uuid.uuid4())
+    retrieval_send = False
+
+    for text in streaming_response.response_gen:
+        if not retrieval_send:
+            annotation_event = streaming_handler.rag_annotation_event(
+                id=aid,
+                annotations=build_annotation_from_score_node(streaming_response.source_nodes, ke_index_structure)
+            )
+            retrieval_send = True
+            user_logger.info(f"rag annotations: {annotation_event['data']}")
+            yield from yield_event(annotation_event['event'], annotation_event['data'])
+
+        msg_event = streaming_handler.rag_msg_event(id=aid, value=text)
+        yield from yield_event(msg_event['event'], msg_event['data'])
+
+
+# todo 后续rag协议切过来后,调整命名
+def rag_streaming_v2(
+        query: str,
+        retrieval_param: dict,
+        generate_param: dict,
+        api_key: str = ""):
+    # 检索参数
+    top_k = retrieval_param.get('top_k', 3)
+    file_ids = retrieval_param.get('file_ids', [])
+    score = retrieval_param.get('score', 0.8)
+    metadata_filter = retrieval_param.get('metadata_filter', [])
+    # 生成参数
+    model = generate_param.get('model', 'c4ai-command-r-plus')
+    instructions = generate_param.get('instructions', '')
+    top_p = generate_param.get('top_p', 1)
+    temperature = generate_param.get('temperature', 0.8)
+    max_tokens = generate_param.get('max_tokens', None)
+
+    def yield_event(event: str, data: Any):
+        yield f"event: {event}\n"
+        yield f"data: {json.dumps(data.json_response(), ensure_ascii=False)}\n\n"
+
+    query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
+                                    model=model, instructions=instructions, metadata_filter=metadata_filter,
+                                    top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=True)
+
+    streaming_response = query_engine.query(query)
+    request_id = get_rag_request_id()
+    aid = str(uuid.uuid4()) if not request_id else request_id
+    retrieval_send = False
+
+    llm_response = ""
+    user_logger.info(f"rag request id: {request_id} start receive stream delta")
+    for text in streaming_response.response_gen:
+        user_logger.info(f"rag request id: {request_id} message delta: {text}")
+        if not retrieval_send:
+            retrieval_event = streaming_handler.create_rag_retrieval_event(
+                id=aid,
+                nodes=streaming_response.source_nodes,
+                event_type='rag.retrieval.completed',
+            )
+            retrieval_send = True
+            user_logger.info(f"rag annotations: {retrieval_event['data'].json_response()}")
+            yield from yield_event(retrieval_event['event'], retrieval_event['data'])
+
+        msg_delta_event = streaming_handler.create_rag_msg_event(id=aid, value=text, event_type='rag.message.delta')
+        llm_response += text
+        yield from yield_event(msg_delta_event['event'], msg_delta_event['data'])
+
+    annotations = build_annotation_from_score_node(streaming_response.source_nodes, ke_index_structure)
+    msg_complete_event = streaming_handler.create_rag_msg_event(id=aid, value=llm_response, annotations=annotations,
+                                                                event_type='rag.message.completed')
+    yield from yield_event(msg_complete_event['event'], msg_complete_event['data'])
+
+
+def build_rag_engine(
+        query: str,
+        # 检索参数
+        top_k: int = 3,
+        file_ids: List[str] = None,
+        score: float = 0.8,
+        # 模型生成参数
+        api_key: str = "",
+        model: str = "c4ai-command-r-plus",
+        instructions: str = "",
+        top_p: int = 1,
+        temperature: float = 0.01,
+        max_tokens: int = None,
+        metadata_filter: List[MetadataFilter] = [],
+        stream: bool = False) -> RetrieverQueryEngine:
+    user_logger.info(f"rag start, query : {query}, file_ids : {file_ids}")
+    filters = [MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)] if file_ids else []
+    if metadata_filter:
+        filters.extend(metadata_filter)
+    metadata_filters = MetadataFilters(filters=filters)
+
+    llm = OpenAPI(temperature=temperature, api_base=OPENAPI["URL"], api_key=api_key, timeout=300,
+                  system_prompt=instructions, additional_kwargs={"top_p": top_p})
 
     retriever = VectorIndexRetriever(
         index=index,
