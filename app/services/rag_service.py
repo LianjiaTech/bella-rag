@@ -346,8 +346,9 @@ def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int) -> F
             file_name=score_node.metadata[ke_index_structure.doc_name_key],
             score=score_node.score,
             chunk_id=score_node.node_id,
-            content=score_node.get_content() if not isinstance(score_node.node, BaseNode) else score_node.node.get_complete_content(),
-            file_tag=score_node.metadata[ke_index_structure.doc_type_key]
+            content=score_node.get_content() if not isinstance(score_node.node,
+                                                               BaseNode) else score_node.node.get_complete_content(),
+            file_tag=score_node.node.get_node_type(),
         )
         items.append(item)
 
