@@ -28,6 +28,10 @@ from ke_rag.response_synthesizers.response_synthesizer_factory import get_llm_re
 from ke_rag.schema.nodes import BaseNode
 from ke_rag.transformations.factory import TransformationFactory
 from ke_rag.utils.file_util import get_file_type, get_file_name
+from ke_rag.utils.trace_log_util import trace_context, trace
+from ke_rag.vector_stores.index import VectorIndex
+from ke_rag.vector_stores.types import MetadataFilters, MetadataFilter, FilterOperator
+from ke_rag.vector_stores.vector_store import ManyVectorStoreIndex
 
 ak = OPENAPI["AK"]
 
@@ -311,7 +315,9 @@ def getDocumentMetadata(file_id: str, file_path: str, city_list: List):
     return {"source_id": file_id, "source_name": get_file_name(file_path), "extra": extra}
 
 
-def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int) -> FileRetrieve:
+@trace("retrieval")
+def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int, score: float,
+              metadata_filter: List[MetadataFilter]) -> FileRetrieve:
     user_logger.info(f"retrieval start, query : {query}, file_ids : {file_ids}, top_k : {top_k}")
     metadata_filter = MetadataFilters(
         filters=[MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)])
