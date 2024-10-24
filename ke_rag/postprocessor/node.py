@@ -50,6 +50,7 @@ class RerankPostprocessor(BaseNodePostprocessor):
         return self._rerank_and_sort_nodes(nodes, rerank_score_map)
 
     def _rerank_and_sort_nodes(self, nodes: List[NodeWithScore], rerank_score_map: dict) -> List[NodeWithScore]:
+        nodes = sorted(nodes, key=lambda x: rerank_score_map.get(x.node_id), reverse=True)
         rerank_score_map_new = {}
         file_index_map = {}
         for sindex, x in enumerate(nodes[:self.top_k]):
