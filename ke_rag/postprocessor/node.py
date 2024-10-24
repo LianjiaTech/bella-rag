@@ -37,7 +37,9 @@ class RerankPostprocessor(BaseNodePostprocessor):
         2. 按照节点的pos排序
         """
         if self.rerank is None or self._need_not_rerank(nodes):
-            rerank_score_map = {x.node_id: x.score for x in nodes[:self.top_k]}
+            rerank_score_map = {}
+            for i, node in enumerate(nodes):
+                rerank_score_map[node.node_id] = -i
         else:
             nodes = nodes[:max(self.rerank_num, self.top_k)]
             index_node_map = {i: n for i, n in enumerate(nodes)}
