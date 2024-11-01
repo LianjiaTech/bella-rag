@@ -425,6 +425,67 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+openapi_conf = conf_dict["OPENAPI"]
+
+OPENAPI = {
+    'URL': openapi_conf["api_base"],
+    'AK': openapi_conf["ak"],
+}
+
+rerank_conf = conf_dict["RERANK"]
+RERANK = {
+    'URL': rerank_conf["api_base"],
+    'MODEL': rerank_conf["model"],
+    'RERANK_NUM': rerank_conf["rerank_num"],
+    'RERANK_THRESHOLD': rerank_conf["rerank_threshold"],
+}
+
+es_conf = conf_dict["ELASTICSEARCH"]
+ELASTICSEARCH = {
+    'SEARCH_URL': es_conf["search_url"],
+    'SEARCH_TOKEN': es_conf["search_token"],
+    'DATA_URL': es_conf["data_url"],
+    'DATA_TOKEN': es_conf["data_token"],
+    'VERSION': es_conf["data_token"],
+}
+
+apollo_conf = conf_dict["APOLLO"]
+APOLLO = {
+    'APP_ID': apollo_conf["APP_ID"],
+    'PORTAL_SERVER_URL': apollo_conf["PORTAL_SERVER_URL"],
+    'CONFIG_SERVER_URL': apollo_conf["CONFIG_SERVER_URL"],
+    'AUTHORIZATION': apollo_conf["AUTHORIZATION"],
+    'ENV': apollo_conf["ENV"],
+    'CYCLE_TIME': apollo_conf["CYCLE_TIME"],
+}
+
+retrieval_conf = conf_dict["RETRIEVAL"]
+RETRIEVAL = {
+    'RETRIEVAL_NUM': retrieval_conf["retrieval_num"],
+    'TOKEN_THRESHOLD': retrieval_conf["complete_token_threshold"],
+    'COMPLETE_MAX_TOKEN': retrieval_conf["complete_max_token"],
+    'MATCH_SCORE': retrieval_conf["match_score"],
+}
+
+chubaofs_conf = conf_dict["CHUBAOFS"]
+
+CHUBAOFS = {
+    'HOSTNAME': chubaofs_conf["hostname"],
+    'USERNAME': chubaofs_conf["username"],
+    'PASSWORD': chubaofs_conf["password"],
+}
+
+kafka_conf = conf_dict["KAFKA"]
+
+KAFKA = {
+    'KNOWLEDGE_INDEX_TASK_BOOTSTRAP_SERVERS': kafka_conf["knowledge_index_task_bootstrap_servers"],
+    'KNOWLEDGE_INDEX_TASK_TOPIC': kafka_conf["knowledge_index_task_topic"],
+    'KNOWLEDGE_INDEX_GROUP_ID': kafka_conf["knowledge_index_group_id"],
+
+    "KNOWLEDGE_FILE_INDEX_DONE_BOOTSTRAP_SERVERS": kafka_conf["knowledge_file_index_done_bootstrap_servers"],
+    'KNOWLEDGE_FILE_INDEX_DONE_TOPIC': kafka_conf["knowledge_file_index_done_topic"],
+    'KNOWLEDGE_FILE_INDEX_DONE_GROUP_ID': kafka_conf["knowledge_file_index_done_group_id"],
+}
 
 LANGUAGE_CODE = 'en-us'
 
