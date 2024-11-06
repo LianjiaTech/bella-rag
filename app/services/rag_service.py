@@ -19,6 +19,7 @@ from app.transformations.parser import BellaCsvParser
 from app.utils.convert import build_annotation_from_score_node
 from common.tool.vector_db_tool import vector_store, questions_vector_store, chunk_index_extend, question_answer_extend
 from init.settings import OPENAPI, user_logger, RERANK, RETRIEVAL
+from ke_rag import callback_manager
 from ke_rag.callbacks.manager import register_callback
 from ke_rag.handler import streaming_handler
 from ke_rag.llm.openapi import OpenAPI, Rerank
@@ -329,7 +330,8 @@ def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int, scor
                                             similarity_top_k=int(RETRIEVAL['RETRIEVAL_NUM']))
 
     # 检索
-    score_nodes = retriever._retrieve(query_bundle=QueryBundle(query_str=query))
+    with callback_manager.as_trace("retrieve"):
+        score_nodes = retriever._retrieve(query_bundle=QueryBundle(query_str=query))
 
     node_postprocessors = [SimilarityPostprocessor(similarity_cutoff=score),
                            RebuildRelationPostprocessor(),
