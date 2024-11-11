@@ -26,6 +26,8 @@ from ke_rag.llm.openapi import OpenAPI, Rerank
 from ke_rag.postprocessor.node import RerankPostprocessor, CompletePostprocessor, RebuildRelationPostprocessor
 from ke_rag.preprocessor.ProcessorGenerators import StandardAnswerGenerator
 from ke_rag.response_synthesizers.response_synthesizer_factory import get_llm_response_synthesizer
+from ke_rag.retrievals.fusion_retrievel import QueryFusionRetriever
+from ke_rag.retrievals.retriever import VectorIndexRetriever
 from ke_rag.schema.nodes import BaseNode
 from ke_rag.transformations.factory import TransformationFactory
 from ke_rag.utils.file_util import get_file_type, get_file_name
@@ -281,13 +283,10 @@ def build_rag_engine(
     llm = OpenAPI(temperature=temperature, api_base=OPENAPI["URL"], api_key=api_key, timeout=300,
                   system_prompt=instructions, additional_kwargs={"top_p": top_p})
 
-    retriever = VectorIndexRetriever(
-        index=index,
-        similarity_top_k=top_k,
-        filters=metadata_filter,
-        vector_store_kwargs={"index": KeIndex(), "index_extend": ChunkContentAttachedIndexExtend()},
-    )
-
+    # 构建多路检索器
+    retriever = create_fusion_retriever(metadata_filters=metadata_filters,
+                                        fusion_mode=FUSION_MODES.RECIPROCAL_RANK,
+                                        score=score)
     response_synthesizer = get_llm_response_synthesizer(
         llm=llm,
         model=model,
@@ -323,11 +322,10 @@ def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int, scor
     metadata_filter = MetadataFilters(
         filters=[MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)])
 
-    retrievers = [create_base_vector_retriever(index, metadata_filters, chunk_index_extend),
-                  create_base_vector_retriever(question_index, metadata_filters, question_answer_extend)]
-
-    retriever = SimilarQueryFusionRetriever(retrievers=retrievers,
-                                            similarity_top_k=int(RETRIEVAL['RETRIEVAL_NUM']))
+    # 构建多路检索器
+    retriever = create_fusion_retriever(metadata_filters=metadata_filters,
+                                        fusion_mode=FUSION_MODES.RECIPROCAL_RANK,
+                                        score=score)
 
     # 检索
     with callback_manager.as_trace("retrieve"):
@@ -384,3 +382,52 @@ def rename_file(file_id: str, file_name: str):
     condition = "source_id=\"{}\"".format(file_id)
     vector_filter = Filter(cond=condition)
     vector_store.collection.update(data=doc, filter=vector_filter)
+
+
+# 构建混合检索器
+def create_fusion_retriever(metadata_filters: MetadataFilters,
+                            score: float,
+                            fusion_mode: FUSION_MODES,) -> QueryFusionRetriever:
+    retrievers = [
+        create_base_vector_retriever(index, metadata_filters, {"index": ke_index_structure, "retrieve_vector": False,
+                                                               "index_extend": chunk_index_extend}, score),
+        create_base_vector_retriever(question_index, metadata_filters,
+                                     {"index": ke_question_index_structure, "retrieve_vector": False,
+                                      "index_extend": question_answer_extend},
+                                     score)]
+
+    vector_retriever = SimilarQueryFusionRetriever(retrievers=retrievers,
+                                                   similarity_top_k=int(RETRIEVAL['RETRIEVAL_NUM']))
+
+    es_retriever = create_base_vector_retriever(es_index, metadata_filters,
+                                                {"index": es_index_structure, "index_extends": [chunk_index_extend,
+                                                                                                question_answer_extend]},
+                                                None)
+    # 构建多路检索器
+    return MultiRecallFusionRetriever(retrievers=[vector_retriever, es_retriever],
+                                      similarity_top_k=int(RETRIEVAL['RETRIEVAL_NUM']),
+                                      use_async=False,
+                                      mode=fusion_mode)
+
+
+# 构建基本向量检索器
+def create_base_vector_retriever(vector_store_index: VectorStoreIndex,
+                                 metadata_filters: MetadataFilters,
+                                 vector_store_kwargs: dict,
+                                 similarity_cutoff: float) -> BaseRetriever:
+    return VectorIndexRetriever(
+        index=vector_store_index,
+        similarity_top_k=int(RETRIEVAL['RETRIEVAL_NUM']),
+        filters=metadata_filters,
+        vector_store_kwargs=vector_store_kwargs,
+        similarity_cutoff=similarity_cutoff,
+        rerank_threshold=float(RERANK['RERANK_THRESHOLD']),
+    )
+
+
+def get_rag_request_id():
+    try:
+        return trace_context.get()
+    except Exception:
+        # 上下文找不到trace_id则直接返回
+        return None
