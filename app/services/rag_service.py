@@ -1,7 +1,9 @@
 from typing import List
 
-import requests
-from llama_index.core import StorageContext, VectorStoreIndex
+import redis
+from deprecated.sphinx import deprecated
+from llama_index.core.base.base_retriever import BaseRetriever
+from llama_index.core import StorageContext, VectorStoreIndex, QueryBundle, Settings
 from llama_index.core.indices.vector_store import VectorIndexRetriever
 from llama_index.core.postprocessor import SimilarityPostprocessor
 from llama_index.core.query_engine import RetrieverQueryEngine
@@ -17,7 +19,12 @@ from app.services.index_extend.db_transformation import ChunkContentAttachedInde
     QuestionAnswerAttachedIndexExtend
 from app.transformations.parser import BellaCsvParser
 from app.utils.convert import build_annotation_from_score_node
-from common.tool.vector_db_tool import vector_store, questions_vector_store, chunk_index_extend, question_answer_extend
+from app.utils.convert import trans_metadata_to_extra
+from common.handler.openapi_error_handler import mock_request_context
+from common.tool.es_db_tool import es_store
+from common.tool.redis_tool import redis_pool
+from common.tool.vector_db_tool import questions_vector_store, chunk_index_extend, question_answer_extend
+from common.tool.vector_db_tool import vector_store
 from init.settings import OPENAPI, user_logger, RERANK, RETRIEVAL
 from ke_rag import callback_manager
 from ke_rag.callbacks.manager import register_callback
@@ -55,13 +62,16 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
         3. Parse Document to BaseNode
         4. Indexing
     '''
-
+    # todo 临时做去重，用于算法同学上传
+    redis_key_prefix = "file_indexing_success_tmp_"
     redis_client = redis.Redis(connection_pool=redis_pool)
-    redis_key_prefix = "file_indexing_success_wyk_"
+
     has_done = redis_client.get(redis_key_prefix + file_id)
     if has_done:
-        logger.info("已经消费完成，不需要再次消费 file_id = %s", file_id)
-        return
+        logger.info("文件已经上传完成，不需要再次上传 file_id = %s", file_id)
+        return True
+    # 设置UID到context，embedding请求会使用
+    u_token = user_context.set(ucid)
 
     if callback:
         register_callback(callback)
@@ -103,6 +113,7 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
     knowledge_file_index_done_msg = {"file_id": file_id, "request_id": trace_context.get(), "file_path": file_path}
     knowledge_file_index_done_producer.sync_send_message(json.dumps(knowledge_file_index_done_msg))
     user_logger.info(f'finish indexing file : {file_id}')
+    redis_client.setex(redis_key_prefix + file_id, 86400, "done")
 
 
 
