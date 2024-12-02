@@ -6,7 +6,7 @@ from llama_index.core.schema import NodeWithScore, QueryBundle
 from app.services import ke_index_structure
 from init.settings import user_logger
 from ke_rag.llm.openapi import Rerank
-from ke_rag.schema.nodes import BaseNode, StructureNode, QaNode
+from ke_rag.schema.nodes import BaseNode, StructureNode, QaNode, NodeWithScore, ContextualNode, DocumentNodeRelationship
 from ke_rag.utils.complete_util import small2big, Small2BigModes
 from ke_rag.utils.schema_util import restore_relationships
 from ke_rag.utils.trace_log_util import trace
@@ -95,14 +95,42 @@ class CompletePostprocessor(BaseNodePostprocessor):
                   ) -> List[NodeWithScore]:
         if not nodes:
             return []
-        complete_res = []
-        for n in nodes:
-            if n.node in complete_nodes:
-                # 如果该检索节点已被补过，则去除该节点重新计算token补全
-                nodes.remove(n)
-                return self._complete(nodes, complete_nodes, chunk_max_len / len(nodes))
-            # 只有有结构的node才能补全
-            if isinstance(n.node, StructureNode):
-                n.node.set_content(_small2big(n.node, chunk_max_len, complete_nodes, self.model))
-            complete_res.append(n)
-        return complete_res
+
+        score_node_map = {node.node_id: (node, index) for index, node in enumerate(nodes)}
+        complete_nodes = [node.node for node in nodes if isinstance(node.node, StructureNode)]
+        res = [(node, index) for index, node in enumerate(nodes) if not isinstance(node.node, StructureNode)]
+
+        for complete_node in complete_nodes:
+            # 将上下文节点的score替换为检索到的分数最高的子节点score
+            # 防止检索分数较低的上下文节点补全后无法进入top20 rerank
+            if not isinstance(complete_node, ContextualNode):
+                contextual_node = complete_node.doc_relationships.get(DocumentNodeRelationship.CONTEXTUAL)
+                if contextual_node and contextual_node.node_id in score_node_map:
+                    new_index = min(score_node_map[contextual_node.node_id][1],
+                                    score_node_map[complete_node.node_id][1])
+                    score_node_map[contextual_node.node_id] = (score_node_map[contextual_node.node_id][0], new_index)
+
+        complete_res = small2big(complete_nodes, chunk_max_len, self.model, Small2BigModes.CONTEXT_MERGE)
+        for node in complete_res:
+            score_node, original_index = score_node_map[node.node_id]
+            score_node.node = node
+            res.append((score_node, original_index))
+
+        res.sort(key=lambda x: x[1])
+        return [node for node, _ in res]
+
+
+class RebuildRelationPostprocessor(BaseNodePostprocessor):
+    """RebuildRelation postprocessor."""
+
+    @trace(step="rebuild_relations", log_enabled=False)
+    def _postprocess_nodes(
+            self,
+            nodes: List[NodeWithScore],
+            query_bundle: Optional[QueryBundle] = None,
+    ) -> List[NodeWithScore]:
+        """Postprocess nodes."""
+        # 还原节点relation关系
+        restore_relationships(nodes=nodes)
+        return nodes
+
