@@ -110,7 +110,11 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
 
     # 发送文件处理完成的消息
     from app.workers import knowledge_file_index_done_producer
-    knowledge_file_index_done_msg = {"file_id": file_id, "request_id": trace_context.get(), "file_path": file_path}
+    knowledge_file_index_done_msg = {
+        "file_id": file_id,
+        "request_id": trace_context.get(),
+        "file_path": file_path,
+        "ucid": ucid}
     knowledge_file_index_done_producer.sync_send_message(json.dumps(knowledge_file_index_done_msg))
     user_logger.info(f'finish indexing file : {file_id}')
     redis_client.setex(redis_key_prefix + file_id, 86400, "done")
