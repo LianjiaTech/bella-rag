@@ -311,7 +311,13 @@ def build_rag_engine(
         service_context=None,
     )
 
-    query_engine = RetrieverQueryEngine(
+    # 根据提供插件构建后置处理器
+    node_postprocessors = build_postprocessor_from_plugins(plugins, model=model)
+    # 添加默认后置处理器
+    node_postprocessors.extend([RerankPostprocessor(rerank=rerank, rerank_num=int(RERANK['RERANK_NUM']), top_k=top_k),
+                                ScorePostprocessor(rerank_score_cutoff=score) if retrieve_mode == RetrievalMode.FUSION else ScorePostprocessor()])
+
+    return RetrieverQueryEngine(
         retriever=retriever,
         response_synthesizer=response_synthesizer,
         node_postprocessors=[SimilarityPostprocessor(similarity_cutoff=score),
@@ -346,12 +352,11 @@ def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int, scor
     with callback_manager.as_trace("retrieve"):
         score_nodes = retriever._retrieve(query_bundle=QueryBundle(query_str=query))
 
-    node_postprocessors = [SimilarityPostprocessor(similarity_cutoff=score),
-                           RebuildRelationPostprocessor(),
-                           CompletePostprocessor(chunk_max_length=max_tokens, model="gpt-4"),
-                           RerankPostprocessor(rerank=rerank, rerank_num=int(RERANK['RERANK_NUM']),
-                                               rerank_threshold=float(RERANK['RERANK_THRESHOLD']),
-                                               top_k=top_k)]
+    # 根据提供插件构建后置处理器
+    node_postprocessors = build_postprocessor_from_plugins(plugins, model=DEFAULT_MODEL, max_tokens=max_tokens)
+    # 添加默认后置处理器
+    node_postprocessors.extend([RerankPostprocessor(rerank=rerank, rerank_num=int(RERANK['RERANK_NUM']), top_k=top_k),
+                                ScorePostprocessor(rerank_score_cutoff=score) if retrieve_mode == RetrievalMode.FUSION else ScorePostprocessor()])
 
     for postprocessor in node_postprocessors:
         score_nodes = postprocessor.postprocess_nodes(nodes=score_nodes, query_str=query)

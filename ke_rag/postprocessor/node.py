@@ -134,3 +134,46 @@ class RebuildRelationPostprocessor(BaseNodePostprocessor):
         restore_relationships(nodes=nodes)
         return nodes
 
+
+class ScorePostprocessor(BaseNodePostprocessor):
+    """节点score处理器"""
+    rerank_score_cutoff: Optional[float] = None
+
+    def _postprocess_nodes(
+            self,
+            nodes: List[NodeWithScore],
+            query_bundle: Optional[QueryBundle] = None,
+    ) -> List[NodeWithScore]:
+        """Postprocess nodes."""
+        res = []
+        for node in nodes:
+            node.score = node.score or 0
+            if self.rerank_score_cutoff and node.rerank_score:
+                normalized_score = self._normalized_rerank_score(node.rerank_score)
+                node.score = normalized_score
+                if normalized_score > self.rerank_score_cutoff:
+                    res.append(node)
+            else:
+                res.append(node)
+        return res
+
+    def _normalized_rerank_score(self, rerank_score: float):
+        """对rerank分数做归一化"""
+        normalized_score = (rerank_score + 10) / 20
+        return max(0.0, min(1.0, normalized_score))
+
+
+def build_postprocessor_from_plugins(plugins: List[Plugin], **kwargs) -> List[BaseNodePostprocessor]:
+    """从插件中构建后置处理器"""
+    post_processors = []
+    for plugin in plugins:
+        # 插件中包含补全器
+        if isinstance(plugin, Completer):
+            # todo 当前接口仍支持传参max_token，临时以用户传参为准，后续全切换为插件内置参数
+            chunk_max_length = kwargs['max_tokens'] if 'max_tokens' in kwargs and kwargs['max_tokens'] is not None \
+                else plugin.complete_max_length
+            post_processors.extend([RebuildRelationPostprocessor(),
+                                    CompletePostprocessor(chunk_max_length=chunk_max_length,
+                                                          small2big_strategy=plugin.complete_mode,
+                                                          **kwargs)])
+    return post_processors
