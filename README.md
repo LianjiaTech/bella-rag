@@ -171,3 +171,18 @@ python3 app.py delete app_test
 > sh bin/run.sh stop : 停止服务
 > sh bin/run.sh start : 仅后台启动django服务
 > sh bin/run.sh install : 环境创建、安装包依赖
+ 
+## mac系统启动mysql连接问题
+
+> mac系统部分内置了mysql 非8.x的版本，在django启动的时候会报如下错：
+>
+> django.db.utils.OperationalError: (2059, "Authentication plugin 'mysql_native_password' cannot be loaded: dlopen(/opt/homebrew/Cellar/mysql/9.1.0_1/lib/plugin/mysql_native_password.so, 0x0002): tried: '/opt/homebrew/Cellar/mysql/9.1.0_1/lib/plugin/mysql_native_password.so' (no such file), 
+
+> 解决方式参考：https://github.com/Homebrew/homebrew-core/issues/180498
+> 需将mysql版本切换至8.x
+
+```
+brew install mysql-client@8.4
+brew unlink mysql
+brew link mysql-client@8.4
+```
