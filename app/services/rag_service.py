@@ -296,7 +296,18 @@ def build_rag_engine(
     metadata_filters = MetadataFilters(filters=filters)
 
     llm = OpenAPI(temperature=temperature, api_base=OPENAPI["URL"], api_key=api_key, timeout=300,
-                  system_prompt=instructions, additional_kwargs={"top_p": top_p})
+                  system_prompt=instructions, additional_kwargs={"top_p": top_p}, model=model)
+
+    # 构建检索器
+    # todo bypass传递有点深，可以加一个no return的retriever
+    bypass_retrieve = not file_ids
+    retriever = create_retriever_by_mode(metadata_filters=metadata_filters, bypass_retrieve=bypass_retrieve,
+                                         score=score, retrieve_mode=retrieve_mode, plugins=plugins)
+
+    # 根据提供插件构建后置处理器
+    node_postprocessors = get_components_from_plugins(plugins, BaseNodePostprocessor)
+    # 添加默认后置处理器
+    node_postprocessors.extend(build_postprocessor_from_retrieve_param(score, top_k, retrieve_mode))
 
     # 构建多路检索器
     retriever = create_fusion_retriever(metadata_filters=metadata_filters,
@@ -340,8 +351,12 @@ def getDocumentMetadata(file_id: str, file_path: str, city_list: List):
 def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int, score: float,
               metadata_filter: List[MetadataFilter]) -> FileRetrieve:
     user_logger.info(f"retrieval start, query : {query}, file_ids : {file_ids}, top_k : {top_k}")
-    metadata_filter = MetadataFilters(
-        filters=[MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)])
+    token = query_embedding_context.set([])
+    file_ids = file_service.filter_deleted_files(file_ids)
+    filters = [MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)] if file_ids else []
+    if metadata_filter:
+        filters.extend(metadata_filter)
+    metadata_filters = MetadataFilters(filters=filters)
 
     # 构建多路检索器
     retriever = create_fusion_retriever(metadata_filters=metadata_filters,
