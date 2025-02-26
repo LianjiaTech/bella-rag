@@ -487,6 +487,14 @@ KAFKA = {
     'KNOWLEDGE_FILE_INDEX_DONE_GROUP_ID': kafka_conf["knowledge_file_index_done_group_id"],
 }
 
+oauth_conf = conf_dict["OAUTH"]
+
+OAUTH = {
+    'url': oauth_conf["url"],
+    'client_id': oauth_conf["client_id"],
+    'client_secret': oauth_conf["client_secret"],
+}
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Shanghai'
