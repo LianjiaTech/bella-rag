@@ -1,7 +1,7 @@
 import base64
 import hmac
 import uuid
-from _sha2 import sha256
+from hashlib import sha256
 from urllib.error import HTTPError
 
 import requests
