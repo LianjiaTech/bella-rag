@@ -77,10 +77,10 @@ def file_indexing(file_id: str, file_path: str, callback: str = None):
         register_callback(callback)
 
 
-    user_logger.info(f'start indexing file : {file_id}, path : {file_path}, city_list:{city_list}')
-    chubao = ChuBaoFSTool()
-    stream = chubao.read_file(file_path)
-    file_type = get_file_type(file_path)
+    # 文件大小校验
+    file = file_info(file_id)
+    if file and int(file.get('bytes')) > 30000000:
+        raise FileCheckException(f"文件大小超过30M：{file.get('bytes')}")
 
     # docx文件转为pdf处理（短期内）
     if file_type in ["doc", "docx"]:
