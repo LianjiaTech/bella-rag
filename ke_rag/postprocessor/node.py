@@ -36,20 +36,29 @@ class RerankPostprocessor(BaseNodePostprocessor):
         1. 先按文件得分（文件内检索节点的最大分值）排序
         2. 按照节点的pos排序
         """
-        if self.rerank is None or self._need_not_rerank(nodes):
-            rerank_score_map = {}
-            for i, node in enumerate(nodes):
-                rerank_score_map[node.node_id] = -i
-        else:
-            nodes = nodes[:max(self.rerank_num, self.top_k)]
-            index_node_map = {i: n for i, n in enumerate(nodes)}
-            docs = [n.node.get_complete_content() for n in nodes]
+        try:
+            if self.rerank is None or self._need_not_rerank(nodes):
+                rerank_score_map = {}
+                nodes = sorted(nodes, key=lambda x: x.score if x.score else 0, reverse=True)
+                for i, node in enumerate(nodes):
+                    rerank_score_map[node.node_id] = -i
+                return self._rerank_and_sort_nodes(nodes, rerank_score_map)
+            else:
+                nodes = nodes[:max(self.rerank_num, self.top_k)]
+                index_node_map = {i: n for i, n in enumerate(nodes)}
+                docs = [n.node.get_complete_content(MetadataMode.RERANK) for n in nodes]
 
-            rerank_resp = self.rerank.rerank(query_bundle.query_str, docs)
-            rerank_score_map = {index_node_map[item["index"]].node_id: item["relevance_score"] for item in
-                                rerank_resp.results}
-
-        return self._rerank_and_sort_nodes(nodes, rerank_score_map)
+                rerank_resp = self.rerank.rerank(query_bundle.query_str, docs)
+                rerank_score_map = {index_node_map[item["index"]].node_id: item["relevance_score"] for item in
+                                    rerank_resp.results}
+                rerank_nodes = self._rerank_and_sort_nodes(nodes, rerank_score_map)
+                for node in rerank_nodes:
+                    # 补充rerank分数
+                    node.rerank_score = rerank_score_map.get(node.node_id)
+                return rerank_nodes
+        except Exception as e:
+            user_logger.error(f'rerank failed: {str(e)}')
+            return nodes
 
     def _rerank_and_sort_nodes(self, nodes: List[NodeWithScore], rerank_score_map: dict) -> List[NodeWithScore]:
         nodes = sorted(nodes, key=lambda x: rerank_score_map.get(x.node_id), reverse=True)
