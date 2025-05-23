@@ -1,9 +1,5 @@
 # coding:utf-8
-"""
-Author:王吉亮
-Date:20161027
-Desc:配置文件转换类，将.conf的配置文件转换为dict
-"""
+
 import configparser
 
 
