@@ -17,7 +17,11 @@ trace_context = contextvars.ContextVar("trace_id")
 tag = 'rag_tag'
 
 
-def trace_log(step):
+def trace(step, log_enabled=True, progress=''):
+    """
+    step: 原子步骤
+    progress：阶段名，可以是多个step的集合
+    """
     def decorator(func):
         def wrapper(*args, **kwargs):
 
