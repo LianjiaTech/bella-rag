@@ -46,7 +46,6 @@ else:
     print("读取配置文件：config_local_mac.ini")
 
 conf_dict = Config().get_conf_dict_by_file(conf_file)  # 初始化配置文件
-config.read(conf_file)  # 文档解析配置，现在这种方式不好，需要document_parse提供新的入口方法，把组件注进去
 
 print("配置：conf_dict: \n%s" % conf_dict)
 print("################################################################################################")
