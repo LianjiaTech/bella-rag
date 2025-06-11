@@ -19,99 +19,12 @@ python>=3.8
 dockerfile-ke中的依赖
 
 # python包管理
-## 新建
-新建子包，选择创建readers或者index下的子包，子包名称为demo_package，里面包含一个demo_package文件和一个__init__.py文件
-并会在tests目录下对应的readers或者index下，新建一个test_demo_package.py文件
-```sh
-python bin/packageManage.py create index demo_package
-python bin/packageManage.py create readers demo_package
+> readers:数据连接器,从各种来源和格式摄取数据，并将其转换为由文本和基本元数据组成的简化文档表示形式。<br>
+> parser:
+> 将文档处理为节点，节点是更细粒度的数据实体，表示源文档的“块”，可以是文本块、图像或其他类型的数据。它们还携带元数据和与其他节点的关系信息，这有助于构建更加结构化和关系型的索引。<br>
+> indexer:结构化索引,在被摄取的数据上构建结构化索引，这些数据表示为文档或节点。这种索引有助于对数据进行有效的查询。<br>
 
-2. **Customized**: `llama-index-core` (https://pypi.org/project/llama-index-core/). Install core LlamaIndex and add your chosen LlamaIndex integration packages ([temporary registry](https://pretty-sodium-5e0.notion.site/ce81b247649a44e4b6b35dfb24af28a6?v=53b3c2ced7bb4c9996b81b83c9f01139))
-   that are required for your application. There are over 300 LlamaIndex integration
-   packages that work seamlessly with core, allowing you to build with your preferred
-   LLM, embedding, and vector store providers.
 
-The LlamaIndex Python library is namespaced such that import statements which
-include `core` imply that the core package is being used. In contrast, those
-statements without `core` imply that an integration package is being used.
-
-```python
-# typical pattern
-from llama_index.core.xxx import ClassABC  # core submodule xxx
-from llama_index.xxx.yyy import (
-    SubclassABC,
-)  # integration yyy for submodule xxx
-
-# concrete example
-from llama_index.core.llms import LLM
-from llama_index.llms.openai import OpenAI
-```
-
-## 删除
-删除子模块，选择删除readers或者index下的子包，子包名称为demo_package，会将子包及其测试文件进行删除
-```sh
-python bin/packageManage.py delete index demo_package
-python bin/packageManage.py delete readers demo_package
-
-LlamaIndex.TS (Typescript/Javascript): https://github.com/run-llama/LlamaIndexTS.
-
-Documentation: https://docs.llamaindex.ai/en/stable/.
-
-Twitter: https://twitter.com/llama_index.
-
-Discord: https://discord.gg/dGcwcsnxhU.
-
-### Ecosystem
-
-- LlamaHub (community library of data loaders): https://llamahub.ai.
-- LlamaLab (cutting-edge AGI projects using LlamaIndex): https://github.com/run-llama/llama-lab.
-
-## 🚀 Overview
-
-**NOTE**: This README is not updated as frequently as the documentation. Please check out the documentation above for the latest updates!
-
-### Context
-
-- LLMs are a phenomenal piece of technology for knowledge generation and reasoning. They are pre-trained on large amounts of publicly available data.
-- How do we best augment LLMs with our own private data?
-
-We need a comprehensive toolkit to help perform this data augmentation for LLMs.
-
-### Proposed Solution
-
-That's where **LlamaIndex** comes in. LlamaIndex is a "data framework" to help you build LLM apps. It provides the following tools:
-
-- Offers **data connectors** to ingest your existing data sources and data formats (APIs, PDFs, docs, SQL, etc.).
-- Provides ways to **structure your data** (indices, graphs) so that this data can be easily used with LLMs.
-- Provides an **advanced retrieval/query interface over your data**: Feed in any LLM input prompt, get back retrieved context and knowledge-augmented output.
-- Allows easy integrations with your outer application framework (e.g. with LangChain, Flask, Docker, ChatGPT, anything else).
-
-LlamaIndex provides tools for both beginner users and advanced users. Our high-level API allows beginner users to use LlamaIndex to ingest and query their data in
-5 lines of code. Our lower-level APIs allow advanced users to customize and extend any module (data connectors, indices, retrievers, query engines, reranking modules),
-to fit their needs.
-
-## 💡 Contributing
-
-Interested in contributing? Contributions to LlamaIndex core as well as contributing
-integrations that build on the core are both accepted and highly encouraged! See our [Contribution Guide](CONTRIBUTING.md) for more details.
-
-## 📄 Documentation
-
-Full documentation can be found here: https://docs.llamaindex.ai/en/latest/.
-
-Please check it out for the most up-to-date tutorials, how-to guides, references, and other resources!
-
-## 💻 Example Usage
-
-```sh
-# custom selection of integrations to work with core
-pip install llama-index-core
-pip install llama-index-llms-openai
-pip install llama-index-llms-replicate
-pip install llama-index-embeddings-huggingface
-```
-
-Examples are in the `docs/examples` folder. Indices are in the `indices` folder (see list of indices below).
 
 # http服务
 
