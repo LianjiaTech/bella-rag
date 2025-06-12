@@ -35,9 +35,8 @@ from ke_rag.llm.openapi import OpenAPI, Rerank
 from ke_rag.postprocessor.node import RerankPostprocessor, CompletePostprocessor, RebuildRelationPostprocessor
 from ke_rag.preprocessor.ProcessorGenerators import StandardAnswerGenerator
 from ke_rag.response_synthesizers.response_synthesizer_factory import get_llm_response_synthesizer
-from ke_rag.retrievals.fusion_retrievel import QueryFusionRetriever
-from ke_rag.retrievals.retriever import VectorIndexRetriever
-from ke_rag.schema.nodes import BaseNode
+from ke_rag.schema.nodes import BaseNode, StructureNode
+from ke_rag.transformations.extractor.extractors import EXTRACTOR_CONTEXT
 from ke_rag.transformations.factory import TransformationFactory
 from ke_rag.utils.file_util import get_file_type, get_file_name
 from ke_rag.utils.trace_log_util import trace_context, trace
