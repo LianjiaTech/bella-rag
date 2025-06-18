@@ -1,11 +1,8 @@
 from typing import List
 
-import redis
-from deprecated.sphinx import deprecated
-from llama_index.core.base.base_retriever import BaseRetriever
-from llama_index.core import StorageContext, VectorStoreIndex, QueryBundle, Settings
-from llama_index.core.indices.vector_store import VectorIndexRetriever
-from llama_index.core.postprocessor import SimilarityPostprocessor
+from llama_index.core import QueryBundle, Response
+from llama_index.core.base.llms.types import ChatResponse
+from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.response_synthesizers import ResponseMode
 from llama_index.core.vector_stores import MetadataFilters, MetadataFilter
@@ -131,6 +128,114 @@ def async_file_indexing(file_id: str, file_path: str, metadata: dict, callback: 
 
 @deprecated(version='1.0', reason="旧版rag，协议优化后切换下线")
 def rag(query: str,
+        top_k: int = 3,
+        file_ids: List[str] = None,
+        score: float = 0,
+        api_key: str = "",
+        model: str = "c4ai-command-r-plus",
+        instructions: str = "",
+        top_p: int = 1,
+        temperature: float = 0.01,
+        max_tokens: int = None,
+        metadata_filters: MetadataFilters = None,
+        retrieve_mode: RetrievalMode = RetrievalMode.SEMANTIC,
+        plugins: List[Plugin] = None,
+        show_quote: bool = False,
+        event_handler: BaseEventHandler = default_event_handler):
+    token = query_embedding_context.set([])
+    file_ids = file_service.filter_deleted_files(file_ids)
+    query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
+                                    model=model, instructions=instructions,
+                                    metadata_filters=metadata_filters,
+                                    top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=False,
+                                    retrieve_mode=retrieve_mode, plugins=plugins, show_quote=show_quote)
+    res = query_engine.query(query)
+    query_embedding_context.reset(token)
+    if isinstance(res, Response):
+        return event_handler.convert_query_res_to_rag_response(res.response, res.source_nodes, [])
+    else:
+        text = res.message.content or ""
+        return event_handler.convert_query_res_to_rag_response(text, res.source_nodes, res.message.sensitives)
+
+
+def rag_streaming(
+        query: str,
+        top_k: int = 3,
+        file_ids: List[str] = None,
+        score: float = 0,
+        api_key: str = "",
+        model: str = "c4ai-command-r-plus",
+        instructions: str = "",
+        top_p: int = 1,
+        temperature: float = 0.01,
+        max_tokens: int = None,
+        metadata_filters: MetadataFilters = None,
+        retrieve_mode: RetrievalMode = RetrievalMode.SEMANTIC,
+        plugins: List[Plugin] = None,
+        show_quote: bool = False,
+        event_handler: BaseEventHandler = default_event_handler):
+    # 初始化流式handler
+    streaming_handler = RAGStreamingHandler(event_handler)
+    trace_args = list(locals().values())
+    embedding_token = query_embedding_context.set([])
+    start = int(time.time() * 1000)
+
+    file_ids = file_service.filter_deleted_files(file_ids)
+    query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
+                                    model=model, instructions=instructions,
+                                    metadata_filters=metadata_filters,
+                                    top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=True,
+                                    retrieve_mode=retrieve_mode, plugins=plugins, show_quote=show_quote)
+
+    streaming_response = query_engine.query(query)
+    aid = str(uuid.uuid4()) if not TraceContext.trace_id else TraceContext.trace_id
+    retrieval_send = False
+
+    llm_response = ""
+    user_logger.info(f"rag request id: {TraceContext.trace_id} start receive stream delta")
+    error_request = False
+    for item in streaming_response.response_gen:
+        user_logger.info(f"rag request id: {TraceContext.trace_id} message delta: {item}")
+        if not retrieval_send:
+            retrieval_send = True
+            yield from streaming_handler.create_retrieval_stream(
+                id=aid,
+                nodes=streaming_response.source_nodes,
+                event_type='retrieval.completed',
+            )
+
+        if isinstance(item, APIError):
+            error_request = True
+            log_trace('rag_streaming', TraceContext.trace_id, int(time.time() * 1000) - start, start, '', item,
+                      trace_args)
+            yield from streaming_handler.create_error_stream(
+                id=aid, event_type='error', error=item,
+            )
+        elif isinstance(item, list) and item and isinstance(item[0], Sensitive):
+            # 敏感词事件透传
+            yield from streaming_handler.create_error_stream(
+                id=aid, sensitives=item, event_type='message.sensitives'
+            )
+        else:
+            llm_response += item
+            yield from streaming_handler.create_msg_stream(
+                id=aid, value=item, event_type='message.delta'
+            )
+    msg_complete_event = streaming_handler.create_msg_stream(id=aid, value=llm_response,
+                                                             nodes=streaming_response.source_nodes,
+                                                             event_type='message.completed')
+    if not error_request:
+        log_trace('rag_streaming', TraceContext.trace_id, int(time.time() * 1000) - start, start,
+                  llm_response, '', trace_args)
+        yield from msg_complete_event
+
+    # 发送done包
+    yield from streaming_handler.create_done()
+    query_embedding_context.reset(embedding_token)
+
+
+def build_rag_engine(
+        query: str,
         # 检索参数
         top_k: int = 3,
         file_ids: List[str] = None,
