@@ -229,8 +229,6 @@ def rag_streaming(
                   llm_response, '', trace_args)
         yield from msg_complete_event
 
-    # 发送done包
-    yield from streaming_handler.create_done()
     query_embedding_context.reset(embedding_token)
 
 
