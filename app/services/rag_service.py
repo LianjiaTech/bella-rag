@@ -10,21 +10,9 @@ from llama_index.core.vector_stores import MetadataFilters, MetadataFilter
 from app.controllers.response.tool_rag_response import FileItem, FileRetrieve, Content, Text, \
     RagResponse, DataItem, ToolRagResponse
 from app.prompts.rag import get_rag_template
-from app.services import ke_index_structure, embed_model
-from app.services.chunk_content_attached_service import ChunkContentAttachedService
-from app.services.data_service import async_log_file_ids
-from app.services.extract_service import EXTRACTOR_CONTEXT
-from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend, \
-    QuestionAnswerAttachedIndexExtend
-from app.transformations.parser import BellaCsvParser
-from app.utils.convert import build_annotation_from_score_node
-from app.utils.convert import trans_metadata_to_extra
-from common.handler.openapi_error_handler import mock_request_context
-from common.tool.es_db_tool import es_store
-from common.tool.redis_tool import redis_pool
-from common.tool.vector_db_tool import questions_vector_store, chunk_index_extend, question_answer_extend
-from common.tool.vector_db_tool import vector_store
-from init.settings import OPENAPI, user_logger, RERANK, RETRIEVAL
+from app.services import file_service
+from app.strategy.retrieval import RetrievalMode, create_retriever_by_mode
+from init.settings import OPENAPI, user_logger, RETRIEVAL
 from ke_rag import callback_manager
 from ke_rag.callbacks.manager import register_callback
 from ke_rag.handler import streaming_handler
@@ -402,7 +390,6 @@ def build_rag_engine(
     llm = OpenAPI(temperature=temperature, api_base=OPENAPI["URL"], api_key=api_key, timeout=300,
                   system_prompt=instructions, additional_kwargs={"top_p": top_p}, model=model)
 
-    async_log_file_ids(file_ids)
     # 构建检索器
     # todo bypass传递有点深，可以加一个no return的retriever
     bypass_retrieve = not file_ids
@@ -458,7 +445,6 @@ def retrieval(file_ids: List[str], query: str, top_k: int, max_tokens: int, scor
     user_logger.info(f"retrieval start, query : {query}, file_ids : {file_ids}, top_k : {top_k}")
     token = query_embedding_context.set([])
     file_ids = file_service.filter_deleted_files(file_ids)
-    async_log_file_ids(file_ids)
     # 构建多路检索器
     retriever = create_fusion_retriever(metadata_filters=metadata_filters,
                                         fusion_mode=FUSION_MODES.RECIPROCAL_RANK,
