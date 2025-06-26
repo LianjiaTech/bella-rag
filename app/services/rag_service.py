@@ -201,7 +201,7 @@ def rag_streaming(
             )
         elif isinstance(item, list) and item and isinstance(item[0], Sensitive):
             # 敏感词事件透传
-            yield from streaming_handler.create_error_stream(
+            yield from streaming_handler.create_sensitive_stream(
                 id=aid, sensitives=item, event_type='message.sensitives'
             )
         else:
