@@ -59,13 +59,23 @@ ak = Bearer your_openai_api_key        # OpenAI API密钥
 api_base = https://api.openai.com/v1   # API基础URL
 ```
 
+### 向量数据库配置 [VECTOR_DB]
+```ini
+[VECTOR_DB]
+url =                    # 向量数据库URL
+key =                    # 访问密钥
+database_name =          # 数据库名称
+dimension =              # 向量维度
+collection_name =        # 集合名称
+embedding_model =        # 嵌入模型名称
+```
+
+
 ## 可选配置
 
 以下配置项为可选，如果不需要相关功能可以省略或留空：
 
 ### Elasticsearch配置 [ELASTICSEARCH]
-
-支持两种配置模式：
 
 **标准Elasticsearch配置：**
 ```ini
@@ -76,28 +86,9 @@ password =                     # ES密码（可选）
 index_name = ke_rag           # 索引名称
 ```
 
-**业务定制ES配置（向后兼容）：**
-```ini
-[ELASTICSEARCH]
-search_url = http://your-search-api/search
-search_token = your_search_token
-data_url = http://your-data-api/data
-data_token = your_data_token
-version = v1.0
-```
-
-### 向量数据库配置 [VECTOR_DB]
-```ini
-[VECTOR_DB]
-url =                    # 向量数据库URL
-key =                    # 访问密钥
-database_name =          # 数据库名称
-dimension = 1024         # 向量维度
-collection_name =        # 集合名称
-embedding_model =        # 嵌入模型名称
-```
 
 ### S3存储配置 [S3]
+用于开启解析过程ocr识别
 ```ini
 [S3]
 access_key =       # S3访问密钥
@@ -109,6 +100,7 @@ image_domain =     # 图片域名
 ```
 
 ### Kafka配置 [KAFKA]
+用于打通file-api的文件上传通路
 ```ini
 [KAFKA]
 bootstrap_servers = localhost:9092              # Kafka服务器地址
