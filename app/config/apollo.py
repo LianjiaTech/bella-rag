@@ -9,23 +9,9 @@ from telnetlib import Telnet
 from typing import Any, Dict, Optional
 
 from init.settings import APOLLO
+from common.helper.exception import BusinessError
 
 
-class BasicException(BaseException):
-    def __init__(self, msg: str):
-        self._msg = msg
-        print(msg)
-
-    def __str__(self):
-        return "%s: %s" % (self.__name__, self._msg)
-
-
-class NameSpaceNotFoundException(BasicException):
-    pass
-
-
-class ServerNotResponseException(BasicException):
-    pass
 
 
 class ApolloClient(object):
@@ -163,7 +149,7 @@ class ApolloClient(object):
             if namespace in self._cache:
                 return self._cache[namespace].get(key, default_val)
             return default_val
-        except BasicException:
+        except BusinessError:
             return default_val
 
     def start(self) -> None:
@@ -212,12 +198,10 @@ class ApolloClient(object):
                 tn = Telnet(host=self.host, port=self.port, timeout=self.timeout // 2)
                 tn.close()
                 # if connect server succeed, raise the exception that namespace not found
-                raise NameSpaceNotFoundException("namespace not found")
+                raise BusinessError("namespace not found")
             except ConnectionRefusedError:
                 # if connection refused, raise server not response error
-                raise ServerNotResponseException(
-                    "server: %s not response" % self.config_server_url
-                )
+                raise BusinessError(f"server: {self.config_server_url} not response")
 
     def _path_checker(self) -> None:
         """
