@@ -198,11 +198,6 @@ if is_linux():
             },
         },
         'loggers': {
-            '': {  # root logger
-                'handlers': ['console', 'default'],
-                'level': 'INFO',
-                'propagate': True
-            },
             'userlog': {
                 'handlers': ['default'],
                 'level': 'DEBUG',
@@ -345,11 +340,6 @@ else:
             },
         },
         'loggers': {
-            '': {  # root logger
-                'handlers': ['console', 'default'],
-                'level': 'INFO',
-                'propagate': True
-            },
             'userlog': {
                 'handlers': ['console', 'default'],
                 'level': 'DEBUG',
