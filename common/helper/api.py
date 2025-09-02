@@ -6,30 +6,23 @@ from django.http import HttpResponse
 
 
 class ApiReturn(object):
-    # 1 开头的表示正常
-    CODE_OK = 10000
-    CODE_TIMEOUT = 10001
-    CODE_NO_DATA = 10002
+    #  正常
+    CODE_OK = 0
 
-    # 2 开头的说明有问题，但是可接受
-    CODE_WARNING = 20001
-
-    # 3 开头的说明是出现了错误
-    CODE_ERROR = 30001  # 出现错误，错误直接展示给用户
-    CODE_SIGN_ERROR = 30011
-    CODE_ERROR_FOR_FE = 31001  # 出现错误，错误展示给FE，由FE确定返回message
-
-    # 4 开头的说明系统异常 或者 严重错误，需要赶紧解决的
-    CODE_EXCEPTION = 41001
-    CODE_FATAL_ERROR = 41002
-    CODE_REQUEST_EXCEPTION = 41003
+    # 通用http状态码异常，返回的状态码和HTTP的保持一直
+    CODE_ERROR_FOR = 403
     CODE_URL_NOT_FOUND = 404
-    CODE_USER_NOT_LOGIN = 44444  # 用户未登录
-    CODE_USER_LOGIN_TIMEOUT = 44445  # 用户登录超时 2小时
+    CODE_METHOD_NOT_ALLOW = 405  # 请求方法不允许
+    CODE_PARAM_NOT_ALLOW = 422  # 请求参数问题
+    CODE_ERROR = 500  # 服务内部错误
 
-    # 特殊状态码，表明服务已经停止
-    CODE_STOP_SERVICE = 60001
-    CODE_BLACK_LIST = 60002
+    # 业务类异常
+    CODE_BODY_INVALID_JSON_EXCEPTION = 10001  # Invalid JSON
+    CODE_NO_DATA = 10002  # 没有数据
+    CODE_BODY_PARAM_ERROR = 10003  # 请求体参数错误
+    CODE_CREATE_FILE_INDEXING_ERROR = 10004  # 创建文件索引任务失败
+    CODE_DELETE_FILE_INDEXING_ERROR = 10005  # 删除文件任务失败
+    CODE_INNER_CODE = 10006  # 服务抛出异常,内部错误
 
     def __init__(self, code=CODE_OK, message="OK", body={}):
         self.__code = code

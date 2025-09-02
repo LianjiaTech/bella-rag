@@ -43,7 +43,7 @@ def validate_request_body_dict(func):
         request = args[0]
         reqbody = request.body.decode("utf8")
         if not TypeTool.is_dict_json_string(reqbody):
-            return json_response(code=ApiReturn.CODE_ERROR, message='请求体必须是合法的json！')
+            return json_response(code=ApiReturn.CODE_BODY_INVALID_JSON_EXCEPTION, message='请求体必须是合法的json！')
         kwargs["body"] = json.loads(reqbody)
         return func(*args, **kwargs)
     return __deco

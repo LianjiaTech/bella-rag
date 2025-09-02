@@ -14,11 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
+from django.urls import path
 
+from app.controllers import health
 from common.views import auto
+from app.controllers.metric import metrics
 
 urlpatterns = [
     url(r'^$', auto.index),
     url(r'^pubCheck/$', auto.pub_check),
-    url(r'^demo/', include(("app.urls", 'app'), namespace='app')),
+    path('metrics', metrics, name='metrics'),
+
+    url(r'^api/actuator/health/liveness$', health.health_liveness, name="health_liveness"),
+    url(r'^api/actuator/health/readiness$', health.health_readiness, name="health_readiness"),
 ]

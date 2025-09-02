@@ -1,0 +1,2431 @@
+[
+    {
+        "question": "系统的实收业绩是实际到账的代理费金额吗？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "应收业绩已下，角色人离职后，实收业绩如何下发？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "合同解约，需要扣除的实收业绩，是扣除的哪个门店？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "合同解约全部退费，合同应收业绩是否为零？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源合作人业绩分配规则是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "什么是24小时被动为空？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "签约前下架钥匙，是否还有钥匙角色业绩？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "业绩分配页面总监错误是什么原因？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "房源发起核销后成交了，业绩如何分配？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源发起人业绩是系统自动锁定划分吗？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "二手/租赁合同跟单人有业绩吗？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源端各个角色的分配规则是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "经纪人推荐客源时，推荐页面会显示业绩比例吗？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源推荐业绩保护期是多少？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "推荐客源成交后再次新增需求再次成交还会分原客源推荐人业绩吗？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源合作业绩保护期是怎么计算？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "验真期内房源成交业绩怎么分配？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "证件人角色重复，房源成交后业绩怎么分配？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "委托人角色重复，房源成交后业绩怎么分配？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "维护人陪看后未扫码，有陪看业绩吗？",
+        "triggerRag": true,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你今天过得怎么样？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢旅行吗？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你平时有什么爱好？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "腾讯会议客户端下载地址？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "企微群聊权限管理（禁言/解散/转让群主等）？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何使用办公区会议室？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "误删微盘文件或者文档怎么办？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何更新企微（以windows 系统为例）？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的楼盘字典项目是什么时候开始的？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的经纪人职业化建设元年是什么时候？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳干部搏学考试辅导教材的编审委员会成员有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的反腐败合规政策有哪些禁止行为？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的职业道德行为守则中，一级违规行为有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "如何快速学习搭建奥丁报告？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的食物是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "小时表查询多少个分区基于什么判断的？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "在奥丁数据模型中，使用hive表时，可查询的pt范围是多少？是否可修改？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的运动？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "公司不予提供备用金的情形有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "长期出差的差旅费报销标准是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "哪些情况不需要进行上线前安全评估",
+        "triggerRag": false,
+        "fileName": "评测文件8-交易知识15-rag-测试.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "软件可以在哪里下载？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何更新企微（以windows 系统为例）？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "浏览器无法打开网页如何解决？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "windows 电脑怎么设置默认浏览器？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "MAC 系统设置默认浏览器？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "office 提示需要激活应该如何处理？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "windows/mac 深信服VPN 怎么安装使用？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "怎么配置企微日程？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "误删微盘文件或者文档怎么办？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "企微群聊权限管理（禁言/解散/转让群主等）？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "企微腾讯文档/微文档/微盘无法打开怎么办？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "花名/代号在哪里申请？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "微盘文档容量说明？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "Home 软件下载链接？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "各内网系统账号密码？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "Home/鲁班系统问题反馈路径？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何使用办公区会议室？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "腾讯会议客户端下载地址？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "腾讯会议客户端登录方式？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "会议记录&云视频查看地址？",
+        "triggerRag": true,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么类型的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么运动？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的食物是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢旅行吗？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "业绩分配页面总监错误是什么原因？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "客源合作业绩保护期是怎么计算？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳干部搏学考试辅导教材的编审委员会成员有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "小时表查询多少个分区基于什么判断的？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的楼盘字典项目是什么时候开始的？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的“一体三翼”战略包括哪些内容？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的“服务者主权”理念是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳干部搏学考试辅导教材的编审委员会成员有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "奥丁中，可以使用哪些库的表？dw表是否可以在奥丁中使用？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "高密指标数据源的下载条数为什么只有2000行？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "行级权限配置后『保存发布报错』，如何解决？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你喜欢什么样的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "收藏项目中心的链接，点击显示网页不存在，如何解决？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你喜欢什么样的运动？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "提交差旅申请单审批通过后，多久可以去携程商旅平台购票？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "集团与地方各级财务负责人职责有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "集团财务运营中心对本制度的解释及修订权利是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "为什么不需要进行上线前安全评估",
+        "triggerRag": false,
+        "fileName": "评测文件1-喵回QA0429.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳在2023年4月提出的战略是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“一体三翼”战略包括哪些内容？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“翻山宣言”是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳干部搏学考试辅导教材的编审委员会成员有哪些？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的楼盘字典项目是什么时候开始的？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“真房源”行动是什么时候启动的？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“品质正循环”理念是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“七面旗帜”包括哪些内容？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的B1112战略目标是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的OKR管理的实施步骤有哪些？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的全面预算管理的原则是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的反腐败合规政策有哪些禁止行为？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的职业道德行为守则中，一级违规行为有哪些？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的反骚扰政策包括哪些内容？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的内部审计主要工作内容是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的经纪人职业化建设元年是什么时候？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“服务者主权”理念是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“有尊严的服务者，更美好的居住”使命是什么时候提出的？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“客户至上”核心价值观的行为准则是什么？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“反垄断合规指引”包括哪些内容？",
+        "triggerRag": true,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的音乐？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你平时喜欢做什么运动？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的食物是什么？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢旅游吗？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源合作人业绩分配规则是什么？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "维护人陪看后未扫码，有陪看业绩吗？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的楼盘字典项目是什么时候开始的？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你平时有什么爱好？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "应收业绩已下，角色人离职后，实收业绩如何下发？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你喜欢什么类型的音乐？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "windows 电脑怎么设置默认浏览器？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "腾讯会议客户端下载地址？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "浏览器无法打开网页如何解决？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "微盘文档容量说明？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "在奥丁报告中使用hive表时，可查询的pt范围是多少？是否可修改？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "下载后的数据行数不对应或有串行问题，该如何解决？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "我的模型/报告/图表/门户中，报错是：check msg：查询分区过大,允许查询的分区：1d，check_error:rpt_XXX_port_da，该如何修改？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "高密指标数据源的下载条数为什么只有2000行？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "在新建字段或SQL语句中，如何计算两个整数相除得到小数？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "长期出差，不想天天住酒店，可以租房住吗？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "备用金管理规定的编制目的是什么？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "什么是事后审核和事前审核？",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "安全评估工单中详细需求应该如何填写",
+        "triggerRag": false,
+        "fileName": "第5届干部搏学教材-定稿0222.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "如何配置奥丁报告的权限？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在新建字段或SQL语句中，如何计算两个整数相除得到小数？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何快速学习搭建奥丁报告？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "行级权限不对，该怎么自查呢？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "下载后的数据行数不对应或有串行问题，该如何解决？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "小时表查询多少个分区基于什么判断的？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "是否可以给所有人授权？如何开放报告的申请权限？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "高密指标数据源的下载条数为什么只有2000行？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "奥丁报告和奥丁门户中，单次最多下载多少条数据？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "奥丁数据查询中，单次最多下载多少条数据？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "行级权限配置后『保存发布报错』，如何解决？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在奥丁报告中使用hive表时，可查询的pt范围是多少？是否可修改？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在奥丁数据模型中，使用hive表时，可查询的pt范围是多少？是否可修改？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "我的模型/报告/图表/门户中，报错是：check msg：查询分区过大,允许查询的分区：1d，check_error:rpt_XXX_port_da，该如何修改？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "收藏项目中心的链接，点击显示网页不存在，如何解决？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报告保存或发布报告时，报错但不显示任何原因，该如何解决？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "奥丁中，可以使用哪些库的表？dw表是否可以在奥丁中使用？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报告/图表报错显示：查询超时，QE调用异常，调用超时,qeCode:1000；该怎么解决？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "字符串转换日期类型时，报错该如何解决？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "保存SQL后，错误提示：Cannot apply operator: bigint = varchar，该如何解决？",
+        "triggerRag": true,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你今天过得怎么样？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的运动？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的食物是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "推荐客源成交后再次新增需求再次成交还会分原客源推荐人业绩吗？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "在奥丁数据模型中，使用hive表时，可查询的pt范围是多少？是否可修改？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "客源合作人业绩分配规则是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "签约前下架钥匙，是否还有钥匙角色业绩？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "Home/鲁班系统问题反馈路径？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "高密指标数据源的下载条数为什么只有2000行？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "windows/mac 深信服VPN 怎么安装使用？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "小时表查询多少个分区基于什么判断的？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "收藏项目中心的链接，点击显示网页不存在，如何解决？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "浏览器无法打开网页如何解决？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的内部审计主要工作内容是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "什么是事后审核和事前审核？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“七面旗帜”包括哪些内容？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在出差地打车费用，如何报销？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "我的出差行程有变化，但是差旅申请单已经提交了，如何处理？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金管理的基本原则有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "差旅费用报销标准是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "什么是上线前安全评估",
+        "triggerRag": false,
+        "fileName": "评测文件3-奥丁-奥丁常见问题QA格式0407.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "出差乘坐火车票、飞机票的报销标准是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "出差住宿的报销标准是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "出差餐费的报销标准是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "我的出差行程有变化，但是差旅申请单已经提交了，如何处理？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "一趟差旅行程能否拆开多次报销？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "可以用在航空公司的网上订单中下载打印下来的机票行程单报销吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "新上线的携程火车票预定功能，是和机票一样由公司结算支付吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "提交差旅申请单审批通过后，多久可以去携程商旅平台购票？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "通过携程商旅订购了火车票，员工是否还需要去火车站取纸质火车票？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在订单信息填写页面，点击关联12306后，系统提示关联失败怎么办？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "选择一等座提交订单后，系统提示预订产品不符合审批权限规定，如何处理？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "我可以自驾出差吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在出差地打车费用，如何报销？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "长期出差，不想天天住酒店，可以租房住吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "出差期间的洗衣费可以报销吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如果出差想选择一个超出差标费用的酒店房型，是一定要先全额垫付再报销差标范围内的金额吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "携程订酒店时，为什么显示让我自己去酒店前台现付，携程商旅不是公司对公支付的吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "企业携程机票、酒店退订如何操作？退票费、改签费可以报销吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "通过携程商旅平台预订火车票后，由于差旅行程变化，需要退票或者改签，可以直接在携程商旅线上操作退改吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "餐费发票不是出差目的地开的，可以报销吗？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么类型的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你平时有什么兴趣爱好？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的运动？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的食物是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "长期出差的差旅费报销标准是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "客源推荐业绩保护期是多少？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "在奥丁数据模型中，使用hive表时，可查询的pt范围是多少？是否可修改？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何更新企微（以windows 系统为例）？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "经纪人推荐客源时，推荐页面会显示业绩比例吗？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "花名/代号在哪里申请？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "Home 软件下载链接？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "MAC 系统设置默认浏览器？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "集团财务运营中心对本制度的解释及修订权利是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你喜欢什么运动？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的反腐败合规政策有哪些禁止行为？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的反骚扰政策包括哪些内容？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "安全评估工单中详细需求应该如何填写",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "腾讯会议客户端下载地址？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的全面预算管理的原则是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "保存SQL后，错误提示：Cannot apply operator: bigint = varchar，该如何解决？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "集团财务中心和集团财务运营中心的职责是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "员工报销单的填写规定是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你喜欢什么运动",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-费控全量qa2029.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金管理规定的编制目的是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金管理规定的适用范围是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "什么是超期备用金？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金核销包括哪些方式？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金管理的基本原则有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金借款人的职责有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "业务审批人的职责是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "集团与地方各级财务负责人职责有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "集团财务中心和集团财务运营中心的职责是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金借支管理的范围包括哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "公司不予提供备用金的情形有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金申请备件要求是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金申请审批额度要求是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金核销的方式及说明是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报销与还款备件要求有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报销审批人的管理职责是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报销和还款有哪些注意事项？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金核销的期限是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "超期备用金的跟进措施有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金管理规定的解释和修订由谁负责？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么类型的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你平时喜欢做什么运动？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢旅行吗？最喜欢去哪里？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的食物是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源合作人业绩分配规则是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "如何使用办公区会议室？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "合同解约全部退费，合同应收业绩是否为零？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的经纪人职业化建设元年是什么时候？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源端各个角色的分配规则是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "腾讯会议客户端下载地址？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的楼盘字典项目是什么时候开始的？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "高密指标数据源的下载条数为什么只有2000行？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源合作业绩保护期是怎么计算？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "软件可以在哪里下载？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的楼盘字典项目是什么时候开始的？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "维护人陪看后未扫码，有陪看业绩吗？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "贝壳的“有尊严的服务者，更美好的居住”使命是什么时候提出的？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "微盘文档容量说明？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "我的出差行程有变化，但是差旅申请单已经提交了，如何处理？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如果出差想选择一个超出差标费用的酒店房型，是一定要先全额垫付再报销差标范围内的金额吗？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "集团财务运营中心的职责有哪些？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "为什么不需要进行上线前安全评估",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-04《备用金管理规定》V3.29--确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "员工费用报销管理规定的适用范围是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "员工费用报销的原则有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "员工费用报销的可报销费用包括哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "什么是事后审核和事前审核？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "财务运营中心平台网站首页的公告栏可以搜索到哪些内容？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "集团财务运营中心的职责有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "员工费用报销申请人有哪些职责？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "日常费用报销标准是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "差旅费用报销标准是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "哪些费用是不予报销的？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报销单填写有哪些要求？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "提交报销有哪些要求？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报销票据有哪些要求？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "例外事项和对应审批流在哪里可以找到？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "违反报销规定的处罚措施有哪些？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "长期出差的差旅费报销标准是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "机票及酒店费用报销有哪些规定？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "员工报销单的填写规定是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "财务运营中心系统信用分管理规定在哪里可以找到？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "集团财务运营中心对本制度的解释及修订权利是什么？",
+        "triggerRag": true,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你平时喜欢做什么运动？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的食物？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的书是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你今天过得怎么样？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢旅行吗？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "业绩分配页面总监错误是什么原因？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的运动？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何使用办公区会议室？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "奥丁中，可以使用哪些库的表？dw表是否可以在奥丁中使用？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么类型的音乐？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "怎么配置企微日程？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "备用金管理规定的编制目的是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你喜欢旅游吗？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳在2023年4月提出的战略是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的楼盘字典项目是什么时候开始的？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "收藏项目中心的链接，点击显示网页不存在，如何解决？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在奥丁报告中使用hive表时，可查询的pt范围是多少？是否可修改？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报告/图表报错显示：查询超时，QE调用异常，调用超时,qeCode:1000；该怎么解决？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "我可以自驾出差吗？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "备用金核销的方式及说明是什么？",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "你最喜欢的食物是什么",
+        "triggerRag": false,
+        "fileName": "评测文件2-财务-LW2626-01《员工费用报销管理规定》V3.29-确认版.pdf",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "什么是上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "为什么要进行上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "上线前安全评估的目的是什么",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "怎么进行上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何触发上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "什么时候需要进行上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "为什么不需要进行上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "哪些情况不需要进行上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "有哪些变更不需要进行上线前安全评估",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "上线前安全评估需要多长时间",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "上线排期紧急安全评估需要多久",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "上线前安全评估需要排期多久",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "上线前安全评估工单如何填写",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "keones安全评估工单在哪里填写",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "怎么填写上线前安全评估申请",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "安全评估工单填写存在些疑问",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "安全评估工单测试环境地址无法提供",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "安全评估工单中详细需求应该如何填写",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "上线前安全评估能确保消除漏洞风险吗",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "通过安全评估上线后却接收到漏洞工单",
+        "triggerRag": true,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么样的音乐",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的电影是什么",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢什么运动",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你最喜欢的食物是什么",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢旅行吗",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的反腐败合规政策有哪些禁止行为？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "误删微盘文件或者文档怎么办？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "委托人角色重复，房源成交后业绩怎么分配？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "推荐客源成交后再次新增需求再次成交还会分原客源推荐人业绩吗？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": true,
+        "triggerRagResultCorrect": false
+    },
+    {
+        "question": "客源推荐业绩保护期是多少？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "高密指标数据源的下载条数为什么只有2000行？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“一体三翼”战略包括哪些内容？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "如何更新企微（以windows 系统为例）？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "客源合作业绩保护期是怎么计算？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳干部搏学考试辅导教材的编审委员会成员有哪些？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的全面预算管理的原则是什么？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "长期出差，不想天天住酒店，可以租房住吗？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "下载后的数据行数不对应或有串行问题，该如何解决？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "贝壳的“真房源”行动是什么时候启动的？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "在新建字段或SQL语句中，如何计算两个整数相除得到小数？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "收藏项目中心的链接，点击显示网页不存在，如何解决？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "出差餐费的报销标准是什么？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "你喜欢旅行吗？最喜欢去哪里？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    },
+    {
+        "question": "报销单填写有哪些要求？",
+        "triggerRag": false,
+        "fileName": "AI基础安全QA问答-产品安全方向-ke-rag-test.csv",
+        "triggerRagResult": false,
+        "triggerRagResultCorrect": true
+    }
+]

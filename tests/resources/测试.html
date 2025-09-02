@@ -1,0 +1,59 @@
+<p>注解开发，反射</p><h4>3.1.反射</h4><p>java反射是指在运行时<strong>动态获取和操作</strong>类的信息以及调用类的方法和属性的能力。通过反射，可以在运行时<strong>检查和修改</strong>类的字段、方法和构造函数等。反射使得我们能够在运行时动态地创建对象、调用方法、获取字段值、修改字段值，以及操作类的私有成员。反射是Java语言的一个强大的特性，它使得Java具有更高的灵活性和扩展性。</p><p>2. 反射的基本概念<br />- Class类：在Java中，每个类都有一个对应的Class类对象，该对象包含了类的结构信息。通过Class类对象，可以获取类的构造函数、方法、字段等信息。<br />- Class.forName()：该方法可以根据类的全限定名获取对应的Class类对象。例如：Class clazz = Class.forName(&quot;com.example.MyClass&quot;)。<br />- 创建对象：通过Class类对象，可以动态创建类的实例。例如：Object obj = clazz.newInstance()。<br />- 获取方法：通过Class类对象，可以获取类的方法信息，包括方法名、参数类型等。例如：Method method = clazz.getMethod(&quot;methodName&quot;, parameterTypes)。<br />- 调用方法：通过Method对象，可以动态调用类的方法。例如：method.invoke(obj, args)。<br />- 获取字段：通过Class类对象，可以获取类的字段信息，包括字段名、字段类型等。例如：Field field = clazz.getField(&quot;fieldName&quot;)。<br />- 修改字段：通过Field对象，可以动态修改类的字段值。例如：field.set(obj, value)。</p><p>3. 示例代码<br />下面是一个简单的示例代码，演示了如何使用反射动态创建对象、调用方法和修改字段值：</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="b65bc1d0-028c-484b-a683-b7c43fc07986"><ac:plain-text-body><![CDATA[```java
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+public class ReflectionExample {
+public static void main(String[] args) throws Exception {
+// 获取Class类对象
+Class clazz = Class.forName("com.example.MyClass");
+
+// 动态创建对象
+Object obj = clazz.newInstance();
+
+// 获取方法并调用
+Method method = clazz.getMethod("methodName", parameterTypes);
+method.invoke(obj, args);
+
+// 获取字段并修改值
+Field field = clazz.getField("fieldName");
+field.set(obj, value);
+}
+}
+```]]></ac:plain-text-body></ac:structured-macro><p>4.使用场景</p><ul><li><span style="color: rgb(34,34,34);">框架设计：在框架设计中，我们通常需要使用反射技术来解耦，使框架可扩展和灵活。</span></li><li><span style="color: rgb(34,34,34);">单元测试：在单元测试中，我们可以使用反射技术来访问私有或受保护的类成员，使测试更加全面。</span></li><li><span style="color: rgb(34,34,34);">动态代理：使用反射技术可以创建动态代理对象，从而可以在运行时期代理任意一个实现了接口的对象，实现AOP等功能。</span></li><li><span style="color: rgb(34,34,34);">序列化和反序列化：许多Java序列化和反序列化工具都是基于Java反射机制实现的，例如Java的ObjectInputStream和ObjectOutputStream</span></li></ul><p>5. 注意事项</p><ul><li>反射操作相对于直接调用方法和访问字段，会有一定的性能损耗，所以在性能敏感的场景下需要慎重使用。</li><li>反射可以访问和修改类的私有成员，但这可能会破坏封装性，所以在正常开发中应遵循面向对象的封装原则。</li><li>反射操作需要处理异常，因为在运行时可能会发生类找不到、方法不存在等异常。</li></ul><h4>3.2.注解</h4><p>java注解是Java语言的一种元数据形式，它可以用于<strong>提供程序的结构化信息</strong>，以及在运行时进行许多类型的<strong>动态处理</strong>。注解是一种为源代码中的类、方法、字段等元素添加元数据的方式，并且这些元数据可以在编译时、类加载时或者在运行时被读取和使用。<span style="color: rgb(51,51,51);">和注释一样，注解<strong>不影响程序逻辑</strong>，但注解可以<strong>被编译或运行</strong>，<strong>相当于嵌入在代码中的补充信息</strong></span></p><p>1.&nbsp;Java注解的基本概念和语法</p><p>- 注解的定义方式：使用`@interface`关键字定义注解，可以包含多个成员变量，成员变量可以指定默认值。<br />- 注解的使用方式：使用`@注解名`将注解应用于类、方法、字段等元素上。<br />- 注解的元数据获取方式：可以通过反射机制在运行时获取注解的信息。</p><p>2. 常见的内置注解</p><p>- `@Override`：用于标识一个方法是覆盖父类的方法。<br />- `@SuppressWarnings`：用于抑制编译器警告信息。<br />- `@FunctionalInterface`：用于标识一个接口是函数式接口。</p><p>举个例子：</p><p>在Java中，当子类继承父类时，子类可以重写父类的方法。但是有时候，子类可能会错误地重写了一个不存在的或者错误的方法。为了防止这种情况发生，可以在子类的方法上添加`@Override`注解。这样编译器会检查该方法是否真的重写了父类的方法。如果没有重写成功，编译器会产生一个错误。</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="f5172fc4-b0bf-4b95-9e1a-a901db420a54"><ac:plain-text-body><![CDATA[class Parent {
+    public void print() {
+        System.out.println("Parent");
+    }
+}
+ 
+class Child extends Parent {
+    @Override
+    public void print() {
+        System.out.println("Child");
+    }
+}]]></ac:plain-text-body></ac:structured-macro><p><br /></p><p>3. 自定义注解的开发</p><p>实现自定义注解需要最少指定两个基本条件：①注解的作用范围②注解的生命周期。</p><p>举个例子：</p><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="b404d257-3273-478a-a097-86fc09005702"><ac:plain-text-body><![CDATA[@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CustomAnnotation {
+    String message() default "";
+    int[] nums();
+}]]></ac:plain-text-body></ac:structured-macro><p><ac:image ac:width="500"><ri:attachment ri:filename="image2023-8-23_17-53-49.png" /></ac:image></p><p><span style="color: rgb(77,77,77);">注解自定义属性的格式为：<span>&nbsp;</span></span><span style="color: rgb(254,44,36);"><strong>属性类型 属性名称()；</strong></span></p><p>```</p><p>String message() default &quot;&quot;;<br />int[] nums();</p><p>```</p><p>4. 注解的实际应用</p><p>- 代码生成：通过自定义注解和注解处理器，可以实现代码的自动生成，减少重复性的工作，例如Lombok库的@Getter、@Setter等注解，用于自动生成getter和setter方法。<br />- 参数校验：通过自定义注解和注解处理器，可以对方法的参数进行校验，确保参数的合法性，例如Hibernate Validator中的@NotNull、@Size等注解，用于验证用户输入。<br />- 文档生成：通过自定义注解和注解处理器，可以生成接口文档、数据库文档等，例如Swagger中的@Api、@ApiOperation等注解。<br />- 配置使用：例如Spring框架中的@Bean和@Autowired注解。</p><h4>3.3.注解和反射结合案例</h4><ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="06061804-ce79-4461-9ac1-eab8f008beec"><ac:plain-text-body><![CDATA[// 定义注解
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MyAnnotation {
+    String value() default "";
+}
+
+// 引用注解
+class MyClass{
+    @MyAnnotation("测试")
+	public void testMethod() {
+   	 // do something
+	}
+}
+​// 结合使用 是否使用了xxx注解，使用则获取，并打印属性的值
+Method method = MyClass.class.getMethod("testMethod");
+if (method.isAnnotationPresent(MyAnnotation.class)) {
+    MyAnnotation annotation = method.getAnnotation(MyAnnotation.class);
+    String value = annotation.value();
+    System.out.println(value); // 输出"测试"
+}]]></ac:plain-text-body></ac:structured-macro><p class="auto-cursor-target"><br /></p>

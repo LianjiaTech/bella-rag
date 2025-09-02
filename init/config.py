@@ -1,7 +1,5 @@
 import os
 
-from settings.ini_config import config
-
 from common.tool.common_func import *
 from common.tool.config import Config
 
@@ -14,9 +12,7 @@ print("BASE_DIR: %s" % BASE_DIR)
 # 当前op判定线上环境的准则是 ENVTYPE 没有这个环境变量就是线上环境，
 # 容易出现误判，所以使用设置线上appid或者线上域名的方式来确定，
 # release_appid的值应该设置为线上目录的最后一级目录的名称
-# 例如线上的 MATRIX_CODE_DIR=/data0/www/htdocs/api.ones.ke.com，
-# 那么 release_appid="api.ones.ke.com"
-# default_release_appid = "ke-rag"
+# default_release_appid = "bella-rag"
 # RELEASE_DIR = "/data0/www/htdocs/%s" % os.getenv("release_appid", default_release_appid)
 # print("线上路径：%s" % RELEASE_DIR)
 

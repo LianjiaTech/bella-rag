@@ -1,7 +1,6 @@
 from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponse
-from common.tool.django_func import get_request_ip
-from init.settings import error_logger, traffic_logger, redis_handle
+from init.settings import error_logger, traffic_logger
 from common.helper.api import ApiReturn
 import traceback
 from common.tool.common_func import *
@@ -9,7 +8,7 @@ import time
 import random
 import json
 import sys
-from common.helper.keones_exception import CodeError, CodeErrorForFe, CodeErrorNoData
+from common.helper.exception import CodeError, CodeErrorForFe, CodeErrorNoData
 
 
 class TrafficMiddleware(MiddlewareMixin):
@@ -95,7 +94,7 @@ class TrafficMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
         if isinstance(exception, CodeErrorForFe):
-            return HttpResponse(ApiReturn(ApiReturn.CODE_ERROR_FOR_FE, str(exception.error_msg)).to_json())
+            return HttpResponse(ApiReturn(ApiReturn.CODE_ERROR_FOR, str(exception.error_msg)).to_json())
         elif isinstance(exception, CodeError):
             return HttpResponse(ApiReturn(ApiReturn.CODE_ERROR, str(exception.error_msg)).to_json())
         elif isinstance(exception, CodeErrorNoData):

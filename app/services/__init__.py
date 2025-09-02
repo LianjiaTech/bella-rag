@@ -1,10 +1,19 @@
-from app.schema.index import KeIndex
-from init.settings import TENCENT_VECTOR_DB, OPENAPI
-from ke_rag.llm.openapi import OpenAPIEmbedding
+from app.schema.index import ChunkVectorIndex, QuestionVectorIndex
+from app.schema.index import EsIndex
+from init.settings import OPENAPI, VECTOR_DB_COMMON
+from bella_rag.llm.openapi import OpenAPIEmbedding
 
 ak = OPENAPI["AK"]
+EXTRA_DOC_TYPE_KEY = 'doc_type'
 
-ke_index_structure = KeIndex()
+chunk_vector_index_structure = ChunkVectorIndex()
+es_index_structure = EsIndex()
 
-embed_model = OpenAPIEmbedding(model=TENCENT_VECTOR_DB["EMBEDDING_MODEL"], embedding_batch_size=100,
-                               api_key=ak)
+question_vector_index_structure = QuestionVectorIndex()
+
+embed_model = OpenAPIEmbedding(
+    model=VECTOR_DB_COMMON.get("EMBEDDING_MODEL"),
+    embedding_batch_size=VECTOR_DB_COMMON["EMBEDDING_BATCH_SIZE"],
+    api_key=ak,
+    model_dimension=int(VECTOR_DB_COMMON["DIMENSION"])
+)

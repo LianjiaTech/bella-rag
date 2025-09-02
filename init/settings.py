@@ -13,12 +13,12 @@ import sys
 from common.tool.common_func import *
 from common.tool.config_manager import init_config, get_config
 from init.const import *
+from bella_rag.utils.token_util import init_tiktoken
 
 SERVER_START_TIME = get_current_time()
 CURRENT_DATE = get_current_date()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))).replace("\\", "/")
 print("BASE_DIR: %s" % BASE_DIR)
 
 # 判断是否是生产环境
@@ -30,9 +30,6 @@ conf_file = ""
 if isRelease:
     conf_file = "%s/conf/config_release.ini" % BASE_DIR
     print("读取配置文件：config_release.ini")
-elif os.getenv("CONFIG_FILE"):
-    conf_file = "%s/conf/%s" % (BASE_DIR, os.getenv("CONFIG_FILE"))
-    print("读取配置文件：%s" % os.getenv("CONFIG_FILE"))
 elif is_linux():
     conf_file = "%s/conf/config_test.ini" % BASE_DIR
     print("读取配置文件：config_test.ini")
@@ -69,17 +66,17 @@ else:
 
 print("log_root:%s" % log_root)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ovjmbwl$ses4)++0+@mp79^8v27n+5&p*8pq32cr*0*or6migi'
-
 DJANGO_INFO_LOG = "django_info.log"
 DJANGO_ERROR_LOG = "django_error.log"
 
 DEBUG = not isRelease
 ALLOWED_HOSTS = eval(config.get('COMMON', 'allowed_host', "['*']"))
 
-INSTALLED_APPS = APPS
+# Django SECRET_KEY - 必需
+SECRET_KEY = config.get('COMMON', 'secret_key',
+                        'django-insecure-default-key-for-development-only-please-change-in-production')
 
+INSTALLED_APPS = APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,34 +88,39 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 以下为自定义中间件
+    'common.middleware.log.LogRequestResponseMiddleware',
     'common.middleware.traffice.TrafficMiddleware',
     'common.middleware.exception.ExceptionMiddleware',
+    'common.middleware.openapi_request.AuthorizationMiddleware',
+    'common.middleware.rate_limit.RateLimitMiddleware',  # 限流中间件
+    'common.middleware.openapi_request.UserContextMiddleware',
+    'common.middleware.openapi_request.RequestTraceMiddleware',
 ]
 
 # 日志配置
 log_formaters = {
-        'verbose': {
-            'format': '%(asctime)s %(levelname)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'datestart': {
-            'format': '%(asctime)s %(message)s'
-        },
-        'simple': {
-            'format': '%(message)s'
-        },
-        'datestart_with_USERLOGGER': {
-            'format': '%(asctime)s USERLOGGER %(levelname)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'datestart_with_TRACELOGGER': {
-            'format': '%(message)s'
-        },
-        'datestart_with_ELAPSEDLOGGER': {
-            'format': '%(asctime)s ELAPSEDLOGGER %(message)s'
-        },
-        'datestart_with_KAFKAASYNCLOGGER': {
-            'format': '%(asctime)s KAFKAASYNCLOGGER %(message)s'
-        },
-    }
+    'verbose': {
+        'format': '%(asctime)s %(levelname)s %(module)s %(process)d %(thread)d %(message)s'
+    },
+    'datestart': {
+        'format': '%(asctime)s %(message)s'
+    },
+    'simple': {
+        'format': '%(message)s'
+    },
+    'datestart_with_USERLOGGER': {
+        'format': '%(asctime)s USERLOGGER %(levelname)s %(module)s %(process)d %(thread)d %(message)s'
+    },
+    'datestart_with_TRACELOGGER': {
+        'format': '%(asctime)s TRACELOGGER %(levelname)s %(message)s'
+    },
+    'datestart_with_ELAPSEDLOGGER': {
+        'format': '%(asctime)s ELAPSEDLOGGER %(message)s'
+    },
+    'datestart_with_KAFKAASYNCLOGGER': {
+        'format': '%(asctime)s KAFKAASYNCLOGGER %(message)s'
+    },
+}
 if is_linux():
     LOGGING = {
         'version': 1,
@@ -366,11 +368,11 @@ else:
                 'propagate': True,
             },
             'kafkaasynclog': {
-                'handlers': ['console','kafkaasync'],
+                'handlers': ['console', 'kafkaasync'],
                 'level': 'DEBUG',
                 'propagate': True,
             },
-            'tracelog':{
+            'tracelog': {
                 'handlers': ['trace', 'console'],
                 'level': 'DEBUG',
                 'propagate': True,
@@ -401,7 +403,7 @@ WSGI_APPLICATION = 'init.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'common.backends',
         'NAME': DB_NAME,
         'USER': DB_USERNAME,
         'PASSWORD': DB_PASSWORD,
@@ -412,7 +414,7 @@ DATABASES = {
         }
     },
     'offline-readonly': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'common.backends',
         'NAME': DB_NAME,
         'USER': DB_USERNAME,
         'PASSWORD': DB_PASSWORD,
@@ -433,7 +435,7 @@ REDIS_DATABASE = config.get('REDIS', 'database', 0, int)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://%s:%s" % (REDIS_HOST, REDIS_PORT),
+        "LOCATION": "redis://%s:%s/%s" % (REDIS_HOST, REDIS_PORT, REDIS_DATABASE),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 100, "decode_responses": True},
@@ -442,95 +444,111 @@ CACHES = {
     }
 }
 
-# OpenAI配置 - 必需
-OPENAI = {
+# OpenAPI配置 - 必需
+OPENAPI = {
     'URL': config.get_required('OPENAPI', 'api_base'),
     'AK': config.get_required('OPENAPI', 'ak'),
 }
 
-# 向量数据库配置 - 必需
+# 向量数据库配置 - 支持多种类型
+VECTOR_DB_TYPE = config.get('VECTOR_DB', 'vector_db_type', 'qdrant')
+
+# 通用向量数据库配置
+try:
+    VECTOR_DB_COMMON = {
+        'DIMENSION': config.get('VECTOR_DB', 'dimension', 1024, int),
+        'METRIC_TYPE': config.get('VECTOR_DB', 'metric_type', 'COSINE'),
+        'EMBEDDING_MODEL': config.get('VECTOR_DB', 'embedding_model', 'text_embedding_v3'),
+        'EMBEDDING_BATCH_SIZE': config.get('VECTOR_DB', 'embedding_batch_size', 100, int),
+    }
+    print(f"DEBUG: VECTOR_DB_COMMON loaded successfully: {VECTOR_DB_COMMON}")
+except Exception as e:
+    print(f"ERROR loading VECTOR_DB_COMMON: {e}")
+    # 提供默认配置
+    VECTOR_DB_COMMON = {
+        'DIMENSION': 1024,
+        'METRIC_TYPE': 'COSINE',
+        'EMBEDDING_MODEL': 'text_embedding_v3',
+        'EMBEDDING_BATCH_SIZE': 100,
+    }
+    print(f"DEBUG: Using default VECTOR_DB_COMMON: {VECTOR_DB_COMMON}")
+
+# 腾讯向量数据库配置
 TENCENT_VECTOR_DB = {
-    'URL': config.get('TENCENT_VECTOR_DB', 'url'),
-    'KEY': config.get('TENCENT_VECTOR_DB', 'key'),
-    'DATABASE_NAME': config.get('TENCENT_VECTOR_DB', 'database_name'),
-    'DIMENSION': config.get('TENCENT_VECTOR_DB', 'dimension', 1024, int),
-    'COLLECTION_NAME': config.get('TENCENT_VECTOR_DB', 'collection_name'),
-    'SUMMARY_QUESTION_COLLECTION_NAME': config.get('TENCENT_VECTOR_DB', 'summary_question_collection_name'),
-    'EMBEDDING_MODEL': config.get('TENCENT_VECTOR_DB', 'embedding_model'),
-    'QUESTIONS_COLLECTION_NAME': config.get('TENCENT_VECTOR_DB', 'questions_collection_name')
+    'URL': config.get('TENCENT_VECTOR_DB', 'url', ''),
+    'KEY': config.get('TENCENT_VECTOR_DB', 'key', ''),
+    'DATABASE_NAME': config.get('TENCENT_VECTOR_DB', 'database_name', ''),
+    'DIMENSION': VECTOR_DB_COMMON['DIMENSION'],
+    'METRIC_TYPE': VECTOR_DB_COMMON['METRIC_TYPE'],
+    'COLLECTION_NAME': config.get('TENCENT_VECTOR_DB', 'collection_name', ''),
+    'QUESTIONS_COLLECTION_NAME': config.get('TENCENT_VECTOR_DB', 'questions_collection_name', ''),
+    'SUMMARY_QUESTION_COLLECTION_NAME': config.get('TENCENT_VECTOR_DB', 'summary_question_collection_name', ''),
+    'EMBEDDING_MODEL': VECTOR_DB_COMMON['EMBEDDING_MODEL'],
 }
 
-# Elasticsearch配置 - 支持两种模式
-if config.has_section('ELASTICSEARCH'):
-    es_config = {}
-    # 标准ES配置
-    if config.has_option('ELASTICSEARCH', 'hosts'):
-        es_config.update({
-            'HOSTS': config.get('ELASTICSEARCH', 'hosts', 'http://localhost:9200'),
-            'USERNAME': config.get('ELASTICSEARCH', 'username', ''),
-            'PASSWORD': config.get('ELASTICSEARCH', 'password', ''),
-            'INDEX_NAME': config.get('ELASTICSEARCH', 'index_name', 'ke_rag'),
-        })
-    # 业务定制ES配置（向后兼容）
-    if config.has_option('ELASTICSEARCH', 'search_url'):
-        es_config.update({
-            'SEARCH_URL': config.get('ELASTICSEARCH', 'search_url'),
-            'SEARCH_TOKEN': config.get('ELASTICSEARCH', 'search_token'),
-            'DATA_URL': config.get('ELASTICSEARCH', 'data_url'),
-            'DATA_TOKEN': config.get('ELASTICSEARCH', 'data_token'),
-            'VERSION': config.get('ELASTICSEARCH', 'version', 'v1.0'),
-        })
-    ELASTICSEARCH = es_config
-else:
-    ELASTICSEARCH = None
+# Qdrant向量数据库配置
+QDRANT_VECTOR_DB = {
+    'URL': config.get('QDRANT_VECTOR_DB', 'url', 'http://localhost:6333'),
+    'API_KEY': config.get('QDRANT_VECTOR_DB', 'api_key', ''),
+    'HOST': config.get('QDRANT_VECTOR_DB', 'host', 'localhost'),
+    'PORT': config.get('QDRANT_VECTOR_DB', 'port', 6333, int),
+    'GRPC_PORT': config.get('QDRANT_VECTOR_DB', 'grpc_port', 6334, int),
+    'PREFER_GRPC': config.get('QDRANT_VECTOR_DB', 'prefer_grpc', 'false').lower() == 'true',
+    'DIMENSION': VECTOR_DB_COMMON['DIMENSION'],
+    'METRIC_TYPE': VECTOR_DB_COMMON['METRIC_TYPE'],
+    'COLLECTION_NAME': config.get('QDRANT_VECTOR_DB', 'collection_name', 'documents'),
+    'QUESTIONS_COLLECTION_NAME': config.get('QDRANT_VECTOR_DB', 'questions_collection_name', 'qa_documents'),
+    'SUMMARY_COLLECTION_NAME': config.get('QDRANT_VECTOR_DB', 'summary_collection_name', 'summary_documents'),
+    'EMBEDDING_MODEL': VECTOR_DB_COMMON['EMBEDDING_MODEL'],
+}
 
-# S3配置 - 可选
-if config.has_section('S3'):
-    S3_CONFIG = {
-        'region_name': config.get('S3', 'region', 'cn-north-1'),
-        'ak': config.get('S3', 'access_key', ''),
-        'sk': config.get('S3', 'secret_key', ''),
-        'endpoint': config.get('S3', 'endpoint', ''),
-        'bucket_name': config.get('S3', 'bucket_name', ''),
-        'image_domain': config.get('S3', 'image_domain', ''),
-    }
-else:
-    S3_CONFIG = None
+# Elasticsearch配置
+ELASTICSEARCH = {
+    'HOSTS': config.get('ELASTICSEARCH', 'hosts', 'http://localhost:9200'),
+    'USERNAME': config.get('ELASTICSEARCH', 'username', ''),
+    'PASSWORD': config.get('ELASTICSEARCH', 'password', ''),
+    'INDEX_NAME': config.get('ELASTICSEARCH', 'index_name', 'bella_rag'),
+}
 
-# Kafka配置 - 可选
-if config.has_section('KAFKA'):
-    KAFKA = {
-        'KNOWLEDGE_INDEX_TASK_BOOTSTRAP_SERVERS': config.get('KAFKA', 'knowledge_index_task_bootstrap_servers', ''),
-        'KNOWLEDGE_INDEX_TASK_TOPIC': config.get('KAFKA', 'knowledge_index_task_topic', ''),
-        'KNOWLEDGE_INDEX_GROUP_ID': config.get('KAFKA', 'knowledge_index_group_id', ''),
+# S3配置
+S3_CONFIG = {
+    'region_name': config.get('S3', 'region', 'cn-north-1'),
+    'ak': config.get('S3', 'AK', ''),
+    'sk': config.get('S3', 'SK', ''),
+    'endpoint': config.get('S3', 'ENDPOINT', ''),
+    'bucket_name': config.get('S3', 'BUCKET_NAME', ''),
+    'image_domain': config.get('S3', 'IMAGE_DOMAIN', ''),
+}
 
-        'KNOWLEDGE_FILE_INDEX_DONE_BOOTSTRAP_SERVERS': config.get('KAFKA', 'knowledge_file_index_done_bootstrap_servers', ''),
-        'KNOWLEDGE_FILE_INDEX_DONE_TOPIC': config.get('KAFKA', 'knowledge_file_index_done_topic', ''),
-        'KNOWLEDGE_FILE_INDEX_DONE_GROUP_ID': config.get('KAFKA', 'knowledge_file_index_done_group_id', ''),
+# Kafka配置
+KAFKA = {
+    'KNOWLEDGE_INDEX_TASK_BOOTSTRAP_SERVERS': config.get('KAFKA', 'knowledge_index_task_bootstrap_servers', ''),
+    'KNOWLEDGE_INDEX_TASK_TOPIC': config.get('KAFKA', 'knowledge_index_task_topic', ''),
+    'KNOWLEDGE_INDEX_GROUP_ID': config.get('KAFKA', 'knowledge_index_group_id', ''),
 
-        'FILE_API_TASK_BOOTSTRAP_SERVERS': config.get('KAFKA', 'file_api_bootstrap_servers', ''),
-        'FILE_API_TASK_TOPIC': config.get('KAFKA', 'file_api_topic', ''),
-        'FILE_API_TASK_GROUP_ID': config.get('KAFKA', 'file_api_group_id', ''),
+    'KNOWLEDGE_FILE_INDEX_DONE_BOOTSTRAP_SERVERS': config.get('KAFKA',
+                                                              'knowledge_file_index_done_bootstrap_servers', ''),
+    'KNOWLEDGE_FILE_INDEX_DONE_TOPIC': config.get('KAFKA', 'knowledge_file_index_done_topic', ''),
+    'KNOWLEDGE_FILE_INDEX_DONE_GROUP_ID': config.get('KAFKA', 'knowledge_file_index_done_group_id', ''),
 
-        'KNOWLEDGE_FILE_CONTEXT_TASK_GROUP_ID': config.get('KAFKA', 'knowledge_file_index_context_group_id', ''),
+    'FILE_API_TASK_BOOTSTRAP_SERVERS': config.get('KAFKA', 'file_api_bootstrap_servers', ''),
+    'FILE_API_TASK_TOPIC': config.get('KAFKA', 'file_api_topic', ''),
+    'FILE_API_TASK_GROUP_ID': config.get('KAFKA', 'file_api_group_id', ''),
 
-        'KNOWLEDGE_FILE_DELETE_BOOTSTRAP_SERVERS': config.get('KAFKA', 'knowledge_file_delete_bootstrap_servers', ''),
-        'KNOWLEDGE_FILE_DELETE_TOPIC': config.get('KAFKA', 'knowledge_file_delete_topic', ''),
-        'KNOWLEDGE_FILE_DELETE_GROUP_ID': config.get('KAFKA', 'knowledge_file_delete_group_id', ''),
-    }
-else:
-    KAFKA = None
+    'KNOWLEDGE_FILE_CONTEXT_TASK_GROUP_ID': config.get('KAFKA', 'knowledge_file_index_context_group_id', ''),
 
-# 重排序配置 - 可选
-if config.has_section('RERANK'):
-    RERANK = {
-        'URL': config.get('RERANK', 'api_base', ''),
-        'MODEL': config.get('RERANK', 'model', ''),
-        'RERANK_NUM': config.get('RERANK', 'rerank_num', 20, int),
-        'RERANK_THRESHOLD': config.get('RERANK', 'rerank_threshold', 0.99, float),
-    }
-else:
-    RERANK = None
+    'KNOWLEDGE_FILE_DELETE_BOOTSTRAP_SERVERS': config.get('KAFKA', 'knowledge_file_delete_bootstrap_servers', ''),
+    'KNOWLEDGE_FILE_DELETE_TOPIC': config.get('KAFKA', 'knowledge_file_delete_topic', ''),
+    'KNOWLEDGE_FILE_DELETE_GROUP_ID': config.get('KAFKA', 'knowledge_file_delete_group_id', ''),
+}
+
+# 重排序配置
+RERANK = {
+    'URL': config.get('RERANK', 'api_base', ''),
+    'MODEL': config.get('RERANK', 'model', ''),
+    'RERANK_NUM': config.get('RERANK', 'rerank_num', 20, int),
+    'RERANK_THRESHOLD': config.get('RERANK', 'rerank_threshold', 0.99, float),
+}
 
 # 检索配置
 RETRIEVAL = {
@@ -551,25 +569,26 @@ CONTEXT_SUMMARY = {
     'SUMMARY_MAX_BATCH_SIZE': config.get('CONTEXT_SUMMARY', 'summary_max_batch_size', 30, int),
 }
 
-# 可选服务配置
+# file-api配置
 FILE_API = {
     'url': config.get('FILE_API', 'url', '')
-} if config.has_section('FILE_API') else None
+}
 
 DOCUMENT_PARSE = {
     'url': config.get('DOCUMENT_PARSE', 'url', '')
-} if config.has_section('DOCUMENT_PARSE') else None
+}
 
 OAUTH = {
     'url': config.get('OAUTH', 'url', ''),
     'client_id': config.get('OAUTH', 'client_id', ''),
     'client_secret': config.get('OAUTH', 'client_secret', ''),
-} if config.has_section('OAUTH') else None
+}
 
 OCR = {
     'model_name': config.get('OCR', 'model_name', 'gpt-4o'),
-    'enable': config.get('OCR', 'enable', True, bool),
-} if config.has_section('OCR') else None
+    'enable': config.get('OCR', 'enable', False, bool),
+    'vision_model_list': json.loads(config.get('OCR', 'vision_model_list', [])),
+}
 
 # Apollo配置 - 可选
 APOLLO = {
@@ -579,7 +598,7 @@ APOLLO = {
     'AUTHORIZATION': config.get('APOLLO', 'AUTHORIZATION', ''),
     'ENV': config.get('APOLLO', 'ENV', 'DEV'),
     'CYCLE_TIME': config.get('APOLLO', 'CYCLE_TIME', 5, int),
-} if config.has_section('APOLLO') else None
+}
 
 # 缓存配置
 CACHE = {
@@ -587,7 +606,7 @@ CACHE = {
 }
 
 # 默认用户
-DEFAULT_USER = config.get('USER', 'default_user', 'ke-rag')
+DEFAULT_USER = config.get('USER', 'default_user', 'bella-rag')
 
 # 国际化配置
 LANGUAGE_CODE = 'en-us'
@@ -611,9 +630,11 @@ NEVER_REDIS_TIMEOUT = 365 * 24 * 60 * 60
 
 # 创建Redis连接
 from django_redis import get_redis_connection
+
 django_redis_default_conn = get_redis_connection("default")
 
 from common.tool.my_redis_cache import MyRedisCache
+
 redis_handle = MyRedisCache(django_redis_default_conn)
 
 # 跨域配置
@@ -651,4 +672,13 @@ traffic_logger = logging.getLogger('trafficlog')
 sql_logger = logging.getLogger('sqllog')
 elapsed_logger = logging.getLogger('elapsedlog')
 kafkaasync_logger = logging.getLogger('kafkaasynclog')
+# 初始化tiktoken到本地
+init_tiktoken()
+
+
+def get_elasticsearch_config():
+    """获取Elasticsearch配置"""
+    return ELASTICSEARCH
+
+
 print("@@@@@@@@@@@@@@@@@@@@ END init.settings.py @@@@@@@@@@@@@@@@@@@@")

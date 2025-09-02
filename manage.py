@@ -1,6 +1,13 @@
 import os
 import sys
 
+# 添加项目根目录到Python路径，以便导入init模块
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from init.const import APPS
+
 if __name__ == "__main__":
     print("start manage.py")
     if sys.argv[-1] == "--ignore":
@@ -12,6 +19,7 @@ if __name__ == "__main__":
             raise ValueError("APP不合法!")
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "init.settings")
     try:
+        APPS.append("app.apps.AppConfig")
         from django.core.management import execute_from_command_line
     except ImportError:
         # The above import may fail for some other reason. Ensure that the

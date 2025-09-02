@@ -130,7 +130,7 @@ enable = true        # 是否启用OCR
 
 1. 复制配置模板：
    ```bash
-   cp conf/config_template.ini conf/config_local.ini
+   cp conf/config_release.ini conf/config_local.ini
    ```
 
 2. 修改必需配置项：

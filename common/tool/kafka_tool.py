@@ -1,161 +1,95 @@
+import json
+import threading
 import time
+from concurrent.futures import Future, ThreadPoolExecutor
 
-from kafka import KafkaConsumer
-from kafka import KafkaProducer
-from kafka import TopicPartition
+from confluent_kafka import Producer, KafkaError, Consumer
+
+from common.helper.exception import BusinessError
+from common.tool.inspect_util import has_parameter
+from init.settings import user_logger
+
+logger = user_logger
+
+# 默认最大重试次数
+DEFAULT_ERR_RETRY_MAX = 3
+# 默认重试间隔，0没有间隔
+DEFAULT_RETRY_INTERVAL = 0
 
 
-class KafkaTool(object):
-    def __init__(self, bootstrap_servers, topics=[]):
-        # 消费者相关的属性
-        self.topics = topics
-        self.bootstrap_servers = bootstrap_servers
-        self.group_id = ""
-        self.client_id = ""
-        self.auto_offset_reset = "latest"
-        self.enable_auto_commit = True
-        self.auto_commit_interval_ms = 0
-        self.consumer_timeout_ms = 0
+class KafkaProducer:
+    def __init__(self, bootstrap_servers, topic):
+        self.producer = Producer(
+            {
+                'bootstrap.servers': bootstrap_servers,
+                'acks': 'all',
+                'retries': 9,
+                'retry.backoff.ms': 1000,
+            }
+        )
+        self._topic = topic
 
-    def create_consumer(self):
-        kwargs = {}
-        kwargs["enable_auto_commit"] = self.enable_auto_commit
+    @property
+    def topic(self):
+        return self._topic
 
-        if self.auto_commit_interval_ms:
-            kwargs["auto_commit_interval_ms"] = self.auto_commit_interval_ms
-        if self.consumer_timeout_ms:
-            kwargs["consumer_timeout_ms"] = self.consumer_timeout_ms
-        if self.bootstrap_servers:
-            kwargs["bootstrap_servers"] = self.bootstrap_servers
+    def __delivery_report(self, future, err, msg):
+        if err is not None:
+            future.set_result(False)
+            logger.error("Message delivery failed: error=%s, msg=%s", err, msg)
         else:
-            logger.info("发送消息成功  topic: [%s] partition:[%s] message: %s", msg.topic(), msg.partition(), msg.value().decode("utf-8"))
+            logger.info("发送消息成功  topic: [%s] partition:[%s] message: %s", msg.topic(), msg.partition(),
+                        msg.value().decode("utf-8"))
             future.set_result(True)
 
-        if self.topics:
-            pass
-        else:
-            return False
-
-        if self.group_id:
-            kwargs["group_id"] = self.group_id
-        if self.client_id:
-            kwargs["client_id"] = self.client_id
-        if self.auto_offset_reset:
-            kwargs["auto_offset_reset"] = self.auto_offset_reset
-
-        self.consumer = KafkaConsumer(*self.topics, **kwargs)
-
-        return self.consumer
-
-    def generate_consume_msg(self, max_item=0, stop_timestamp=0, stop_time=None):
-        if self.consumer:
-            consume_count = 0
-            for msg in self.consumer:
-                yield msg
-                consume_count += 1
-                if (max_item > 0 and consume_count >= max_item) or (
-                        stop_timestamp > 0 and time.time() >= stop_timestamp) or (
-                        stop_time is not None and time.time() >= time.mktime(
-                    time.strptime(stop_time, "%Y-%m-%d %H:%M:%S"))):
-                    # 如果满足最大消费次数 或者 最大时间戳 或者 截止时间，则退出
-                    break
-
-    def get_metrics(self):
-        if self.consumer:
-            return self.consumer.metrics()
-        else:
-            return None
-
-    def create_producer(self):
-        if self.bootstrap_servers:
-            self.producer = KafkaProducer(bootstrap_servers=self.bootstrap_servers)
-            return self.producer
-        else:
-            return False
-
-    def close_producer(self):
-        if hasattr(self, "producer"):
-            self.producer.close()
-            delattr(self, "producer")
-
-    def send_producer_msg(self, value, topic=None, key=None, headers=None, partition=None, timestamp_ms=None):
-        # 查看producer是否创建，如果没有创建就创建，重试5次
-        for i in range(0, 5):
-            try:
-                if not hasattr(self, "producer"):
-                    self.create_producer()
-            except Exception as e:
-                print(e)
-            finally:
-                if not hasattr(self, "producer"):
-                    time.sleep(1)
-
-        if topic:
-            res = self.producer.send(topic, value, key=key, headers=headers, partition=partition,
-                                     timestamp_ms=timestamp_ms)
-            self.producer.flush()
-            return res
-        elif self.topics:
-            res = self.producer.send(self.topics[0], value, key=key, headers=headers, partition=partition,
-                                     timestamp_ms=timestamp_ms)
-            self.producer.flush()
-            return res
-        else:
-            return False
+    def sync_send_message(self, message) -> bool:
+        future = Future()
+        self.producer.produce(topic=self._topic, value=message,
+                              callback=lambda err, msg: self.__delivery_report(future, err, msg))
+        self.producer.flush()
+        return future.result()  # 等待结果
 
 
 class KafkaConsumer:
-    def __init__(self, bootstrap_servers, group_id, topic, callback):
-        self.consumer = Consumer({
+    def __init__(self,
+                 bootstrap_servers,
+                 group_id,
+                 topic,
+                 callback,
+                 callback_timeout,
+                 producer=None,
+                 # callback_timeout + err_retry_max 需小于 retry_interval！防止重平衡
+                 err_retry_max=DEFAULT_ERR_RETRY_MAX,
+                 retry_interval=DEFAULT_RETRY_INTERVAL,
+                 **kwargs):
+        base_conf = {
             'bootstrap.servers': bootstrap_servers,
             'group.id': group_id,
             'auto.offset.reset': 'earliest',  # 可以是 'earliest', 'latest', 'none'
             'enable.auto.commit': False,  # 禁用自动提交
-            'max.poll.interval.ms': 600000,  # 10分钟,避免_MAX_POLL_EXCEEDED
-        })
+        }
+        base_conf.update(kwargs)
+
+        self.consumer = Consumer(base_conf)
         self.topic = topic
+        self.group_id = group_id
         self.consumer.subscribe([self.topic])
         self.callback = callback
-        self.err_cnt_max = 3
+        self.err_retry_max = err_retry_max
+        self.retry_interval = retry_interval
         self.__closed = False
         self.lock = threading.Lock()
+        self.callback_timeout = callback_timeout
+        self.producer = producer
 
-    def create_consumer(self):
-        kwargs = {}
-        kwargs["enable_auto_commit"] = self.enable_auto_commit
-
-        # if self.enable_auto_commit and self.auto_commit_interval_ms is not None:
-        #     kwargs["auto_commit_interval_ms"] = self.auto_commit_interval_ms
-        if self.consumer_timeout_ms:
-            kwargs["consumer_timeout_ms"] = self.consumer_timeout_ms
-        if self.bootstrap_servers:
-            kwargs["bootstrap_servers"] = self.bootstrap_servers
-        else:
-            return False
-
-        if self.topic:
-            pass
-        else:
-            return False
-
-        if self.group_id:
-            kwargs["group_id"] = self.group_id
-        if self.client_id:
-            kwargs["client_id"] = self.client_id
-        if self.auto_offset_reset:
-            kwargs["auto_offset_reset"] = self.auto_offset_reset
-
-        self.consumer = KafkaConsumer(*self.topic, **kwargs)
-
-        return self.consumer
-
-    def generate_consume_msg(self, max_item=0, stop_timestamp=0, stop_time=None):
+    def consume_messages(self):
+        """
+        三次重试，失败后打印错误日志，研发查看原因，手动补偿
+        """
         try:
-            if self.consumer:
-                consume_count = 0
-                while True:
-                    msg = next(self.consumer)
-                    if msg == -1:
+            while True:
+                with self.lock:
+                    if self.__closed:
                         break
                     msg = self.consumer.poll(1.0)
                 if msg is None:
@@ -163,37 +97,56 @@ class KafkaConsumer:
                 if msg.error():
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         logger.info("consume_messages PARTITION_EOF topic=%s partition=%s code=%s ",
-                                    msg.topic(), msg.partition(), msg.error().code())
+                                    self.topic, msg.partition(), msg.error().code())
                     else:
                         logger.error("consume_messages error topic=%s partition=%s code=%s message: %s",
-                                     msg.topic(), msg.partition(), msg.error().code(), msg.value().decode("utf-8") if msg.value() else "None")
+                                     self.topic, msg.partition(), msg.error().code(),
+                                     msg.value().decode("utf-8") if msg.value() else "None")
                 else:
                     message_value = msg.value().decode("utf-8")
                     logger.info("Received topic: [%s] partition:[%s] message: %s",
                                 self.topic, msg.partition(), message_value)
-                    err_cnt = 0
-                    while err_cnt < self.err_cnt_max:
-                        try:
-                            # 调用注册的回调方法
-                            if self.callback(message_value):
-                                # 手动提交偏移量
-                                self.consumer.commit(msg)
-                                logger.info("consumer topic: [%s] partition:[%s] message: %s 消费成功",
-                                            self.topic, msg.partition(), message_value)
-                                break
-                            else:
-                                err_cnt += 1
-                                logger.info("consumer topic: [%s] partition:[%s] message: %s  retry=%s",
-                                            self.topic, msg.partition(), message_value, err_cnt)
-                        except Exception as e:
+                    payload: dict = json.loads(message_value)
+                    err_cnt = payload.get('reconsume_times', 0)
+                    try:
+                        # 传递重试次数，仿照rocketMQ，取名，各自回调视情况需要接收
+                        kwargs = {}
+                        if has_parameter(self.callback, "reconsume_times"):
+                            kwargs["reconsume_times"] = err_cnt
+
+                        if self.run_callback(payload, **kwargs):
+                            # 手动提交偏移量
+                            self.consumer.commit(msg)
+                            logger.info("consumer topic: [%s] partition:[%s] message: %s 消费成功",
+                                        self.topic, msg.partition(), message_value)
+                        else:
                             err_cnt += 1
-                            logger.info("consumer  topic: [%s] partition:[%s] message: %s  retry=%s e=%s",
-                                        self.topic, msg.partition(), message_value, err_cnt, e)
-                            logger.exception(e)
-                    if err_cnt == self.err_cnt_max:
-                        logger.error("consumer fail topic: [%s] partition:[%s] 需要研发关注补偿: %s",
+                            logger.info("consumer topic: [%s] partition:[%s] message: %s  retry=%s",
+                                        self.topic, msg.partition(), message_value, err_cnt)
+
+                    except BusinessError as e:
+                        err_cnt += 1
+                        logger.error("业务异常consumer  topic: [%s] partition:[%s] message: %s  retry=%s",
+                                    self.topic, msg.partition(), message_value, err_cnt, exc_info=True)
+                        # 如果是0则不会引入任何延迟
+                        time.sleep(self.retry_interval)
+                    except Exception as e:
+                        err_cnt += 1
+                        logger.error("非业务异常需要关注 consumer  topic: [%s] partition:[%s] message: %s  retry=%s",
+                                    self.topic, msg.partition(), message_value, err_cnt, exc_info=True)
+                        # 如果是0则不会引入任何延迟
+                        time.sleep(self.retry_interval)
+
+                    if err_cnt >= self.err_retry_max:
+                        logger.error("consumer fail topic: [%s] partition:[%s] 需要研发关注是否需要补偿: %s",
                                      self.topic, msg.partition(), message_value)
                         self.consumer.commit(msg)
+                    elif payload.get('reconsume_times', 0) != err_cnt:
+                        # 本次消费执行失败，重新发送kafka消息
+                        payload.update({'reconsume_times': err_cnt})
+                        self.reconsume_messages(json.dumps(payload))
+                        self.consumer.commit(msg)
+
         except KeyboardInterrupt:
             logger.error("用户中断")
         except KafkaError as e:
@@ -208,67 +161,17 @@ class KafkaConsumer:
                 logger.info("workers topic = %s final close", self.topic)
                 self.consumer.close()
 
-                    yield msg
-                    consume_count += 1
-                    if not self.enable_auto_commit:
-                        self.consumer.commit()
-                    # self.consumer.commit(offsets={self.tp: (OffsetAndMetadata(end_offset + 1, None))})
-                    print('Kafka partition: %s offset: %s' % (
-                        msg.partition, self.consumer.committed(TopicPartition(msg.topic, msg.partition))))
-                    if (max_item > 0 and consume_count >= max_item) or (
-                            stop_timestamp > 0 and time.time() >= stop_timestamp) or (
-                            stop_time is not None and time.time() >= time.mktime(
-                        time.strptime(stop_time, "%Y-%m-%d %H:%M:%S"))):
-                        # 如果满足最大消费次数 或者 最大时间戳 或者 截止时间，则退出
-                        break
-        except Exception as e:
-            print(e)
+    def stop(self):
+        with self.lock:
+            if not self.__closed:
+                logger.info("workers  topic = %s stop close", self.topic)
+                self.__closed = True
+                self.consumer.close()
 
-    def get_metrics(self):
-        if self.consumer:
-            return self.consumer.metrics()
-        else:
-            return None
+    def run_callback(self, payload, **kwargs) -> bool:
+        return self.callback(payload, **kwargs)
 
-    def create_producer(self):
-        if self.bootstrap_servers:
-            self.producer = KafkaProducer(bootstrap_servers=self.bootstrap_servers)
-            return self.producer
-        else:
-            return False
-
-    def close_producer(self):
-        if hasattr(self, "producer"):
-            self.producer.close()
-            delattr(self, "producer")
-
-    def send_producer_msg(self, value, topic=None, key=None, headers=None, partition=None, timestamp_ms=None):
-        # 查看producer是否创建，如果没有创建就创建，重试5次
-        for i in range(0, 5):
-            try:
-                if not hasattr(self, "producer"):
-                    self.create_producer()
-            except Exception as e:
-                print(e)
-            finally:
-                if not hasattr(self, "producer"):
-                    time.sleep(1)
-
-        if topic:
-            res = self.producer.send(topic, value, key=key, headers=headers, partition=partition,
-                                     timestamp_ms=timestamp_ms)
-            self.producer.flush()
-            return res
-        elif self.topic:
-            res = self.producer.send(self.topic, value, key=key, headers=headers, partition=partition,
-                                     timestamp_ms=timestamp_ms)
-            self.producer.flush()
-            return res
-        else:
-            return False
-
-
-if __name__ == "__main__":
-    mytopics = ["plat-qa-wjltest"]
-    myservers = ["kafka01-test.lianjia.com:9092", "kafka02-test.lianjia.com:9092", "kafka03-test.lianjia.com:9092"]
-    kt = KafkaTool(myservers, mytopics)
+    def reconsume_messages(self, message_value):
+        logger.info("reconsume message topic: [%s] message: %s", self.topic, message_value)
+        if self.producer:
+            self.producer.sync_send_message(message_value)

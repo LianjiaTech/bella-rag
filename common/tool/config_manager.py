@@ -93,10 +93,23 @@ config_manager: Optional[ConfigManager] = None
 
 
 def init_config(config_file: str) -> ConfigManager:
-    """初始化全局配置管理器"""
+    """
+    初始化全局配置管理器
+    
+    Args:
+        config_file: 主配置文件路径
+
+    Returns:
+        ConfigManager实例
+    """
     global config_manager
-    config_manager = ConfigManager(config_file)
-    return config_manager
+    
+    # 尝试加载主配置文件
+    if os.path.exists(config_file):
+        config_manager = ConfigManager(config_file)
+        return config_manager
+    else:
+        raise FileNotFoundError(f"配置文件不存在: {config_file}")
 
 
 def get_config() -> ConfigManager:
