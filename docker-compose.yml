@@ -1,0 +1,253 @@
+version: '3.8'
+services:
+
+  # ========== 基础服务 ==========
+  
+  mysql:
+    image: mysql:8.0
+    container_name: bella-rag-mysql
+    restart: unless-stopped
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bella_rag}
+      MYSQL_USER: ${MYSQL_USER:-bella_rag_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-bella_rag_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init-mysql.sh:/docker-entrypoint-initdb.d/init-mysql.sh:ro
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=2G   # MySQL buffer pool 2GB
+    deploy:
+      resources:
+        limits:
+          memory: 3g   # MySQL 最大 3GB
+
+  redis:
+    image: redis:7-alpine
+    container_name: bella-rag-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+      - ./scripts/init-redis.sh:/docker-entrypoint-initdb.d/init-redis.sh:ro
+    command: redis-server --appendonly yes
+
+  elasticsearch:
+    image: elasticsearch:8.8.0
+    container_name: bella-rag-elasticsearch
+    restart: unless-stopped
+    ports:
+      - "${ES_PORT:-9200}:9200"
+      - "${ES_TRANSPORT_PORT:-9300}:9300"
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+      - xpack.security.enabled=false
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+      - ./scripts/init-elasticsearch.sh:/docker-entrypoint-initdb.d/init-elasticsearch.sh:ro
+    deploy:
+      resources:
+        limits:
+          memory: 4g   # 容器总内存限制（Heap 3GB + 文件缓存 1GB）
+
+  # ========== 向量数据库服务 ==========
+  
+  # Qdrant向量数据库
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: bella-rag-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_HTTP_PORT:-6333}:6333"  # REST API
+      - "${QDRANT_GRPC_PORT:-6334}:6334"  # gRPC API
+      - "${QDRANT_CLUSTER_PORT:-6335}:6335"  # 集群通信端口
+    volumes:
+      - qdrant_data:/qdrant/storage
+      - ./scripts/init-qdrant.sh:/docker-entrypoint-initdb.d/init-qdrant.sh:ro
+    environment:
+      - QDRANT__LOG_LEVEL=${QDRANT_LOG_LEVEL:-INFO}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:6333/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 3g
+
+  # ========== 消息队列服务 ==========
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: bella-rag-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: bella-rag-kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "${KAFKA_PORT:-19092}:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+      - ./scripts/init-kafka.sh:/docker-entrypoint-initdb.d/init-kafka.sh:ro
+
+  # ========== 应用服务 ==========
+  
+  bella-rag-api:
+    image: bellatop/bella-rag:latest
+    container_name: bella-rag-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8008}:8080"
+    environment:
+      - CONFIG_FILE=${CONFIG_FILE:-config_release.ini}
+      - ENVTYPE=${ENVTYPE:-prod}
+      - PORT=8080
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=${MYSQL_USER:-bella_rag_user}
+      - DB_PASSWORD=${MYSQL_PASSWORD:-bella_rag_password}
+      - DB_NAME=${MYSQL_DATABASE:-bella_rag}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - REDIS_DATABASE=0
+      - ES_HOSTS=http://elasticsearch:9200
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - QDRANT_GRPC_PORT=6334
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      # OpenAI API配置
+      - OPENAI_API_KEY=85f22198-59cb-4da8-9ef9-07c1bd30ad21
+      - OPENAI_API_BASE=https://api.bella.top/v1
+    volumes:
+      # - ./conf:/app/conf:ro
+      - ./logs:/app/logs
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+      - qdrant
+      - kafka  # 可选：如果不使用kafka可以注释掉
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/api/actuator/health/liveness" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ========== 初始化服务 ==========
+  
+  mysql-init:
+    image: mysql:8.0
+    container_name: bella-rag-mysql-init
+    depends_on:
+      - mysql
+    volumes:
+      - ./scripts:/scripts:ro
+    command: >
+      bash -c "
+        echo 'Waiting for MySQL to be ready...'
+        until mysql -h mysql -u root -p${MYSQL_ROOT_PASSWORD:-root_password} -e 'SELECT 1'; do
+          sleep 2
+        done
+        echo 'MySQL is ready, running initialization scripts...'
+        bash /scripts/init-mysql.sh
+        echo 'MySQL initialization completed'
+      "
+    restart: "no"
+
+  elasticsearch-init:
+    image: curlimages/curl:latest
+    container_name: bella-rag-elasticsearch-init
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./scripts:/scripts:ro
+    command: >
+      sh -c "
+        echo 'Waiting for Elasticsearch to be ready...'
+        until curl -s http://elasticsearch:9200/_cluster/health; do
+          sleep 2
+        done
+        echo 'Elasticsearch is ready, running initialization scripts...'
+        sh /scripts/init-elasticsearch.sh
+        echo 'Elasticsearch initialization completed'
+      "
+    restart: "no"
+
+  qdrant-init:
+    image: debian:bullseye
+    container_name: bella-rag-qdrant-init
+    depends_on:
+      - qdrant
+    volumes:
+      - ./scripts:/scripts:ro
+    command: >
+      bash -c "
+        apt-get update && apt-get install -y curl;
+        echo 'Waiting for Qdrant to be ready...';
+        until curl -s http://qdrant:6333/health; do
+          sleep 2;
+        done;
+        echo 'Qdrant is ready, running initialization scripts...';
+        bash /scripts/init-qdrant.sh;
+        echo 'Qdrant initialization completed';
+      "
+    restart: "no"
+
+  # kafka-init:
+  #   image: confluentinc/cp-kafka:7.4.0
+  #   container_name: bella-rag-kafka-init
+  #   depends_on:
+  #     - kafka
+  #   volumes:
+  #     - ./scripts:/scripts:ro
+  #   command: >
+  #     bash -c "
+  #       echo 'Waiting for Kafka to be ready...'
+  #       until kafka-topics --bootstrap-server kafka:29092 --list; do
+  #         sleep 2
+  #       done
+  #       echo 'Kafka is ready, running initialization scripts...'
+  #       bash /scripts/init-kafka.sh
+  #       echo 'Kafka initialization completed'
+  #     "
+  #   restart: "no"
+
+volumes:
+  mysql_data:
+  redis_data:
+  es_data:
+  qdrant_data:
+  zookeeper_data:
+  zookeeper_logs:
+  kafka_data:
+
+networks:
+  default:
+    name: bella-rag-network
