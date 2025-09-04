@@ -1,9 +1,8 @@
 import json
-import traceback
 import threading
 import time
-import queue
-from typing import List, Dict, Any, Generator, Iterator
+import traceback
+from typing import List, Dict, Any, Generator
 
 from app.common.contexts import UserContext, OpenapiContext
 from app.plugin.plugins import Plugin
@@ -12,6 +11,8 @@ from app.response.rag_response import OpenApiError
 from app.services.rag_service import rag_streaming, rag
 from app.strategy.retrieval import RetrievalMode
 from app.utils.llm_response_util import get_response_json_str
+from bella_rag.handler.streaming_handler import BaseEventHandler
+from bella_rag.vector_stores.types import MetadataFilters
 from deep_rag.common.contexts import DeepRagContext
 from deep_rag.entity.exception import UnablePlanException
 from deep_rag.entity.memory import Memory, MemoryItem
@@ -21,8 +22,6 @@ from deep_rag.pipline.plan_and_solve_runner import run_deep_rag, review_plan, re
 from deep_rag.prompt.pipline import multi_step_planning_prompt, memory_combine_prompt, conclusion_prompt
 from deep_rag.tools.schemas import search_tool, read_tool, tool_list
 from init.settings import user_logger
-from bella_rag.handler.streaming_handler import BaseEventHandler
-from bella_rag.vector_stores.types import MetadataFilters
 
 logger = user_logger
 
@@ -70,34 +69,30 @@ class RagRunner:
                    model=model, metadata_filters=metadata_filters, retrieve_mode=retrieve_mode,
                    plugins=plugins, show_quote=show_quote, event_handler=self.event_handler, )
 
-    @staticmethod
-    def mode():
-        return "normal"
-
 
 class HeartbeatStreamWrapper:
     """心跳包流式包装器 - 真正的独立心跳发送"""
-    
+
     def __init__(self, main_generator: Generator[str, None, None], session_id: str, heartbeat_interval: int = 10):
         self.main_generator = main_generator
         self.session_id = session_id
         self.heartbeat_interval = heartbeat_interval
-        
+
     def __iter__(self):
         """使用超时机制来实现心跳包"""
-        
+
         # 将主生成器转换为列表以便处理
         main_items = []
         main_thread = threading.Thread(target=self._collect_main_items, args=(main_items,))
         main_thread.daemon = True
         main_thread.start()
-        
+
         last_heartbeat = time.time()
         main_index = 0
-        
+
         while main_thread.is_alive() or main_index < len(main_items):
             current_time = time.time()
-            
+
             # 检查是否有新的主流程项目
             if main_index < len(main_items):
                 yield main_items[main_index]
@@ -115,10 +110,10 @@ class HeartbeatStreamWrapper:
                     yield f"data: {json.dumps(heartbeat.to_dict(), ensure_ascii=False)}\n\n"
                     last_heartbeat = current_time
                     logger.debug(f"Heartbeat sent for session {self.session_id}")
-                
+
                 # 短暂等待避免忙等待
                 time.sleep(0.1)
-    
+
     def _collect_main_items(self, items_list):
         """在独立线程中收集主生成器的项目"""
         try:
@@ -217,7 +212,7 @@ class PlanAndSolveStreamRunner(RagRunner):
 
     def _emit_error(self, error_code: str, error_type: str, error_message: str) -> StreamResponse:
         """发送错误事件"""
-        error = OpenApiError(message=error_message,  body={"code": error_code, "type": error_type})
+        error = OpenApiError(message=error_message, body={"code": error_code, "type": error_type})
         return self._create_stream_response(
             StreamEventType.ERROR,
             StreamEventType.ERROR.value,
@@ -248,7 +243,7 @@ class PlanAndSolveStreamRunner(RagRunner):
                 # 将 StreamResponse 转换为event事件
                 yield f"event: {stream_response.event.value}\n"
                 yield f"data: {json.dumps(stream_response.to_dict(), ensure_ascii=False)}\n\n"
-        
+
         # 使用心跳包装器
         heartbeat_wrapper = HeartbeatStreamWrapper(main_stream(), self.session_id)
         yield from heartbeat_wrapper
@@ -471,7 +466,3 @@ class PlanAndSolveStreamRunner(RagRunner):
         answer = run_deep_rag(query, file_ids=file_ids, user=UserContext.user_id, model=model)
         message = self.event_handler.convert_query_res_to_rag_response(answer, [], [])
         return MessageWithPlan(content=message.content, plan=DeepRagContext.plan).to_dict()
-
-    @staticmethod
-    def mode():
-        return "deep"

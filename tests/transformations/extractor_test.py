@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.rag_service import file_indexing
+from app.services.file_service import file_indexing
 from app.workers.handlers.knowledge_context_summary_task import knowledge_file_context_summary_callback
 from bella_rag.utils.file_api_tool import file_api_client
 from tests import TEST_PATH
