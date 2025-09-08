@@ -50,7 +50,7 @@ def search(request):
 
         # 直接使用用户模式获取检索配置
         retrieve_mode = get_retrieval_mode_from_user_mode(user_mode)
-        plugins = build_plugins_from_user_mode(user_mode)
+        plugins = build_plugins_from_user_mode(user_mode, top_k=top_k)
         
         nodes = rag_service.retrieval(file_ids=file_ids, query=query, top_k=int(top_k),
                                       score=0, metadata_filters=metadata_filters,
@@ -101,8 +101,8 @@ def chat(request):
             return HttpResponse(error.json_response().encode('utf-8'), status=422)
 
         # 直接使用用户模式获取检索配置
-        retrieve_mode = get_retrieval_mode_from_user_mode(user_mode)
-        plugins = build_plugins_from_user_mode(user_mode)
+        retrieve_mode = get_retrieval_mode_from_user_mode(user_mode, top_k=top_k)
+        plugins = build_plugins_from_user_mode(user_mode, top_k=top_k)
 
         # rag模式
         runner_class = rag_runners.get(user_mode, None)
