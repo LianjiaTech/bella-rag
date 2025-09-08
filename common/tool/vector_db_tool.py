@@ -4,6 +4,7 @@ from typing import List, Optional
 from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend, \
     QuestionAnswerAttachedIndexExtend
 from bella_rag.schema.nodes import BaseNode
+from app.services import embed_model, chunk_vector_index_structure, question_vector_index_structure
 from bella_rag.vector_stores import qdrant_manager, tencent_manager
 from bella_rag.vector_stores.types import MetadataFilter, FilterOperator, MetadataFilters
 
@@ -80,6 +81,7 @@ def batch_query_by_source(source_id: str, limit: int, offset: int, read_strong_c
         offset=offset,
         filter_condition=metadata_filters,
         index_extend=chunk_index_extend,
+        index=chunk_vector_index_structure,
     )
 
 
@@ -107,6 +109,7 @@ def batch_question_by_filter(source_id: str, limit: int, offset: int, group_ids:
         offset=offset,
         document_ids=ids,
         filter_condition=metadata_filters,
+        index=question_vector_index_structure,
         index_extend=question_answer_extend,
     )
 
