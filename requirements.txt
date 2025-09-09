@@ -25,9 +25,10 @@ chardet==5.2.0
 pyexcel==0.7.0
 PyMuPDF==1.23.6
 
-# start gunicore
-gunicorn==19.9.0
-eventlet==0.25.1
+# start gunicorn  
+gunicorn==21.2.0
+gevent==23.9.1
+dnspython==2.4.2
 
 python-docx==1.1.2  # DOCX 文本提取
 
