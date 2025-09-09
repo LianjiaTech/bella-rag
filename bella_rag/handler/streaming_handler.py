@@ -100,7 +100,7 @@ class RagEventHandler(BaseEventHandler):
                                              file_citation=ChatFileCitation(
                                                  file_id=score_node.metadata[chunk_vector_index_structure.doc_id_key],
                                                  file_name=score_node.metadata[chunk_vector_index_structure.doc_name_key],
-                                                 path=parse_path_from_order_num(getattr(score_node.node, 'order_num_str', ''))
+                                                 paths=parse_paths_from_node(score_node.node)
                                              )))
         rag_text = RagText(value=text, annotations=annotations)
         content = RagContent(type='text', sensitives=sensitives, text=[rag_text])

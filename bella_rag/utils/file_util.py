@@ -44,7 +44,8 @@ def create_standard_dom_tree_from_json(json_data: dict) -> StandardDomTree:
     从JSON数据创建StandardDomTree
     """
     from bella_openapi.entity.standard_domtree import StandardNode
+    from bella_rag.transformations.domtree import format_domtree
     # 创建根节点
-    root_node = StandardNode(**json_data)
+    root_node = format_domtree(StandardNode(**json_data))
     # 创建StandardDomTree
     return StandardDomTree(root=root_node)

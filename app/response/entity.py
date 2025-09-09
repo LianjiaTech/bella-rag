@@ -58,13 +58,13 @@ class ChatFileCitation:
     """专门用于chat接口的文件引用类"""
     file_id: str
     file_name: Optional[str] = None
-    path: Optional[List[int]] = None
+    paths:  Optional[List[List]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             'file_id': self.file_id,
             'file_name': self.file_name,
-            'path': self.path  # chat接口返回path字段
+            'paths': self.paths
         }
 
 @dataclass

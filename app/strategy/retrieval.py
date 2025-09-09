@@ -221,7 +221,7 @@ def get_retrieval_config_from_user_mode(user_mode: str, **kwargs) -> Tuple[Retri
     """从用户模式直接获取检索配置"""
     if user_mode == UserMode.FAST.value:
         return RetrievalMode.SEMANTIC, [
-            Reranker(status=PluginStatus.OFF, parameters={}),
+            Reranker(status=PluginStatus.OFF, parameters={}), 
             Completer(parameters={"complete_max_length": 1500, "complete_mode": "most_complete"}, **kwargs)
         ]
     elif user_mode in [UserMode.ULTRA.value, UserMode.DEEP.value]:
@@ -236,7 +236,6 @@ def get_retrieval_config_from_user_mode(user_mode: str, **kwargs) -> Tuple[Retri
             Completer(parameters={"complete_max_length": 1500, "complete_mode": "most_complete"}, **kwargs),
             Reranker(parameters={}, **kwargs),
         ]
-
 
 def get_retrieval_mode_from_user_mode(user_mode: str, **kwargs) -> RetrievalMode:
     """从用户模式获取检索模式"""

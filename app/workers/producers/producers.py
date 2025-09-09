@@ -61,7 +61,6 @@ knowledge_index_task_kafka_producer = producers["knowledge_index_task"]
 knowledge_file_extractor_producer = producers["knowledge_file_extractor"]
 knowledge_file_delete_producer = producers["knowledge_file_delete"]
 
-
 def async_send_kafka_message(producer: KafkaProducer, data: str):
     if not producer:
         logger.warn(f'producer is none, can not send message: {data}')

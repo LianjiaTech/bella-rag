@@ -38,4 +38,4 @@ def stop_workers():
     executor.shutdown()
 
 
-__all__ = ['knowledge_index_task_kafka_producer', 'knowledge_file_extractor_producer', 'start_workers', 'stop_workers']
+__all__ = ['knowledge_index_task_kafka_producer', 'knowledge_file_extractor_producer', 'start_workers', 'stop_workers','consumers','executor']

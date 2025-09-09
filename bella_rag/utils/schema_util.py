@@ -110,7 +110,7 @@ def to_llama_index_node(node: StandardNode) -> Union[StructureNode, List[Structu
     # 通过类型区分
 
     if node.element.type == "Figure" and node.element.image:
-        ocr_result = " " if EMPTY_OCR_RESULT in node.element.text else node.element.text
+        ocr_result = " " if node.element.text is None or EMPTY_OCR_RESULT in node.element.text else node.element.text
         return ImageNode(
             order_num_str=_format_dom_path(node.path),
             image_url=node.element.image.url,

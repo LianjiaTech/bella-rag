@@ -682,3 +682,19 @@ class FileAPIClient:
             return str(file_info.get('pdf_file_id'))
         except FileNotFoundException:
             return ""
+
+
+    def file_domtree(self, file_id: str) -> dict:
+        """
+        获取文件的domtree
+        """
+        url = f"{self.base_url}/files/{file_id}/dom-tree/content"
+        try:
+            response = requests.get(url, headers=self._get_headers())
+            if response.status_code == 404:
+                raise FileNotFoundException(f"File {file_id} not found")
+            response.raise_for_status()
+            return response.json()
+        except RequestException as e:
+            logger.error(f"Download file failed: {str(e)}")
+            raise

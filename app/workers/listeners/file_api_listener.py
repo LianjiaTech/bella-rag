@@ -11,8 +11,8 @@ file_api_task_config = {
     'max.poll.interval.ms': 60000,  # 60s,避免_MAX_POLL_EXCEEDED
 }
 
-
 class FileApiTaskListener(BaseListener):
 
     def __init__(self, instance_num):
         super().__init__(instance_num, **file_api_task_config)
+

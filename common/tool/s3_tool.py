@@ -8,6 +8,7 @@ import warnings
 from typing import Optional, IO, Dict, Any
 
 from init.settings import user_logger
+import json
 
 warnings.filterwarnings('ignore')
 
@@ -108,3 +109,32 @@ class S3(object):
         signed_url = f"{uri.scheme}://{host}{path}?{params}"
         return signed_url
 
+    def upload_dict_content(self, data: dict, file_key: str) -> str:
+        json_data = json.dumps(data)
+        self.bucket.Object(file_key).put(Body=json_data)
+        return file_key
+
+    def download_dict_content(self, file_key: str) -> dict:
+        response = self.bucket.Object(file_key).get()
+        return response['Body'].read().decode('utf-8')
+    
+    def delete_file(self, file_key: str) -> bool:
+        """删除字典内容"""
+        try:
+            self.bucket.Object(file_key).delete()
+            user_logger.info(f'Successfully deleted dict content: {file_key}')
+            return True
+        except Exception as e:
+            user_logger.error(f'Failed to delete dict content {file_key}: {repr(e)}')
+            traceback.print_exc()
+            return False
+
+    def exists_file(self, file_key: str) -> bool:
+        """判断字典内容是否存在"""
+        try:
+            self.bucket.Object(file_key).load()
+            user_logger.info(f'Dict content exists: {file_key}')
+            return True
+        except Exception as e:
+            user_logger.info(f'Dict content not exists: {file_key}')
+            return False 
