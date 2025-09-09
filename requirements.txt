@@ -13,7 +13,7 @@ django-redis==5.2.0
 # 数据库连接池配置
 django-db-connection-pool==1.2.5
 
-bella_openapi==1.0.4.1
+bella_openapi==1.0.4.10
 
 # 定时任务
 apscheduler==3.11.0
