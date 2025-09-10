@@ -222,7 +222,8 @@ class TencentVectorDB(OriginalTencentVectorDB, BellaVectorStore):
             retrieve_vector=retrieve_vector,
             output_fields=query.output_fields,
             filter=search_filter,
-            params=SearchParam(ef=10000)
+            params=SearchParam(ef=10000),
+            timeout=60
         )
         if len(results) == 0:
             return VectorStoreQueryResult(nodes=[], similarities=[], ids=[])
