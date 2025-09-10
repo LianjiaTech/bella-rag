@@ -83,7 +83,7 @@ def context_summary(source_id: str):
         return
 
     # 查询全量节点
-    nodes = query_all_by_source(source_id)
+    nodes = query_all_by_source(source_id, True)
     rebuild_node_dic = rebuild_nodes_from_index(source_id, index_nodes=nodes, origin_nodes=nodes)
     nodes = list(rebuild_node_dic.values())
     user_logger.info(f'start context summary: {source_id}, chunk size: {len(nodes)}')
