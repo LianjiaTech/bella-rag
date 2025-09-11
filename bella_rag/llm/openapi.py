@@ -674,6 +674,33 @@ class FileAPIClient:
             logger.error(f"get file ids by space failed: {str(e)}")
             return []
 
+    def get_file_ids_by_ancestor(self, ancestor: str) -> List[str]:
+        """
+        获取指定ancestor下面所有的file_ids
+        """
+        url = f"{self.base_url}/files/find?type=file"
+        files = {'ancestor_id': (None, ancestor)}
+        headers = self._get_headers()
+
+        try:
+            response = requests.get(
+                url,
+                files=files,
+                headers=headers
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            if 'data' in data and isinstance(data['data'], list):
+                return [file['id'] for file in data['data']]
+            else:
+                return []
+
+        except RequestException as e:
+            logger.error(f"get file ids by ancestor failed: {str(e)}")
+            return []
+
+
     def get_docx_file_pdf_id(self, docx_file_id: str) -> str:
         try:
             file_info = self.get_file_info(docx_file_id)

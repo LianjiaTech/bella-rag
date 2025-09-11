@@ -1,5 +1,6 @@
 from common.helper.exception import CheckError
 
+
 def validate_request_params(data):
     """
     校验请求参数是否有效
@@ -8,7 +9,7 @@ def validate_request_params(data):
     scope = data.get('scope', [])
     if not scope or len(scope) == 0:
         raise CheckError("请求中scope必传")
-    
+
     for scope_item in scope:
         if not isinstance(scope_item, dict):
             raise CheckError("scope数组中的每个元素必须是对象")
@@ -16,8 +17,8 @@ def validate_request_params(data):
         scope_ids = scope_item.get('ids', [])
         if not scope_type or not scope_ids:
             raise CheckError("scope中type和ids字段必传")
-        if scope_type not in ['file', 'space']:
-            raise CheckError("type只支持file和space类型")
+        if scope_type not in ['file', 'space', 'directory']:
+            raise CheckError("type只支持file、space、directory类型")
         if not isinstance(scope_ids, list):
             raise CheckError("scope中ids必须是数组")
 

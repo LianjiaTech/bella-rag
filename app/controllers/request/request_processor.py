@@ -23,6 +23,14 @@ def extract_file_ids_from_scope(scope: List[dict]) -> List[str]:
                     file_ids.extend(space_file_ids)
                 except Exception as e:
                     raise CheckError(f"获取空间 {space_id} 下的文件失败: {str(e)}")
+        elif scope_type == 'directory':
+            # 通过directory获取该目录下所有file_ids
+            for directory_id in scope_ids:
+                try:
+                    directory_file_ids = file_api_client.get_file_ids_by_ancestor(directory_id)
+                    file_ids.extend(directory_file_ids)
+                except Exception as e:
+                    raise CheckError(f"获取目录 {directory_id} 下的文件失败: {str(e)}")
 
     # 去重并返回
     return list(set(file_ids))
