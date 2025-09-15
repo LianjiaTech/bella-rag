@@ -220,24 +220,24 @@ services:
       "
     restart: "no"
 
-  # kafka-init:
-  #   image: confluentinc/cp-kafka:7.4.0
-  #   container_name: bella-rag-kafka-init
-  #   depends_on:
-  #     - kafka
-  #   volumes:
-  #     - ./scripts:/scripts:ro
-  #   command: >
-  #     bash -c "
-  #       echo 'Waiting for Kafka to be ready...'
-  #       until kafka-topics --bootstrap-server kafka:29092 --list; do
-  #         sleep 2
-  #       done
-  #       echo 'Kafka is ready, running initialization scripts...'
-  #       bash /scripts/init-kafka.sh
-  #       echo 'Kafka initialization completed'
-  #     "
-  #   restart: "no"
+  kafka-init:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: bella-rag-kafka-init
+    depends_on:
+      - kafka
+    volumes:
+      - ./scripts:/scripts:ro
+    command: >
+      bash -c "
+        echo 'Waiting for Kafka to be ready...'
+        until kafka-topics --bootstrap-server kafka:29092 --list; do
+          sleep 2
+        done
+        echo 'Kafka is ready, running initialization scripts...'
+        bash /scripts/init-kafka.sh
+        echo 'Kafka initialization completed'
+      "
+    restart: "no"
 
 volumes:
   mysql_data:
