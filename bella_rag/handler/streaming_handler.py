@@ -8,7 +8,7 @@ from app.response.entity import ChatFileCitation, Text as RagText, Annotation as
     Content as RagContent, Message
 from app.response.rag_response import RagStreamSensitive
 from app.services import chunk_vector_index_structure
-from app.utils.convert import convert_score_nodes_to_search_res, parse_path_from_order_num
+from app.utils.convert import convert_score_nodes_to_search_res, parse_paths_from_node
 from bella_rag.llm.types import Sensitive
 from bella_rag.schema.nodes import NodeWithScore
 
