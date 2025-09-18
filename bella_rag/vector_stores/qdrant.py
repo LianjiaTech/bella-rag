@@ -612,15 +612,61 @@ class QdrantVectorDB(QdrantVectorStore, BellaVectorStore):
             else:
                 query_filter = Filter(must=[id_condition])
 
-        # 执行滚动查询
-        scroll_result = self.client.scroll(
-            collection_name=self.collection_name,
-            scroll_filter=query_filter,
-            limit=limit or 100,
-            offset=offset or 0,
-            with_payload=True,
-            with_vectors=kwargs.get("with_vectors", False)
-        )
+        # 安全的limit限制，避免内存问题
+        MAX_LIMIT = 10000  # qdrant建议的最大单次查询量
+        safe_limit = min(limit or 100, MAX_LIMIT)
+        
+        # 兼容offset/limit分页：安全地跳过offset条记录
+        if offset and offset > 0:
+            # 分批跳过offset条记录，避免单次limit过大
+            current_offset = 0
+            next_cursor = None
+            
+            while current_offset < offset:
+                skip_batch = min(offset - current_offset, MAX_LIMIT)
+                skip_result = self.client.scroll(
+                    collection_name=self.collection_name,
+                    scroll_filter=query_filter,
+                    limit=skip_batch,
+                    offset=next_cursor,
+                    with_payload=False,
+                    with_vectors=False
+                )
+                
+                # 如果没有更多数据，提前退出
+                if not skip_result[0]:
+                    next_cursor = None
+                    break
+                    
+                current_offset += len(skip_result[0])
+                next_cursor = skip_result[1]
+                
+                # 如果没有下一页cursor，说明数据已经遍历完
+                if not next_cursor:
+                    break
+            
+            # 获取实际需要的数据
+            if next_cursor is not None:
+                scroll_result = self.client.scroll(
+                    collection_name=self.collection_name,
+                    scroll_filter=query_filter,
+                    limit=safe_limit,
+                    offset=next_cursor,
+                    with_payload=True,
+                    with_vectors=kwargs.get("with_vectors", False)
+                )
+            else:
+                # 没有更多数据了
+                scroll_result = ([], None)
+        else:
+            # 直接从头开始查询
+            scroll_result = self.client.scroll(
+                collection_name=self.collection_name,
+                scroll_filter=query_filter,
+                limit=safe_limit,
+                with_payload=True,
+                with_vectors=kwargs.get("with_vectors", False)
+            )
 
         nodes = []
         for point in scroll_result[0]:  # scroll返回(points, next_page_offset)
