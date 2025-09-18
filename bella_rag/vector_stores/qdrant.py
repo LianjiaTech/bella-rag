@@ -523,7 +523,7 @@ class QdrantVectorDB(QdrantVectorStore, BellaVectorStore):
         from init.settings import user_logger
 
         payload = scored_point.payload or {}
-        user_logger.info(f"[QdrantVectorDB._point_to_node] 原始payload: {payload}")
+        user_logger.debug(f"[QdrantVectorDB._point_to_node] 原始payload: {payload}")
 
         # 提取关系信息
         relationships_str = payload.get(FIELD_RELATIONSHIPS)
