@@ -85,7 +85,10 @@ def rag_streaming(
         event_handler: BaseEventHandler = default_event_handler):
     # 初始化流式handler
     streaming_handler = RAGStreamingHandler(event_handler)
-    trace_args = list(locals().values())
+    trace_locals = locals().copy()
+    # 屏蔽api_key
+    trace_locals.pop('api_key', None)
+    trace_args = list(trace_locals.values())
     embedding_token = query_embedding_context.set([])
     start = int(time.time() * 1000)
 
