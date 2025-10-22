@@ -3,7 +3,7 @@ import random
 import time
 import traceback
 from io import BytesIO
-from typing import Any, Optional, List, Dict, Sequence, cast, Generator, Union, BinaryIO
+from typing import Any, Optional, List, Dict, Sequence, cast, Generator, Union, BinaryIO, Tuple
 
 import requests
 from bella_openapi import StandardDomTree
@@ -725,3 +725,26 @@ class FileAPIClient:
         except RequestException as e:
             logger.error(f"Download file failed: {str(e)}")
             raise
+
+    def decode_resource_id(self, resource_id: str) -> Dict[str, str]:
+        """
+        解析resource_id, 返回包含id和type的字典
+        """
+        resource_type = 'directory' if resource_id.endswith('-d') else 'file'
+        return {'id': resource_id, 'type': resource_type}
+
+    def decode_resource_ids(self, resource_ids: List[str]) -> Tuple[List[str], List[str]]:
+        """
+        将resource_id列表分类为文件和目录列表
+        """
+        file_ids = []
+        dir_ids = []
+
+        for resource_id in resource_ids:
+            resource_info = self.decode_resource_id(resource_id)
+            if resource_info['type'] == 'directory':
+                dir_ids.append(resource_id)
+            else:
+                file_ids.append(resource_id)
+
+        return file_ids, dir_ids
