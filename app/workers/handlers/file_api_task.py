@@ -37,7 +37,7 @@ def file_api_task_callback(payload: dict) -> bool:
         return True
 
     file_id = data.get('id')
-    if payload.get('event') == "file.created" and data.get('purpose') == 'assistants':
+    if payload.get('event') == "file.created" and data.get('purpose') in ['assistants', 'assistants-chat']:
         # 更新文件状态为消息入队
         file_api_client.update_processing_status('queued', 0, file_id, '', "file_indexing")
         return True
