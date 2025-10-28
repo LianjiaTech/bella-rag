@@ -33,7 +33,8 @@ from common.helper.exception import FileNotFoundException
 from init.settings import user_logger, OPENAPI
 from bella_rag.llm.types import RerankResponse, dict_to_sensitive, ChatMessage, ChatResponse, Sensitive
 from bella_rag.utils.file_util import create_standard_dom_tree_from_json
-from bella_rag.utils.openapi_util import openapi_modelname_to_contextsize, openapi_is_function_calling_model
+from bella_rag.utils.openapi_util import openapi_modelname_to_contextsize, openapi_is_function_calling_model, \
+    openapi_model_supported_params
 from bella_rag.utils.trace_log_util import trace
 from bella_rag.utils.user_util import get_user_info
 
@@ -287,8 +288,24 @@ class OpenAPI(Llama_OpenAI):
         return messages
 
     def _get_model_kwargs(self, **kwargs: Any) -> Dict[str, Any]:
-        base_kwargs = {"model": self.model, "temperature": self.temperature, "user": get_user_info(), **kwargs}
-        return {**base_kwargs, **self.additional_kwargs}
+        supported = openapi_model_supported_params(self._get_model_name())
+
+        # 构建基础参数
+        model_kwargs = {
+            "model": self.model,
+            "user": get_user_info()
+        }
+
+        if supported['temperature']:
+            model_kwargs['temperature'] = self.temperature
+
+        all_params = {**kwargs, **self.additional_kwargs}
+        for key, value in all_params.items():
+            if key not in ('max_tokens', 'top_p') or supported[key]:
+                model_kwargs[key] = value
+
+        logger.info(f"Model: {self.model}, Final kwargs: {model_kwargs}")
+        return model_kwargs
 
     @llm_retry_decorator
     def _stream_chat(
