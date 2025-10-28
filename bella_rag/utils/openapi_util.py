@@ -1,4 +1,5 @@
 import json
+from functools import lru_cache
 
 import requests
 import tiktoken
@@ -17,22 +18,44 @@ def fetch_model_data(model: str):
     response = requests.get(OPENAPI["URL"] + "/meta/model/info/" + model, headers=headers)
     return response.json()
 
-
-def openapi_modelname_to_contextsize(model: str):
+@lru_cache(maxsize=128)
+def openapi_model_info(model: str) -> dict:
+    """一次性获取模型的所有信息"""
     if model == MOCK_MODEL:
-        return 8192
+        return {
+            'context_window': 8192,
+            'function_call': True,
+            'support_temperature': True,
+            'support_top_P': True,
+            'support_max_tokens': True
+        }
+
     data = fetch_model_data(model)
     properties = json.loads(data['data']['properties'])
-    return int(properties.get('max_input_context'))
+    features = json.loads(data['data']['features'])
 
+    return {
+      'context_window': int(properties.get('max_input_context')),
+      'function_call': bool(features.get('function_call')),
+      'support_temperature': bool(features.get('support_temperature', True)),
+      'support_top_P': bool(features.get('support_top_P', True)),
+      'support_max_tokens': bool(features.get('support_max_tokens', True))
+    }
+
+
+def openapi_modelname_to_contextsize(model: str):
+    return openapi_model_info(model)['context_window']
 
 def openapi_is_function_calling_model(model: str):
-    if model == MOCK_MODEL:
-        return True
-    data = fetch_model_data(model)
-    features = json.loads(data['data']['features'])
-    return bool(features.get('function_call'))
+    return openapi_model_info(model)['function_call']
 
+def openapi_model_supported_params(model: str) -> dict:
+    info = openapi_model_info(model)
+    return {
+        'temperature': info['support_temperature'],
+        'top_p': info['support_top_P'],
+        'max_tokens': info['support_max_tokens']
+    }
 
 def count_tokens(text: str, model: str = DEFAULT_MODEL) -> int:
     if not text:
