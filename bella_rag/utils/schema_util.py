@@ -121,7 +121,7 @@ def to_llama_index_node(node: StandardNode) -> Union[StructureNode, List[Structu
         table_nodes = []
         row_len = 0
         for row in node.element.rows:
-            row_len = max(row_len, row.cells[0].path[0])
+            row_len = max(row_len, row.cells[0].path[1])
 
         matrix = [[] for _ in range(row_len)]
         for row in node.element.rows:
