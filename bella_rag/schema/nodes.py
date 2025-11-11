@@ -216,9 +216,9 @@ class ImageNode(StructureNode, LlamaImageNode):
             elif metadata_mode == MetadataMode.LLM:
                 # 生成使用ocr结果 + 图片url模板化
                 return (f'\n[图片信息]\n'
-                        f'图片链接：{self.image_url}\n'
+                        f'图片链接：![图片]({self.image_url})\n'
                         f'图片视觉信息：{self.image_ocr_result}\n')
-        return self.image_url or ""
+        return f" ![图片]({self.image_url}) " if self.image_url else ""
 
     def get_content(self, metadata_mode: MetadataMode = MetadataMode.NONE) -> str:
         return self.image_ocr_result or " "
