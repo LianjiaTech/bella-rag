@@ -215,10 +215,13 @@ class ImageNode(StructureNode, LlamaImageNode):
                 return self.image_ocr_result
             elif metadata_mode == MetadataMode.LLM:
                 # 生成使用ocr结果 + 图片url模板化
-                return (f'\n[图片信息]\n'
-                        f'图片链接：![图片]({self.image_url})\n'
-                        f'图片视觉信息：{self.image_ocr_result}\n')
-        return f" ![图片]({self.image_url}) " if self.image_url else ""
+                if self.image_url and self.image_url.strip():
+                    return (f'\n[图片信息]\n'
+                            f'图片链接：![图片]({self.image_url})\n'
+                            f'图片视觉信息：{self.image_ocr_result}\n')
+                else:
+                    return f'\n[图片信息]\n图片视觉信息：{self.image_ocr_result}\n'
+        return f" ![图片]({self.image_url}) " if self.image_url and self.image_url.strip() else ""
 
     def get_content(self, metadata_mode: MetadataMode = MetadataMode.NONE) -> str:
         return self.image_ocr_result or " "
