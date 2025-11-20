@@ -8,7 +8,36 @@ _user_context = contextvars.ContextVar("user_context", default=None)
 query_embedding_context = contextvars.ContextVar("query_embedding", default=[])
 _trace_progress_context = contextvars.ContextVar("trace_progress", default="")
 _openapi_key_context = contextvars.ContextVar("ak", default="")
+_openapi_usage_record_context = contextvars.ContextVar("model_usage_record", default={})
 
+class _ModelUsageRecord(object):
+    @property
+    def usage_ak_code(self) -> str:
+        record_info = _openapi_usage_record_context.get()
+        return record_info.get("ak_code", "") if record_info else ""
+
+    @usage_ak_code.setter
+    def usage_ak_code(self, value):
+        record_info = _openapi_usage_record_context.get()
+        if not record_info:
+            record_info = {"ak_code": value}
+        else:
+            record_info["ak_code"] = value
+        _openapi_usage_record_context.set(record_info)
+
+    @property
+    def usage_ak_sha(self) -> str:
+        record_info = _openapi_usage_record_context.get()
+        return record_info.get("ak_sha", "") if record_info else ""
+
+    @usage_ak_sha.setter
+    def usage_ak_sha(self, value):
+        record_info = _openapi_usage_record_context.get()
+        if not record_info:
+            record_info = {"ak_sha": value}
+        else:
+            record_info["ak_sha"] = value
+        _openapi_usage_record_context.set(record_info)
 
 class _UserContext(object):
     @property
@@ -49,3 +78,4 @@ class _OpenapiContext(object):
 UserContext = _UserContext()
 TraceContext = TraceContext()
 OpenapiContext = _OpenapiContext()
+ModelUsageRecord = _ModelUsageRecord()

@@ -1,6 +1,7 @@
 import json
 
 from app.postprocessors.file_postprocessors import FileSummaryProcessor, FileIndexingProcessor
+from bella_rag.utils.openapi_util import fetch_ak_sha_by_code
 from common.helper.exception import FileNotFoundException
 from init.settings import user_logger
 from bella_rag.utils.file_api_tool import file_api_client
@@ -58,6 +59,10 @@ def file_api_task_callback(payload: dict) -> bool:
     except FileNotFoundException:
         user_logger.warn(f"源文件已删除，跳过解析 : {source_file_id}")
         return True
+
+    # 查询文件上传方ak_code对应的akSha
+    if 'ak_code' in payload:
+        payload['ak_sha'] = fetch_ak_sha_by_code(payload.get('ak_code'))
 
     for post_processor in file_api_postprocessors:
         post_processor.post_process(payload)
