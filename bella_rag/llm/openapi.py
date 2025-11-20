@@ -316,12 +316,11 @@ class OpenAPI(Llama_OpenAI):
             ak_code = ModelUsageRecord.usage_ak_code
             ak_sha = ModelUsageRecord.usage_ak_sha
 
-            # 如果没有用户ID，则不上报
+            # 如果没有用户ID或aksha，则不上报
             if not user_id or not ak_sha:
                 logger.debug("Skip usage report: user_id or ak_sha not found")
                 return
 
-            # 如果是对象，尝试转换为字典
             usage_dict = {
                 "prompt_tokens": getattr(usage_data, 'prompt_tokens', 0),
                 "completion_tokens": getattr(usage_data, 'completion_tokens', 0),
@@ -416,6 +415,7 @@ class OpenAPI(Llama_OpenAI):
                         ),
                         delta=content_delta,
                         raw=response,
+                        additional_kwargs=self._get_response_token_counts(response),
                     )
 
                 if last_usage:
