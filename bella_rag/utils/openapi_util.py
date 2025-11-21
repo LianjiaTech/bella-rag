@@ -109,7 +109,7 @@ def fetch_ak_sha_by_code(ak_code: str) -> str:
         headers = {
             "Authorization": OPENAPI["AK"]
         }
-        url = f'{str.replace(OPENAPI["URL"], '/v1', '')}/console/apikey/fetchByCode'
+        url = f'{OPENAPI["URL"].replace("/v1", "")}/console/apikey/fetchByCode'
         params = {'code': ak_code}
 
         response = requests.get(url, headers=headers, params=params)
