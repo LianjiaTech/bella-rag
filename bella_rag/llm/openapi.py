@@ -108,11 +108,11 @@ async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> 
 
 
 def get_embedding(client: OpenAI, texts: List[str], model: str) -> List[Embedding]:
-    return get_embeddings(client, texts, model, user=get_user_info())
+    return get_embeddings(client, texts, model)
 
 
 async def aget_embedding(client: AsyncOpenAI, texts: List[str], model: str) -> List[Embedding]:
-    return await aget_embeddings(client, texts, model, user=get_user_info())
+    return await aget_embeddings(client, texts, model)
 
 
 def stream_completion_response_to_tokens(
