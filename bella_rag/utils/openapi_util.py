@@ -90,10 +90,10 @@ def str_token_limit(text: str, token_limit: int, model: str = DEFAULT_MODEL) -> 
 def valid_openapi_token(ak: str) -> bool:
     headers = {'Authorization': ak}
     response = requests.get(OPENAPI["URL"] + "/apikey/whoami", headers=headers)
-    
+
     if int(response.status_code) != 200:
         return False
-    
+
     try:
         data = response.json()
         return data.get("code") == 200
@@ -105,20 +105,23 @@ def fetch_ak_sha_by_code(ak_code: str) -> str:
     """
     根据 akcode 获取 akSha
     """
-    headers = {
-        "Authorization": OPENAPI["AK"]
-    }
-    
-    url = f'{OPENAPI["URL"]}/console/apikey/fetchByCode'
-    params = {'code': ak_code}
+    try:
+        headers = {
+            "Authorization": OPENAPI["AK"]
+        }
+        url = f'{str.replace(OPENAPI["URL"], '/v1', '')}/console/apikey/fetchByCode'
+        params = {'code': ak_code}
 
-    response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()
-    data = response.json()
-    if data.get('code') == 200 and 'data' in data:
-        return data['data'].get('akSha')
-    else:
-        user_logger.error("fetch ak sha failed : {}".format(ak_code))
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        if data.get('code') == 200 and 'data' in data:
+            return data['data'].get('akSha')
+        else:
+            user_logger.error("fetch ak sha request failed : {}".format(ak_code))
+            return None
+    except Exception as e:
+        user_logger.error("fetch ak sha failed : {}".format(ak_code), e)
         return None
 
 
@@ -151,7 +154,7 @@ def report_usage_log(
             "endpoint": endpoint,
             "usage": usage
         }
-        
+
         # 添加可选字段
         if ak_sha:
             log_data["akSha"] = ak_sha
@@ -159,17 +162,17 @@ def report_usage_log(
             log_data["akCode"] = ak_code
         if bella_trace_id:
             log_data["bellaTraceId"] = bella_trace_id
-        
+
         # 发送请求
         headers = {
             "Authorization": OPENAPI["AK"],
             "Content-Type": "application/json"
         }
-        
+
         url = f'{OPENAPI["URL"]}/log'
         response = requests.post(url, headers=headers, json=log_data, timeout=5)
         response.raise_for_status()
-        
+
         user_logger.info(f"Usage log reported successfully for user={user}, model={model}, total_tokens={usage.get('total_tokens', 0)}")
         return True
     except Exception as e:
