@@ -88,7 +88,9 @@ def run_index_file(file_id: str, file_name: str, documents: list, transforms: li
         "request_id": TraceContext.trace_id,
         "file_name": file_name,
         "extractors": [EXTRACTOR_CONTEXT],
-        "ucid": user
+        "ucid": user,
+        "ak_code": UserContext.usage_ak_code,
+        "ak_sha": UserContext.usage_ak_sha,
     }
     async_send_kafka_message(knowledge_file_extractor_producer, json.dumps(knowledge_file_index_done_msg))
     user_logger.info(f'finish indexing file : {file_id}')

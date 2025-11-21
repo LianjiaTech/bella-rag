@@ -31,6 +31,8 @@ class FileSummaryProcessor(FilePostProcessor):
             "request_id": file_id,
             "file_name": file_name,
             "extractors": [EXTRACTOR_SUMMARY],
+            "ak_code": payload.get('ak_code'),
+            "ak_sha": payload.get('ak_sha'),
             "ucid": DEFAULT_USER}
         async_send_kafka_message(knowledge_file_extractor_producer, json.dumps(knowledge_file_summary_extract_msg))
         user_logger.info(f'send file summary task : {file_id}')
@@ -67,6 +69,8 @@ class FileIndexingProcessor(FilePostProcessor):
             "file_id": file_id,
             "callbacks": callbacks,
             "file_name": file_name,
+            "ak_code": payload.get('ak_code'),
+            "ak_sha": payload.get('ak_sha'),
         }
         async_send_kafka_message(knowledge_index_task_kafka_producer, json.dumps(indexing_data))
         user_logger.info(f'send file indexing task : {file_id}')

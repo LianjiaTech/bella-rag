@@ -16,6 +16,8 @@ def knowledge_file_summary_extract_callback(payload: dict) -> bool:
     file_name = payload.get('file_name')
     ucid = payload.get('ucid')
     extractors = payload.get('extractors', [])
+    ak_sha = payload.get('ak_sha')
+    ak_code = payload.get('ak_code')
 
     lock = Lock(redis_client=redis.Redis(connection_pool=redis_pool),
                 name=f"knowledge_file_index_done_task_lock_{file_id}",
@@ -31,6 +33,10 @@ def knowledge_file_summary_extract_callback(payload: dict) -> bool:
             logger.info("已经消费完成，不需要再次消费 file_id = %s", file_id)
             return True
         UserContext.user_id = ucid
+
+        # 模型调用成本分摊code记录到上下文
+        UserContext.usage_ak_sha = ak_sha
+        UserContext.usage_ak_code = ak_code
         for extractor in summary_extractors:
             if extractor.type() in extractors:
                 # summary分别提取

@@ -17,6 +17,8 @@ def knowledge_file_context_summary_callback(payload: dict) -> bool:
     if context_extractor.type() not in extractors:
         return True
 
+    ak_sha = payload.get('ak_sha')
+    ak_code = payload.get('ak_code')
     lock = Lock(redis_client=redis.Redis(connection_pool=redis_pool),
                 name=f"knowledge_file_context_summary_lock_{file_id}",
                 auto_renewal=True,
@@ -24,6 +26,9 @@ def knowledge_file_context_summary_callback(payload: dict) -> bool:
     try:
         lock.acquire()
 
+        # 模型调用成本分摊code记录到上下文
+        UserContext.usage_ak_sha = ak_sha
+        UserContext.usage_ak_code = ak_code
         UserContext.user_id = ucid
         TraceContext.trace_id = file_id
         context_extractor.extract(source_id=file_id)
