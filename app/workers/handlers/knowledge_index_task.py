@@ -1,7 +1,7 @@
 import redis
 from redis_lock import Lock
 
-from app.common.contexts import TraceContext, ModelUsageRecord
+from app.common.contexts import TraceContext, UserContext
 from app.config.apollo_configs import file_access_config
 from app.services.file_service import file_indexing
 from common.tool.redis_tool import redis_pool
@@ -34,8 +34,8 @@ def knowledge_index_task_callback(payload: dict) -> bool:
             return True
 
         # 使用用户上传文件的ak分摊成本
-        ModelUsageRecord.usage_ak_code = payload.get('ak_code')
-        ModelUsageRecord.usage_ak_sha = payload.get('ak_sha')
+        UserContext.usage_ak_code = payload.get('ak_code')
+        UserContext.usage_ak_sha = payload.get('ak_sha')
         TraceContext.trace_id = request_id
         metadata = metadata or {}
         file_indexing_black_list = file_access_config.file_space_black_list()

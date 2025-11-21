@@ -15,7 +15,7 @@ from llama_index.core.bridge.pydantic import PrivateAttr
 from llama_index.core.instrumentation.events.llm import LLMPredictStartEvent, LLMPredictEndEvent
 from llama_index.core.llms.callbacks import llm_chat_callback
 from llama_index.core.llms.llm import dispatcher
-from llama_index.embeddings.openai.base import get_embeddings, aget_embeddings
+from llama_index.embeddings.openai.base import embedding_retry_decorator
 from llama_index.legacy.llms.konko_utils import to_openai_message_dicts
 from llama_index.llms.openai import OpenAI as Llama_OpenAI
 from llama_index.llms.openai.base import llm_retry_decorator
@@ -27,7 +27,7 @@ from pydantic import Field
 from requests import RequestException
 from requests_toolbelt import MultipartEncoder
 
-from app.common.contexts import query_embedding_context, TraceContext, UserContext, ModelUsageRecord
+from app.common.contexts import query_embedding_context, TraceContext, UserContext
 from app.utils.metric_util import increment_counter_with_tag
 from bella_rag.llm.types import RerankResponse, dict_to_sensitive, ChatMessage, ChatResponse, Sensitive
 from bella_rag.utils.file_util import create_standard_dom_tree_from_json
@@ -75,6 +75,36 @@ class AsyncOpenAI(LlamaAsyncOpenAI):
             TRACE_ID: TraceContext.trace_id,
             **self._custom_headers,
         }
+
+@embedding_retry_decorator
+def get_embeddings(client: OpenAI, texts: List[str], model: str) -> List[Embedding]:
+    assert len(texts) <= 2048, "The batch size should not be larger than 2048."
+    response = client.embeddings.create(input=texts, model=model, user=get_user_info())
+    embeddings = [data.embedding for data in response.data]
+
+    if hasattr(response, 'usage') and response.usage:
+        usage = response.usage.model_dump()
+        user_id = UserContext.user_id
+        ak_sha = UserContext.usage_ak_sha
+        report_usage_log(user=user_id, model=model, usage=usage, ak_code=UserContext.usage_ak_code,
+                         ak_sha=ak_sha, bella_trace_id=TraceContext.trace_id, endpoint="/v1/embeddings")
+    return embeddings
+
+@embedding_retry_decorator
+async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> List[Embedding]:
+    assert len(texts) <= 2048, "The batch size should not be larger than 2048."
+    response = await client.embeddings.create(input=texts, model=model, user=get_user_info())
+    embeddings = [data.embedding for data in response.data]
+
+    # 上报 usage
+    if hasattr(response, 'usage') and response.usage:
+        usage = response.usage.model_dump()
+        user_id = UserContext.user_id
+        ak_sha = UserContext.usage_ak_sha
+
+        report_usage_log(user=user_id, model=model, usage=usage, ak_code=UserContext.usage_ak_code,
+                         ak_sha=ak_sha, bella_trace_id=TraceContext.trace_id, endpoint="/v1/embeddings")
+    return embeddings
 
 
 def get_embedding(client: OpenAI, texts: List[str], model: str) -> List[Embedding]:
@@ -313,12 +343,11 @@ class OpenAPI(Llama_OpenAI):
         """
         try:
             user_id = UserContext.user_id
-            ak_code = ModelUsageRecord.usage_ak_code
-            ak_sha = ModelUsageRecord.usage_ak_sha
+            ak_code = UserContext.usage_ak_code
+            ak_sha = UserContext.usage_ak_sha
 
             # 如果没有用户ID或aksha，则不上报
             if not user_id or not ak_sha:
-                logger.debug("Skip usage report: user_id or ak_sha not found")
                 return
 
             usage_dict = {
@@ -340,7 +369,7 @@ class OpenAPI(Llama_OpenAI):
             )
         except Exception as e:
             # 上报失败不影响主流程
-            logger.error(f"Failed to report usage: {str(e)}")
+            logger.error(f"Failed to report chat usage: {str(e)}")
 
     @llm_retry_decorator
     def _stream_chat(

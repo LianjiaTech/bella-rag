@@ -11,7 +11,7 @@ from llama_index.core.storage.index_store import SimpleIndexStore
 from llama_index.core.vector_stores import VectorStoreQuery
 from llama_index.core.vector_stores.simple import DEFAULT_VECTOR_STORE
 
-from app.common.contexts import UserContext, TraceContext, ModelUsageRecord
+from app.common.contexts import UserContext, TraceContext
 from app.handler.custom_error_handler import custom_exception_handler
 from app.services import chunk_vector_index_structure, embed_model, question_vector_index_structure
 from app.services.context_service import vector_store
@@ -89,8 +89,8 @@ def run_index_file(file_id: str, file_name: str, documents: list, transforms: li
         "file_name": file_name,
         "extractors": [EXTRACTOR_CONTEXT],
         "ucid": user,
-        "ak_code": ModelUsageRecord.usage_ak_code,
-        "ak_sha": ModelUsageRecord.usage_ak_sha,
+        "ak_code": UserContext.usage_ak_code,
+        "ak_sha": UserContext.usage_ak_sha,
     }
     async_send_kafka_message(knowledge_file_extractor_producer, json.dumps(knowledge_file_index_done_msg))
     user_logger.info(f'finish indexing file : {file_id}')

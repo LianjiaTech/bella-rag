@@ -1,7 +1,7 @@
 import redis
 from redis_lock import Lock
 
-from app.common.contexts import UserContext, ModelUsageRecord
+from app.common.contexts import UserContext
 from common.helper.exception import FileNotFoundException
 from common.tool.redis_tool import redis_pool
 from init.settings import user_logger
@@ -35,8 +35,8 @@ def knowledge_file_summary_extract_callback(payload: dict) -> bool:
         UserContext.user_id = ucid
 
         # 模型调用成本分摊code记录到上下文
-        ModelUsageRecord.usage_ak_sha = ak_sha
-        ModelUsageRecord.usage_ak_code = ak_code
+        UserContext.usage_ak_sha = ak_sha
+        UserContext.usage_ak_code = ak_code
         for extractor in summary_extractors:
             if extractor.type() in extractors:
                 # summary分别提取

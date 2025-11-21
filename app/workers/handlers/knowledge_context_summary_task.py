@@ -1,6 +1,6 @@
 import redis
 
-from app.common.contexts import UserContext, TraceContext, ModelUsageRecord
+from app.common.contexts import UserContext, TraceContext
 from init.settings import user_logger
 from redis_lock import Lock
 
@@ -27,8 +27,8 @@ def knowledge_file_context_summary_callback(payload: dict) -> bool:
         lock.acquire()
 
         # 模型调用成本分摊code记录到上下文
-        ModelUsageRecord.usage_ak_sha = ak_sha
-        ModelUsageRecord.usage_ak_code = ak_code
+        UserContext.usage_ak_sha = ak_sha
+        UserContext.usage_ak_code = ak_code
         UserContext.user_id = ucid
         TraceContext.trace_id = file_id
         context_extractor.extract(source_id=file_id)
