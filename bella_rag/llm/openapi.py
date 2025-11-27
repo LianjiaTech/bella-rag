@@ -32,7 +32,7 @@ from app.utils.metric_util import increment_counter_with_tag
 from bella_rag.llm.types import RerankResponse, dict_to_sensitive, ChatMessage, ChatResponse, Sensitive
 from bella_rag.utils.file_util import create_standard_dom_tree_from_json
 from bella_rag.utils.openapi_util import openapi_modelname_to_contextsize, openapi_is_function_calling_model, \
-    openapi_model_supported_params, report_usage_log
+    openapi_model_supported_params
 from bella_rag.utils.trace_log_util import trace
 from bella_rag.utils.user_util import get_user_info
 from common.helper.exception import FileNotFoundException
@@ -41,6 +41,7 @@ from init.settings import user_logger, OPENAPI
 ChatResponseGen = Generator[ChatResponse, None, None]
 TokenGen = Generator[Union[str, APIError, List[Sensitive]], None, None]
 COMPLETION_ERROR_KEY = 'completion_error'
+OPENAPI_USER_AK_CODE_KEY = 'X-BELLA-USER-AK-CODE'
 
 logger = user_logger
 
@@ -79,31 +80,25 @@ class AsyncOpenAI(LlamaAsyncOpenAI):
 @embedding_retry_decorator
 def get_embeddings(client: OpenAI, texts: List[str], model: str) -> List[Embedding]:
     assert len(texts) <= 2048, "The batch size should not be larger than 2048."
-    response = client.embeddings.create(input=texts, model=model, user=get_user_info())
-    embeddings = [data.embedding for data in response.data]
 
-    if hasattr(response, 'usage') and response.usage:
-        usage = response.usage.model_dump()
-        user_id = UserContext.user_id
-        ak_sha = UserContext.usage_ak_sha
-        report_usage_log(user=user_id, model=model, usage=usage, ak_code=UserContext.usage_ak_code,
-                         ak_sha=ak_sha, bella_trace_id=TraceContext.trace_id, endpoint="/v1/embeddings")
+    extra_headers = {}
+    if UserContext.usage_ak_code:
+        extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
+
+    response = client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
+    embeddings = [data.embedding for data in response.data]
     return embeddings
 
 @embedding_retry_decorator
 async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> List[Embedding]:
     assert len(texts) <= 2048, "The batch size should not be larger than 2048."
-    response = await client.embeddings.create(input=texts, model=model, user=get_user_info())
+
+    extra_headers = {}
+    if UserContext.usage_ak_code:
+        extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
+
+    response = await client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
     embeddings = [data.embedding for data in response.data]
-
-    # 上报 usage
-    if hasattr(response, 'usage') and response.usage:
-        usage = response.usage.model_dump()
-        user_id = UserContext.user_id
-        ak_sha = UserContext.usage_ak_sha
-
-        report_usage_log(user=user_id, model=model, usage=usage, ak_code=UserContext.usage_ak_code,
-                         ak_sha=ak_sha, bella_trace_id=TraceContext.trace_id, endpoint="/v1/embeddings")
     return embeddings
 
 
@@ -337,39 +332,6 @@ class OpenAPI(Llama_OpenAI):
         logger.info(f"Model: {self.model}, Final kwargs: {model_kwargs}")
         return model_kwargs
 
-    def _report_usage(self, usage_data: dict):
-        """
-        上报 usage 信息到 OpenAPI
-        """
-        try:
-            user_id = UserContext.user_id
-            ak_code = UserContext.usage_ak_code
-            ak_sha = UserContext.usage_ak_sha
-
-            # 如果没有用户ID或aksha，则不上报
-            if not user_id or not ak_sha:
-                return
-
-            usage_dict = {
-                "prompt_tokens": getattr(usage_data, 'prompt_tokens', 0),
-                "completion_tokens": getattr(usage_data, 'completion_tokens', 0),
-                "total_tokens": getattr(usage_data, 'total_tokens', 0),
-                "cache_creation_tokens": getattr(usage_data, 'cache_creation_tokens', 0),
-                "cache_read_tokens": getattr(usage_data, 'cache_read_tokens', 0),
-            }
-
-            # 调用上报方法
-            report_usage_log(
-                user=user_id,
-                model=self.model,
-                usage=usage_dict,
-                ak_code=ak_code,
-                ak_sha=ak_sha,
-                bella_trace_id=TraceContext.trace_id
-            )
-        except Exception as e:
-            # 上报失败不影响主流程
-            logger.error(f"Failed to report chat usage: {str(e)}")
 
     @llm_retry_decorator
     def _stream_chat(
@@ -378,10 +340,14 @@ class OpenAPI(Llama_OpenAI):
         client = self._get_client()
         message_dicts = to_openai_message_dicts(messages)
 
+        extra_headers = kwargs.get('extra_headers', {}) or {}
+        if UserContext.usage_ak_code:
+            extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
+            kwargs['extra_headers'] = extra_headers
+
         def gen() -> ChatResponseGen:
             content = ""
             tool_calls: List[ChoiceDeltaToolCall] = []
-            last_usage = None  # 用于记录最后的 usage 信息
 
             is_function = False
             try:
@@ -431,11 +397,6 @@ class OpenAPI(Llama_OpenAI):
                         tool_calls = self._update_tool_calls(tool_calls, delta.tool_calls)
                         additional_kwargs["tool_calls"] = tool_calls
 
-                    # 获取并保存 usage 信息
-                    token_counts = self._get_response_token_counts(response)
-                    if token_counts:
-                        last_usage = token_counts
-
                     yield ChatResponse(
                         message=ChatMessage(
                             role=role,
@@ -447,8 +408,6 @@ class OpenAPI(Llama_OpenAI):
                         additional_kwargs=self._get_response_token_counts(response),
                     )
 
-                if last_usage:
-                    self._report_usage(last_usage)
             except APIError as e:
                 logger.error(f'rag stream request llm error.{e}\\n{traceback.format_exc()}')
                 increment_counter_with_tag('rag', 'error_code', e.code)
@@ -466,6 +425,11 @@ class OpenAPI(Llama_OpenAI):
 
     @llm_chat_callback()
     def chat(self, messages: Sequence[ChatMessage], **kwargs: Any) -> ChatResponse:
+        extra_headers = kwargs.get('extra_headers', {}) or {}
+        if UserContext.usage_ak_code:
+            extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
+            kwargs['extra_headers'] = extra_headers
+
         chat_response = super()._chat(messages, **kwargs)
 
         # 提取敏感信息
@@ -479,10 +443,6 @@ class OpenAPI(Llama_OpenAI):
                 additional_kwargs=chat_message.additional_kwargs,
             )
             chat_response.message = chat_message
-
-        # 打印 usage 信息并上报
-        if chat_response.raw and 'usage' in chat_response.raw:
-            self._report_usage(chat_response.raw['usage'])
 
         return chat_response
 
