@@ -40,6 +40,14 @@ class _FileAccessConfig(object):
     def file_space_black_list(self):
         return self.__getattr__().get('file_space_black_list', [])
 
+    def enable_ak_codes(self):
+        # 文件解析准入的ak_code
+        return self.__getattr__().get('enable_ak_codes', [])
+
+    def enable_ak_code_filter(self):
+        # 开启ak_code白名单准入
+        return self.__getattr__().get('enable_ak_code_filter', False)
+
 
 class _RateLimitConfig(object):
     """

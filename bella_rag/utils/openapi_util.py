@@ -101,28 +101,30 @@ def valid_openapi_token(ak: str) -> bool:
         return False
 
 
-def fetch_ak_sha_by_code(ak_code: str) -> str:
-    """
-    根据 akcode 获取 akSha
-    """
+def _fetch_ak_info(ak_code: str) -> dict:
+    """根据 akcode 获取 ak 信息"""
     try:
-        headers = {
-            "Authorization": OPENAPI["AK"]
-        }
+        headers = {"Authorization": OPENAPI["AK"]}
         url = f'{OPENAPI["URL"].replace("/v1", "")}/console/apikey/fetchByCode'
-        params = {'code': ak_code}
-
-        response = requests.get(url, headers=headers, params=params)
+        response = requests.get(url, headers=headers, params={'code': ak_code})
         response.raise_for_status()
         data = response.json()
         if data.get('code') == 200 and 'data' in data:
-            return data['data'].get('akSha')
-        else:
-            user_logger.error("fetch ak sha request failed : {}".format(ak_code))
-            return None
-    except Exception as e:
-        user_logger.error("fetch ak sha failed : {}".format(ak_code), e)
+            return data['data']
         return None
+    except Exception as e:
+        user_logger.error(f"fetch ak info failed: {ak_code}, {e}")
+        return None
+
+def fetch_ak_sha_by_code(ak_code: str) -> str:
+    """根据 akcode 获取 akSha"""
+    info = _fetch_ak_info(ak_code)
+    return info.get('akSha') if info else None
+
+def fetch_ak_parent_code(ak_code: str) -> str:
+    """根据 akcode 获取 parent_ak_code"""
+    info = _fetch_ak_info(ak_code)
+    return info.get('parentCode') if info else None
 
 
 def report_usage_log(
