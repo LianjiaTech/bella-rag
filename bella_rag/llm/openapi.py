@@ -15,7 +15,7 @@ from llama_index.core.bridge.pydantic import PrivateAttr
 from llama_index.core.instrumentation.events.llm import LLMPredictStartEvent, LLMPredictEndEvent
 from llama_index.core.llms.callbacks import llm_chat_callback
 from llama_index.core.llms.llm import dispatcher
-from llama_index.embeddings.openai.base import embedding_retry_decorator
+from llama_index.embeddings.openai.utils import create_retry_decorator
 from llama_index.legacy.llms.konko_utils import to_openai_message_dicts
 from llama_index.llms.openai import OpenAI as Llama_OpenAI
 from llama_index.llms.openai.base import llm_retry_decorator
@@ -42,6 +42,13 @@ ChatResponseGen = Generator[ChatResponse, None, None]
 TokenGen = Generator[Union[str, APIError, List[Sensitive]], None, None]
 COMPLETION_ERROR_KEY = 'completion_error'
 OPENAPI_USER_AK_CODE_KEY = 'X-BELLA-USER-AK-CODE'
+embedding_retry_decorator = create_retry_decorator(
+    max_retries=2,
+    random_exponential=True,
+    stop_after_delay_seconds=60,
+    min_seconds=1,
+    max_seconds=3,
+)
 
 logger = user_logger
 
