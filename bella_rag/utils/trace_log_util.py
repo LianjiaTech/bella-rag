@@ -1,6 +1,7 @@
 import time
 
 from llama_index.core.callbacks import CBEventType
+from openai import RateLimitError
 
 from app.utils.metric_util import histogram_with_buckets
 from common.helper.exception import BusinessError
@@ -65,6 +66,9 @@ def trace(step, log_enabled=True, progress=''):
                 return result
             except BusinessError as be:
                 send_event("failed", be.error_msg)
+                raise
+            except RateLimitError as re:
+                send_event("failed", str(re))
                 raise
             except Exception:
                 send_event("failed", "internal error")
