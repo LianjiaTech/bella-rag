@@ -81,6 +81,11 @@ def file_api_task_callback(payload: dict) -> bool:
         file_api_client.update_processing_status('access_denied', 0, file_id, f'ak_code : {ak_code} is not enabled for file indexing', "file_indexing")
         return True
 
+    parent_code = ak_info.get('parentCode') if ak_info else None
+    if parent_code:
+        # 使用parent ak code
+        payload['ak_code'] = parent_code
+
     # 根据domtree查找source文件信息
     domtree = file_api_client.parse_pdf_from_json(file_id)
     source_file_id = domtree.root.source_file.id
