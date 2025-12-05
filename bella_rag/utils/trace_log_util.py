@@ -70,8 +70,8 @@ def trace(step, log_enabled=True, progress=''):
             except RateLimitError as re:
                 send_event("failed", str(re))
                 raise
-            except Exception:
-                send_event("failed", "internal error")
+            except Exception as e:
+                send_event("failed", 'Error: ' + str(e))
                 raise
 
         return wrapper
