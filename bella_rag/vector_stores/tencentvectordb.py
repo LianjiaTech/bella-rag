@@ -372,6 +372,7 @@ class TencentVectorDB(OriginalTencentVectorDB, BellaVectorStore):
                     metadata=metadata,
                     context_id=metadata.get('context_id'),
                     doc_relationships=contextual_relationship,
+                    embedding=doc.get(FIELD_VECTOR),
                 )
             else:
                 node = TextNode(
