@@ -19,7 +19,7 @@ from bella_rag.utils.openapi_util import count_tokens, DEFAULT_MODEL
 from bella_rag.utils.schema_util import rebuild_nodes_from_index
 from bella_rag.utils.trace_log_util import trace
 
-llm = OpenAPI(model="gpt-4o", temperature=0, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300, top_p=1,)
+llm = OpenAPI(model="gpt-5.4", temperature=0, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300, top_p=1,)
 
 # todo summary prompt配到apollo里
 contextual_prompt = '''

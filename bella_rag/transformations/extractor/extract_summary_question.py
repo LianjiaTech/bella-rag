@@ -16,7 +16,7 @@ from common.helper.exception import BusinessError
 from init.settings import OPENAPI
 from bella_rag.llm.openapi import OpenAPI
 
-llm = OpenAPI(model="gpt-4o", temperature=0.01, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300)
+llm = OpenAPI(model="gpt-5.4", temperature=0.01, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300)
 
 SUMMARY_RAG_TRIGGER_PROMPT = (
     "以下是来自多个来源的上下文信息。\n"

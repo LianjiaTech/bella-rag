@@ -585,7 +585,7 @@ OAUTH = {
 }
 
 OCR = {
-    'model_name': config.get('OCR', 'model_name', 'gpt-4o'),
+    'model_name': config.get('OCR', 'model_name', 'gpt-5.4'),
     'enable': config.get('OCR', 'enable', False, bool),
     'vision_model_list': json.loads(config.get('OCR', 'vision_model_list', [])),
 }

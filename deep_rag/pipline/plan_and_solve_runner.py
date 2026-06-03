@@ -205,7 +205,7 @@ def run_deep_rag(question: str,
                  file_ids: List[str],
                  user: str = None,
                  max_turns: int = 10,
-                 model: str = "gpt-4o-mini") -> str:
+                 model: str = "gpt-5.4") -> str:
     """
     执行planning and solve模式pipline
     1. plan(query) -> plan

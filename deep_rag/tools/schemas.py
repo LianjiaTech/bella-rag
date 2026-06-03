@@ -79,7 +79,7 @@ search_tool = FunctionTool.from_defaults(fn=file_search, tool_metadata=search_me
 def file_load_and_summary(file_id: str):
     res = file_load(file_id)
     conclusion_llm = OpenAPI(temperature=0.01, api_base=OPENAPI["URL"], api_key=OpenapiContext.ak,
-                             timeout=300, model='gpt-4o')
+                             timeout=300, model='gpt-5.4')
     if '无答案' in str(res):
         return '无相关内容'
     llm_input = read_summary_prompt.replace("$question", DeepRagContext.query).replace("$file_content", str(res))

@@ -66,7 +66,7 @@ embed_model = OpenAPIEmbedding(model=VECTOR_DB_COMMON["EMBEDDING_MODEL"],
                                embedding_batch_size=VECTOR_DB_COMMON["EMBEDDING_BATCH_SIZE"],
                                api_key=ak, model_dimension=int(VECTOR_DB_COMMON["DIMENSION"]))
 
-llm = OpenAPI(model="gpt-4o", temperature=0.01, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300)
+llm = OpenAPI(model="gpt-5.4", temperature=0.01, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300)
 
 response_synthesizer = get_response_synthesizer(response_mode=ResponseMode.TREE_SUMMARIZE, llm=llm,
                                                 summary_template=QUESTION_SUMMARIZE_PROMPT,

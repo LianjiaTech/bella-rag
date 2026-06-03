@@ -221,7 +221,7 @@ class PlanAndSolveStreamRunner(RagRunner):
 
     def rag_streaming(self, query: str,
                       file_ids: List[str] = None,
-                      model: str = "gpt-4o-mini",
+                      model: str = "gpt-5.4",
                       metadata_filters: MetadataFilters = None,
                       retrieve_mode: RetrievalMode = RetrievalMode.SEMANTIC,
                       plugins: List[Plugin] = None,
@@ -250,7 +250,7 @@ class PlanAndSolveStreamRunner(RagRunner):
 
     def run_stream(self, query: str,
                    file_ids: List[str] = None,
-                   model: str = "gpt-4o-mini",
+                   model: str = "gpt-5.4",
                    metadata_filters: MetadataFilters = None,
                    retrieve_mode: RetrievalMode = RetrievalMode.SEMANTIC,
                    plugins: List[Plugin] = None,
@@ -448,7 +448,7 @@ class PlanAndSolveStreamRunner(RagRunner):
 
     def rag(self, query: str,
             file_ids: List[str] = None,
-            model: str = "gpt-4o-mini",
+            model: str = "gpt-5.4",
             metadata_filters: MetadataFilters = None,
             retrieve_mode: RetrievalMode = RetrievalMode.SEMANTIC,
             plugins: List[Plugin] = None,

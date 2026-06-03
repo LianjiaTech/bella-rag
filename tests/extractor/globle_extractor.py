@@ -22,7 +22,7 @@ def test_summary():
         documents = reader.load_data(io.BytesIO(file_bytes))
         assert len(documents) > 0
 
-    llm = OpenAPI(model="gpt-4o", temperature=0.01,
+    llm = OpenAPI(model="gpt-5.4", temperature=0.01,
                   api_base=OPENAPI["URL"],
                   api_key=OPENAPI["AK"])
     response_synthesizer = get_response_synthesizer(response_mode=ResponseMode.TREE_SUMMARIZE, llm=llm,

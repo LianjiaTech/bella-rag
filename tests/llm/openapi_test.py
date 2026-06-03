@@ -21,7 +21,7 @@ def test_embedding():
 
 def test_completion():
     UserContext.user_id = get_user_info()
-    llm = OpenAPI(model="gpt-4o", temperature=0.01, max_tokens=4000, api_base=OpenAPI['URL'],
+    llm = OpenAPI(model="gpt-5.4", temperature=0.01, max_tokens=4000, api_base=OpenAPI['URL'],
                   api_key=OpenAPI['AK'])
     text = "我是中国人"
     completion = llm.complete(text)

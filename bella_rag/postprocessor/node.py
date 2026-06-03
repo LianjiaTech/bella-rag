@@ -100,7 +100,7 @@ class CompletePostprocessor(BaseNodePostprocessor):
 
     chunk_max_length: int
 
-    model: str = 'gpt-4o'
+    model: str = 'gpt-5.4'
 
     small2big_strategy: Small2BigModes
 

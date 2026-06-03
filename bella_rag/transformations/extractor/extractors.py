@@ -9,7 +9,7 @@ from bella_rag.llm.openapi import OpenAPI
 from bella_rag.transformations.extractor.extract_context import context_summary
 from bella_rag.transformations.extractor.extract_tag import extract_tag_impl
 
-llm = OpenAPI(model="gpt-4o", temperature=0.01, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300)
+llm = OpenAPI(model="gpt-5.4", temperature=0.01, api_base=OPENAPI["URL"], api_key=OPENAPI["AK"], timeout=300)
 EXTRACTOR_CONTEXT = "context_extractor"
 EXTRACTOR_SUMMARY = "summary_extractor"
 

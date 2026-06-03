@@ -83,7 +83,7 @@ class FileSearchTool(ITool):
                                                                                     'file_contents': contents[
                                                                                         'file_contents']}))
             llm = OpenAPI(temperature=0.01, api_base=OPENAPI["URL"], api_key=OpenapiContext.ak,
-                          timeout=300, model='gpt-4o')
+                          timeout=300, model='gpt-5.4')
             completion = llm.complete(llm_input)
             res = completion.text
             compress_res.append(
