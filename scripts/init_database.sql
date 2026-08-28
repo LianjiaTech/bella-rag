@@ -67,6 +67,21 @@ CREATE TABLE IF NOT EXISTS `system_config` (
   UNIQUE KEY `uk_config_key` (`config_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统配置表';
 
+-- 创建文件级主 chunk 向量索引状态表
+CREATE TABLE IF NOT EXISTS `file_vector_index_state` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `file_id` varchar(128) NOT NULL COMMENT '文件id',
+  `status` smallint(6) NOT NULL DEFAULT '1' COMMENT '0=索引中, 1=可用, 2=归档中, 3=已归档',
+  `last_indexed_at` datetime(6) NOT NULL DEFAULT '1970-01-01 00:00:00.000000' COMMENT '最近一次主chunk索引完成时间',
+  `archive_started_at` datetime(6) NOT NULL DEFAULT '1970-01-01 00:00:00.000000' COMMENT '最近归档开始时间',
+  `archived_at` datetime(6) NOT NULL DEFAULT '1970-01-01 00:00:00.000000' COMMENT '归档完成时间',
+  `create_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `update_time` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_vector_state_file_id` (`file_id`),
+  KEY `idx_vector_state_scan` (`status`, `last_indexed_at`, `file_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='文件向量索引状态';
+
 -- 插入默认配置
 INSERT INTO `system_config` (`config_key`, `config_value`, `description`) VALUES
 ('system.version', '1.0.0', '系统版本'),

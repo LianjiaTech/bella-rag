@@ -11,6 +11,9 @@ from app.utils.convert import extract_metadata_from_extra, convert_chunk_content
 from common.helper.exception import ChunkOperateError
 from common.tool.vector_db_tool import vector_store, batch_query_by_source
 from init.settings import user_logger
+from ke_business.services.file_vector_index_state_service import (
+    maintain_file_vector_state,
+)
 from bella_rag.meta.meta_data import NodeTypeEnum
 from bella_rag.schema.nodes import TextNode, ImageNode, QaNode
 from bella_rag.utils.openapi_util import count_tokens
@@ -19,6 +22,9 @@ from bella_rag.utils.schema_util import node_cache
 logger = user_logger
 
 
+# 状态装饰器放在事务外层，使文件锁覆盖 MySQL 事务和向量库/ES 的全部副作用；
+# 只有函数整体成功返回后才刷新 AVAILABLE 与 last_indexed_at。
+@maintain_file_vector_state(lambda source_id, *args, **kwargs: source_id)
 @transaction.atomic
 def add_chunk(source_id: str, source_name: str, content_title: str, content_data: str, chunk_type: str, chunk_pos: int,
               extra: dict):
@@ -65,6 +71,11 @@ def add_chunk(source_id: str, source_name: str, content_title: str, content_data
         raise
 
 
+@maintain_file_vector_state(
+    lambda chunk_id, *args, **kwargs: ChunkContentAttachedService.get_by_chunk_id(
+        chunk_id,
+    ).source_id,
+)
 @transaction.atomic
 def delete_chunk(chunk_id: str):
     # 【不完备】需要删除relationship
@@ -89,6 +100,11 @@ def delete_chunk(chunk_id: str):
                                                     -1 * count_tokens(chunk.content_data))
 
 
+@maintain_file_vector_state(
+    lambda chunk_id, *args, **kwargs: ChunkContentAttachedService.get_by_chunk_id(
+        chunk_id,
+    ).source_id,
+)
 @transaction.atomic
 def update_chunk(chunk_id: str, content_title: str, content_data: str, extra: dict):
     index = vector_store.query_by_ids([chunk_id])

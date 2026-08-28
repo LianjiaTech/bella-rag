@@ -5,10 +5,13 @@ from app.postprocessors.file_postprocessors import FileSummaryProcessor, FileInd
 from app.services.file_service import file_delete_submit_task
 from bella_rag.utils.openapi_util import _fetch_ak_info
 from common.helper.exception import FileNotFoundException
-from init.settings import user_logger
+from init.settings import FILE_API, user_logger
 from bella_rag.utils.file_api_tool import file_api_client
 
-file_api_postprocessors = [FileIndexingProcessor(), FileSummaryProcessor()]
+file_api_postprocessors = [FileIndexingProcessor()]
+if FILE_API.get('enable_summary', True):
+    # 后处理器链在进程启动时确定，保证同一进程内所有文件采用一致的摘要策略。
+    file_api_postprocessors.append(FileSummaryProcessor())
 valid_file_purposes = {'assistants', 'assistants-chat'}
 file_event_handlers = {
     # 发送删除事件

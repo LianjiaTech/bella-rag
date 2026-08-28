@@ -2,6 +2,7 @@ import random
 import string
 import time
 import uuid
+import traceback
 from typing import List
 
 from llama_index.core import QueryBundle, Response
@@ -15,6 +16,7 @@ from openai._types import Headers
 from app import openapi_trace_handler as trace_handler
 from app.common.contexts import query_embedding_context, UserContext, TraceContext
 from app.controllers import default_event_handler
+from app.response.error_response import create_stream_api_error
 from app.plugin.factory import build_postprocessor_from_retrieve_param, \
     get_components_from_plugins
 from app.plugin.plugins import Plugin
@@ -92,15 +94,27 @@ def rag_streaming(
     embedding_token = query_embedding_context.set([])
     start = int(time.time() * 1000)
 
-    file_ids = file_service.filter_deleted_files(file_ids)
-    query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
-                                    model=model, instructions=instructions,
-                                    metadata_filters=metadata_filters,
-                                    top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=True,
-                                    retrieve_mode=retrieve_mode, plugins=plugins, show_quote=show_quote)
-
-    streaming_response = query_engine.query(query)
     aid = str(uuid.uuid4()) if not TraceContext.trace_id else TraceContext.trace_id
+    try:
+        file_ids = file_service.filter_deleted_files(file_ids)
+        query_engine = build_rag_engine(query=query, top_k=top_k, file_ids=file_ids, score=score, api_key=api_key,
+                                        model=model, instructions=instructions,
+                                        metadata_filters=metadata_filters,
+                                        top_p=top_p, temperature=temperature, max_tokens=max_tokens, stream=True,
+                                        retrieve_mode=retrieve_mode, plugins=plugins, show_quote=show_quote)
+        streaming_response = query_engine.query(query)
+    except Exception as error:
+        user_logger.error(f"rag streaming request error: {error}\n{traceback.format_exc()}")
+        trace_handler.log_trace('rag_streaming', TraceContext.trace_id, int(time.time() * 1000) - start, start,
+                                '', error, trace_args)
+        yield from streaming_handler.create_error_stream(
+            id=aid,
+            event_type='error',
+            error=create_stream_api_error(error),
+        )
+        query_embedding_context.reset(embedding_token)
+        return
+
     retrieval_send = False
 
     llm_response = ""

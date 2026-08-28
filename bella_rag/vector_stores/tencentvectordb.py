@@ -17,6 +17,7 @@ from bella_rag.utils.trace_log_util import trace
 from bella_rag.vector_stores.index import FIELD_RELATIONSHIPS, VectorIndex
 from bella_rag.vector_stores.types import FilterOperator, MetadataFilters, MetadataFilter
 from bella_rag.vector_stores.bella_vector_store import BellaVectorStore
+from bella_rag.vector_stores.delete_result import delete_tencent_in_batches
 
 class TencentVectorDB(OriginalTencentVectorDB, BellaVectorStore):
     stores_text: bool
@@ -173,20 +174,10 @@ class TencentVectorDB(OriginalTencentVectorDB, BellaVectorStore):
         tencent_filter = self._build_tencent_filter_string(metadata_filters)
 
         if not tencent_filter:
-            user_logger.warning("No valid filter provided for delete_by_filter")
-            return
+            raise ValueError("No valid filter provided for delete_by_filter")
 
         # 分批删除，向量库一次删除数据量超过16384会直接报错
-        delete_batch_limit = 15000
-        while True:
-            del_res = self.collection.delete(filter=tencent_filter, limit=delete_batch_limit)
-            if not del_res or del_res.get('code', -1) != 0:
-                user_logger.error(f'delete data from tencent vectordb failed : {del_res}')
-                return
-
-            if del_res.get('affectedCount') < delete_batch_limit:
-                # 删除完毕
-                return
+        delete_tencent_in_batches(self.collection.delete, tencent_filter)
 
     @trace("vector_query")
     def query(self, query: VectorStoreQuery, index: VectorIndex, index_extend: IndexExtendTransformComponent = None,
@@ -332,11 +323,14 @@ class TencentVectorDB(OriginalTencentVectorDB, BellaVectorStore):
             filter_string = self._build_tencent_filter_string(filter_condition)
             query_filter = Filter(filter_string) if filter_string else None
         
+        # 默认保留历史调用的明细日志行为；批量归档等高吞吐调用可显式关闭。
+        log_node_metadata = kwargs.pop('log_node_metadata', True)
         docs = self.collection.query(filter=query_filter, offset=offset, limit=limit, document_ids=document_ids, **kwargs)
         nodes = []
         for doc in docs:
             node = self.doc2node(doc, index)
-            user_logger.info(f'node metadata:{node.metadata}')
+            if log_node_metadata:
+                user_logger.info(f'node metadata:{node.metadata}')
             nodes.append(node)
 
         if index_extend is not None:

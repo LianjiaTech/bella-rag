@@ -53,10 +53,24 @@ embedding_retry_decorator = create_retry_decorator(
 logger = user_logger
 
 
+def ensure_bearer_token(ak: str) -> str:
+    ak = (ak or "").strip()
+    if ak and not ak.lower().startswith("bearer "):
+        ak = f"Bearer {ak}"
+    return ak
+
+
+def strip_bearer_token(ak: str) -> str:
+    ak = (ak or "").strip()
+    if ak.lower().startswith("bearer "):
+        return ak[7:].strip()
+    return ak
+
+
 class OpenAI(LlamaOpenAI):
     @property
     def auth_headers(self) -> dict[str, str]:
-        api_key = self.api_key
+        api_key = ensure_bearer_token(self.api_key)
         return {"Authorization": api_key}
 
     @property
@@ -72,7 +86,7 @@ class OpenAI(LlamaOpenAI):
 class AsyncOpenAI(LlamaAsyncOpenAI):
     @property
     def auth_headers(self) -> dict[str, str]:
-        api_key = self.api_key
+        api_key = ensure_bearer_token(self.api_key)
         return {"Authorization": api_key}
 
     @property
@@ -157,13 +171,16 @@ class OpenAPIEmbedding(BaseEmbedding):
     _aclient: Optional[AsyncOpenAI] = PrivateAttr()
     user: str = Field(default_factory=get_user_info, description="user")
     model_dimension: int = Field(description="embedding模型维数")
+    timeout: Optional[float] = Field(default=None, description="embedding请求超时时间（秒）")
 
-    def __init__(self, model: str, api_key: str, embedding_batch_size: int, model_dimension: int = 1024, **kwargs):
+    def __init__(self, model: str, api_key: str, embedding_batch_size: int, model_dimension: int = 1024,
+                 timeout: Optional[float] = None, **kwargs):
         super().__init__(
             model_name=model,
             embed_batch_size=embedding_batch_size,
-            api_key=api_key,
+            api_key=strip_bearer_token(api_key),
             model_dimension=model_dimension,
+            timeout=timeout,
             **kwargs,
         )
         self._client = None
@@ -198,7 +215,10 @@ class OpenAPIEmbedding(BaseEmbedding):
 
     def _get_client(self, api_key: str) -> OpenAI:
         if self._client is None:
-            self._client = OpenAI(api_key=api_key, base_url=OPENAPI["URL"])
+            client_kwargs = {"api_key": api_key, "base_url": OPENAPI["URL"]}
+            if self.timeout is not None:
+                client_kwargs["timeout"] = self.timeout
+            self._client = OpenAI(**client_kwargs)
         return self._client
 
     @trace(step="generate_embeddings", log_enabled=False)
@@ -218,11 +238,17 @@ class OpenAPIEmbedding(BaseEmbedding):
 
     def _get_aclient(self, api_key: str) -> AsyncOpenAI:
         if self._aclient is None:
-            self._aclient = AsyncOpenAI(api_key=api_key, base_url=OPENAPI["URL"])
+            client_kwargs = {"api_key": api_key, "base_url": OPENAPI["URL"]}
+            if self.timeout is not None:
+                client_kwargs["timeout"] = self.timeout
+            self._aclient = AsyncOpenAI(**client_kwargs)
         return self._aclient
 
-
 class OpenAPI(Llama_OpenAI):
+    def _get_credential_kwargs(self, is_async: bool = False, **kwargs: Any) -> Dict[str, Any]:
+        credential_kwargs = super()._get_credential_kwargs(is_async=is_async, **kwargs)
+        credential_kwargs["api_key"] = strip_bearer_token(credential_kwargs.get("api_key", ""))
+        return credential_kwargs
 
     @property
     def metadata(self) -> LLMMetadata:
@@ -495,7 +521,7 @@ class FileAPIClient:
 
     def _get_headers(self) -> dict:
         """获取通用请求头"""
-        return {'Authorization': f'{self.ak}'}
+        return {'Authorization': ensure_bearer_token(self.ak)}
 
     def file_content(self, file_id: str) -> BinaryIO:
         """
