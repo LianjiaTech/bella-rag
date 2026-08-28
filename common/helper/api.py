@@ -23,6 +23,7 @@ class ApiReturn(object):
     CODE_CREATE_FILE_INDEXING_ERROR = 10004  # 创建文件索引任务失败
     CODE_DELETE_FILE_INDEXING_ERROR = 10005  # 删除文件任务失败
     CODE_INNER_CODE = 10006  # 服务抛出异常,内部错误
+    CODE_UPSTREAM_TIMEOUT = 10007  # 上游服务超时
 
     def __init__(self, code=CODE_OK, message="OK", body={}):
         self.__code = code

@@ -65,7 +65,10 @@ def count_tokens(text: str, model: str = DEFAULT_MODEL) -> int:
     # 自研模型均用gpt-4计算（可能有误差，可忽略）
     if not model.startswith("gpt-"):
         count_model = DEFAULT_MODEL
-    encoding = tiktoken.encoding_for_model(count_model)
+    try:
+        encoding = tiktoken.encoding_for_model(count_model)
+    except KeyError:
+        encoding = tiktoken.encoding_for_model(DEFAULT_MODEL)
     tokens = encoding.encode(text)
     # 计算标记列表的长度，即标记的数量
     token_count = len(tokens)
@@ -81,7 +84,10 @@ def str_token_limit(text: str, token_limit: int, model: str = DEFAULT_MODEL) -> 
     # 自研模型均用gpt-4计算（可能有误差，可忽略）
     if not model.startswith("gpt-"):
         count_model = DEFAULT_MODEL
-    encoding = tiktoken.encoding_for_model(count_model)
+    try:
+        encoding = tiktoken.encoding_for_model(count_model)
+    except KeyError:
+        encoding = tiktoken.encoding_for_model(DEFAULT_MODEL)
     tokens = encoding.encode(text=text)
     truncated_tokens = tokens[:token_limit]
     return encoding.decode(tokens=truncated_tokens)

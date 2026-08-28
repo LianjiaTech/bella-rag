@@ -1,0 +1,89 @@
+stages:
+  - sync
+github_sync_master:
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
+  stage: sync
+  script:
+    - echo "======== 开始从GitHub同步代码 ========"
+    - echo "配置Git用户信息..."
+    - git config user.name "GitLab CI Bot"
+    - git config user.email "dy7tffuid54yu"
+
+    - echo "配置GitHub远程仓库..."
+    - git remote remove github || true
+    - git remote add github https://oauth2:${GITHUB_ACCESS_TOKEN}@github.com/LianjiaTech/bella-rag.git
+
+    - echo "获取GitHub最新代码..."
+    - git fetch github main
+
+    - echo "检查是否需要更新..."
+    - LOCAL_HEAD=$(git rev-parse HEAD)
+    - GITHUB_HEAD=$(git rev-parse github/main)
+    - if [ "$LOCAL_HEAD" = "$GITHUB_HEAD" ]; then echo "本地分支已是最新，无需同步"; exit 0; fi
+
+    - echo "执行rebase操作..."
+    - git rebase github/main || (echo "rebase失败，可能存在冲突"; git rebase --abort; exit 1)
+
+    - echo "配置推送URL..."
+    - git remote set-url origin https://oauth2:${PROJECT_ACCESS_TOKEN}@git.lianjia.com/ai-arch/ke-RAG.git
+
+    - echo "推送更新到master分支..."
+    - git push --force-with-lease origin HEAD:master || (echo "推送失败，请检查访问令牌权限"; exit 1)
+    - echo "✅ 同步成功完成"
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" && $CI_MERGE_REQUEST_EVENT_TYPE == "merged"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "master"'
+      when: always
+    - when: never
+
+github_sync_develop:
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
+  stage: sync
+  script:
+    - echo "======== 开始从GitHub同步代码 ========"
+    - echo "配置Git用户信息..."
+    - git config user.name "GitLab CI Bot"
+    - git config user.email "dy7tffuid54yu"
+
+    - echo "配置GitHub远程仓库..."
+    - git remote remove github || true
+    - git remote add github https://oauth2:${GITHUB_ACCESS_TOKEN}@github.com/LianjiaTech/bella-rag.git
+
+    - echo "获取GitHub最新代码..."
+    - git fetch github develop
+
+    - echo "检查是否需要更新..."
+    - LOCAL_HEAD=$(git rev-parse HEAD)
+    - GITHUB_HEAD=$(git rev-parse github/develop)
+    - if [ "$LOCAL_HEAD" = "$GITHUB_HEAD" ]; then echo "本地分支已是最新，无需同步"; exit 0; fi
+
+    - echo "执行rebase操作..."
+    - git rebase github/develop || (echo "rebase失败，可能存在冲突"; git rebase --abort; exit 1)
+
+    - echo "配置推送URL..."
+    - git remote set-url origin https://oauth2:${PROJECT_ACCESS_TOKEN}@git.lianjia.com/ai-arch/ke-RAG.git
+
+    - echo "推送更新到dev分支..."
+    - git push --force-with-lease origin HEAD:develop || (echo "推送失败，请检查访问令牌权限"; exit 1)
+    - echo "✅ 同步成功完成"
+
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "develop"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop" && $CI_MERGE_REQUEST_EVENT_TYPE == "merged"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "develop"'
+      when: always
+    - when: never

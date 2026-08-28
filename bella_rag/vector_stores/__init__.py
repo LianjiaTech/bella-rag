@@ -1,3 +1,5 @@
+from typing import Optional
+
 from llama_index.vector_stores.tencentvectordb import CollectionParams
 from tcvectordb.model.enum import ReadConsistency
 
@@ -14,74 +16,53 @@ class TencentStoreManager:
         self._stores = {}
         self._master_stores = {}  # 强一致性读
 
-    def init_stores(self):
-        """初始化腾讯向量库存储实例"""
-        user_logger.info("Initializing TencentVectorDB vector stores")
-
-        # 公共配置
-        common_config = {
+    @staticmethod
+    def _create_store(collection_name: str, master: bool = False) -> TencentVectorDB:
+        """按统一配置创建客户端；并行任务可借此获得线程独占实例。"""
+        config = {
             'stores_text': False,
             'url': TENCENT_VECTOR_DB["URL"],
             'key': TENCENT_VECTOR_DB["KEY"],
             'database_name': TENCENT_VECTOR_DB["DATABASE_NAME"],
         }
+        if master:
+            config['read_consistency'] = ReadConsistency.STRONG_CONSISTENCY
+        return TencentVectorDB(
+            collection_params=CollectionParams(
+                dimension=int(TENCENT_VECTOR_DB["DIMENSION"]),
+                collection_name=collection_name,
+                drop_exists=False,
+            ),
+            **config,
+        )
+
+    def init_stores(self):
+        """初始化腾讯向量库存储实例"""
+        user_logger.info("Initializing TencentVectorDB vector stores")
 
         # 初始化普通读实例
-        self._stores['chunk'] = TencentVectorDB(
-            collection_params=CollectionParams(
-                dimension=int(TENCENT_VECTOR_DB["DIMENSION"]),
-                collection_name=TENCENT_VECTOR_DB["COLLECTION_NAME"],
-                drop_exists=False
-            ),
-            **common_config
+        self._stores['chunk'] = self._create_store(
+            TENCENT_VECTOR_DB["COLLECTION_NAME"],
         )
-
-        self._stores['qa'] = TencentVectorDB(
-            collection_params=CollectionParams(
-                dimension=int(TENCENT_VECTOR_DB["DIMENSION"]),
-                collection_name=TENCENT_VECTOR_DB["QUESTIONS_COLLECTION_NAME"],
-                drop_exists=False
-            ),
-            **common_config
+        self._stores['qa'] = self._create_store(
+            TENCENT_VECTOR_DB["QUESTIONS_COLLECTION_NAME"],
         )
-
-        self._stores['summary'] = TencentVectorDB(
-            collection_params=CollectionParams(
-                dimension=int(TENCENT_VECTOR_DB["DIMENSION"]),
-                collection_name=TENCENT_VECTOR_DB["SUMMARY_QUESTION_COLLECTION_NAME"],
-                drop_exists=False
-            ),
-            **common_config
+        self._stores['summary'] = self._create_store(
+            TENCENT_VECTOR_DB["SUMMARY_QUESTION_COLLECTION_NAME"],
         )
 
         # 初始化强一致性读实例
-        master_config = {**common_config, 'read_consistency': ReadConsistency.STRONG_CONSISTENCY}
-
-        self._master_stores['chunk'] = TencentVectorDB(
-            collection_params=CollectionParams(
-                dimension=int(TENCENT_VECTOR_DB["DIMENSION"]),
-                collection_name=TENCENT_VECTOR_DB["COLLECTION_NAME"],
-                drop_exists=False
-            ),
-            **master_config
+        self._master_stores['chunk'] = self._create_store(
+            TENCENT_VECTOR_DB["COLLECTION_NAME"],
+            master=True,
         )
-
-        self._master_stores['qa'] = TencentVectorDB(
-            collection_params=CollectionParams(
-                dimension=int(TENCENT_VECTOR_DB["DIMENSION"]),
-                collection_name=TENCENT_VECTOR_DB["QUESTIONS_COLLECTION_NAME"],
-                drop_exists=False
-            ),
-            **master_config
+        self._master_stores['qa'] = self._create_store(
+            TENCENT_VECTOR_DB["QUESTIONS_COLLECTION_NAME"],
+            master=True,
         )
-
-        self._master_stores['summary'] = TencentVectorDB(
-            collection_params=CollectionParams(
-                dimension=int(TENCENT_VECTOR_DB["DIMENSION"]),
-                collection_name=TENCENT_VECTOR_DB["SUMMARY_QUESTION_COLLECTION_NAME"],
-                drop_exists=False
-            ),
-            **master_config
+        self._master_stores['summary'] = self._create_store(
+            TENCENT_VECTOR_DB["SUMMARY_QUESTION_COLLECTION_NAME"],
+            master=True,
         )
 
         # 设置过滤字段（所有实例使用默认的filter_fields配置）
@@ -92,6 +73,48 @@ class TencentStoreManager:
     def get_chunk_store(self, master: bool = False) -> TencentVectorDB:
         """获取文档块存储"""
         return self._master_stores['chunk'] if master else self._stores['chunk']
+
+    def create_chunk_store(self, master: bool = False) -> TencentVectorDB:
+        """创建独立的文档块存储客户端，供并行任务在线程内独占使用。"""
+        return self._create_store(
+            TENCENT_VECTOR_DB["COLLECTION_NAME"],
+            master=master,
+        )
+
+    def rebuild_chunk_index(
+            self,
+            drop_before_rebuild: bool = False,
+            throttle: Optional[int] = None,
+    ) -> dict:
+        """提交主 chunk 集合索引重建，并返回实际操作的集合标识。"""
+        collection = self.get_chunk_store().collection
+        user_logger.info(
+            "提交主chunk集合索引重建: database=%s, collection=%s, "
+            "dropBeforeRebuild=%s, throttle=%s",
+            collection.database_name,
+            collection.collection_name,
+            drop_before_rebuild,
+            throttle,
+        )
+        collection.rebuild_index(
+            drop_before_rebuild=drop_before_rebuild,
+            throttle=throttle,
+        )
+        return {
+            'database': collection.database_name,
+            'collection': collection.collection_name,
+        }
+
+    def get_chunk_index_status(self) -> dict:
+        """通过 SDK 查询主 chunk 集合最新的索引任务状态。"""
+        store = self.get_chunk_store()
+        collection = store.collection
+        latest_collection = store.describe_collection()
+        return {
+            'database': collection.database_name,
+            'collection': collection.collection_name,
+            'indexStatus': latest_collection.index_status,
+        }
 
     def get_qa_store(self, master: bool = False) -> TencentVectorDB:
         """获取问答存储"""

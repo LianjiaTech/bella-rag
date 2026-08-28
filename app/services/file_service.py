@@ -4,6 +4,7 @@ from threading import Thread
 from typing import List, Optional
 
 import redis
+from django.utils import timezone
 from llama_index.core import StorageContext, Document
 from llama_index.core.graph_stores import SimpleGraphStore
 from llama_index.core.storage.docstore import SimpleDocumentStore
@@ -24,6 +25,7 @@ from app.utils.convert import trans_metadata_to_extra
 from app.workers.producers.producers import knowledge_file_delete_producer, async_send_kafka_message
 from common.helper.exception import UnsupportedTypeError, FileCheckException
 from common.tool.redis_tool import redis_pool
+from common.tool.file_vector_operation_lock import file_vector_operation_lock
 from common.tool.vector_db_tool import summary_question_vector_store
 from init.settings import user_logger
 from bella_rag.callbacks.manager import init_callbacks
@@ -39,6 +41,9 @@ from bella_rag.vector_stores.factory import has_index, get_index
 from bella_rag.vector_stores.types import MetadataFilter
 from bella_rag.vector_stores.types import MetadataFilters, FilterOperator
 from bella_rag.vector_stores.vector_store import ManyVectorStoreIndex
+from ke_business.services.file_vector_index_state_service import (
+    FileVectorIndexStateService,
+)
 
 redis_client = redis.Redis(connection_pool=redis_pool)
 deleted_files_key = "rag:deleted_file_ids"
@@ -59,7 +64,8 @@ def run_index_file(file_id: str, file_name: str, documents: list, transforms: li
         vector_stores['elasticsearch'] = es_index.vector_store
 
     # 区分 QA 与知识文件
-    if is_qa_knowledge(file_name):
+    is_qa_file = is_qa_knowledge(file_name)
+    if is_qa_file:
         vector_stores[DEFAULT_VECTOR_STORE] = questions_vector_store
         transforms.append(QuestionAnswerAttachedIndexExtend())
     else:
@@ -73,13 +79,39 @@ def run_index_file(file_id: str, file_name: str, documents: list, transforms: li
         graph_store=SimpleGraphStore(),
     )
 
-    ManyVectorStoreIndex.from_documents(
-        documents,
-        storage_context=storage_context,
-        transformations=transforms,
-        embed_model=embed_model,
-        metadata=get_document_metadata(file_id=file_id, file_name=file_name, metadata=metadata),
-    )
+    index_options = {
+        'storage_context': storage_context,
+        'transformations': transforms,
+        'embed_model': embed_model,
+        'metadata': get_document_metadata(
+            file_id=file_id,
+            file_name=file_name,
+            metadata=metadata,
+        ),
+    }
+    if is_qa_file:
+        ManyVectorStoreIndex.from_documents(documents, **index_options)
+    else:
+        # 锁必须覆盖完整的外部向量写入和状态收敛，避免归档在构建中途删除新向量。
+        with file_vector_operation_lock(
+                file_id,
+                blocking=True,
+                timeout=30,
+        ) as acquired:
+            if not acquired:
+                raise TimeoutError(
+                    f'等待文件向量操作锁超时: file_id={file_id}'
+                )
+            # 仅已有状态会转为 INDEXING；初次索引直到全部写入成功才创建 AVAILABLE 行。
+            replaces_existing_index = (
+                FileVectorIndexStateService.mark_indexing_if_exists(file_id)
+            )
+            ManyVectorStoreIndex.from_documents(documents, **index_options)
+            FileVectorIndexStateService.mark_index_available(
+                file_id,
+                timezone.now(),
+                cleanup_archive=replaces_existing_index,
+            )
 
     # 发送文件处理完成的消息
     from app.workers import knowledge_file_extractor_producer

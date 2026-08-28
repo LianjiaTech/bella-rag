@@ -84,7 +84,6 @@ def complete_table_extra_info(table_node: StandardNode) -> StandardNode:
         new_cells = []
         for cell in row.cells:
 
-            cell_path = cell.path
             cell_text = cell.text
             cell_token = count_tokens(cell_text)
             element_data = {"type": "Text", "text": cell_text, "positions": None}
@@ -120,5 +119,5 @@ def upload_base64_image(base64_data: str) -> str:
         return image_url
     except Exception as e:
         user_logger.info(f"图片上传失败: {e}")
-        return None
+        return ""
 

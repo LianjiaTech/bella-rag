@@ -534,7 +534,6 @@ KAFKA = {
     'FILE_API_TASK_BOOTSTRAP_SERVERS': config.get('KAFKA', 'file_api_bootstrap_servers', ''),
     'FILE_API_TASK_TOPIC': config.get('KAFKA', 'file_api_topic', ''),
     'FILE_API_TASK_GROUP_ID': config.get('KAFKA', 'file_api_group_id', ''),
-
     'KNOWLEDGE_FILE_CONTEXT_TASK_GROUP_ID': config.get('KAFKA', 'knowledge_file_index_context_group_id', ''),
 
     'KNOWLEDGE_FILE_DELETE_BOOTSTRAP_SERVERS': config.get('KAFKA', 'knowledge_file_delete_bootstrap_servers', ''),
@@ -556,6 +555,7 @@ RETRIEVAL = {
     'TOKEN_THRESHOLD': config.get('RETRIEVAL', 'complete_token_threshold', 0.6, float),
     'COMPLETE_MAX_TOKEN': config.get('RETRIEVAL', 'complete_max_token', 1500, int),
     'MATCH_SCORE': config.get('RETRIEVAL', 'match_score', 0.95, float),
+    'EMBEDDING_TIMEOUT': config.get('RETRIEVAL', 'embedding_timeout', 5.0, float),
 }
 
 # 上下文总结配置
@@ -571,7 +571,9 @@ CONTEXT_SUMMARY = {
 
 # file-api配置
 FILE_API = {
-    'url': config.get('FILE_API', 'url', '')
+    'url': config.get('FILE_API', 'url', ''),
+    # 默认保留文件摘要链路；需要临时关闭时可通过 FILE_API_ENABLE_SUMMARY=false 覆盖。
+    'enable_summary': config.get('FILE_API', 'enable_summary', True, bool),
 }
 
 DOCUMENT_PARSE = {

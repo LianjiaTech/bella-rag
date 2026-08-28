@@ -8,6 +8,7 @@ from openai import APIError
 from app.common.contexts import TraceContext
 from app.controllers import default_event_handler
 from app.response.rag_response import OpenApiError, create_response
+from app.response.error_response import create_http_error_response
 from app.runner import rag_runners
 from app.services import rag_service
 from app.strategy.retrieval import get_retrieval_mode_from_user_mode, build_plugins_from_user_mode
@@ -18,6 +19,7 @@ from app.controllers.request.request_processor import extract_file_ids_from_scop
 from common.helper import ApiReturn
 from common.helper.exception import CheckError
 from init.settings import user_logger, error_logger
+from bella_rag.llm.openapi import strip_bearer_token
 from bella_rag.vector_stores.types import MetadataFilters
 
 
@@ -67,16 +69,14 @@ def search(request):
         user_logger.error(f'retrieval request error :{str(e)}\\n{traceback.format_exc()}')
         # 添加接口error埋点
         increment_counter_with_tag('retrieval', 'error_code', e.__class__.__name__)
-        error = OpenApiError(message=str(e),
-                             body={"code": ApiReturn.CODE_INNER_CODE, "type": "internal_error"})
-        return HttpResponse(error.json_response().encode('utf-8'), status=500)
+        return create_http_error_response(e)
 
 
 @require_http_methods(["POST"])
 def chat(request):
     try:
         # 获取请求的ak
-        ak = request.META.get('HTTP_AUTHORIZATION', '')
+        ak = strip_bearer_token(request.META.get('HTTP_AUTHORIZATION', ''))
         data = json.loads(request.body)
         # 生成参数
         model = data.get('model', 'c4ai-command-r-plus')
@@ -144,12 +144,10 @@ def chat(request):
                              body={"code": ApiReturn.CODE_PARAM_NOT_ALLOW, "type": "unsupported_params"})
         return HttpResponse(error.json_response().encode('utf-8'), status=422)
     except APIError as e:
-        increment_counter_with_tag('rag', 'error_code', e.code)
+        increment_counter_with_tag('rag', 'error_code', getattr(e, 'status_code', None) or e.__class__.__name__)
         user_logger.error(f'rag open api error: {str(e)}\n{traceback.format_exc()}')
-        return HttpResponse(json.dumps(e.body, ensure_ascii=False), status=int(e.code))
+        return create_http_error_response(e)
     except Exception as e:
         user_logger.error(f'rag chat request error :{str(e)}\n{traceback.format_exc()}')
         increment_counter_with_tag('rag', 'error_code', e.__class__.__name__)
-        error = OpenApiError(message=str(e),
-                             body={"code": ApiReturn.CODE_INNER_CODE, "type": "internal_error"})
-        return HttpResponse(error.json_response().encode('utf-8'), status=500)
+        return create_http_error_response(e)

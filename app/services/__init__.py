@@ -1,6 +1,6 @@
 from app.schema.index import ChunkVectorIndex, QuestionVectorIndex
 from app.schema.index import EsIndex
-from init.settings import OPENAPI, VECTOR_DB_COMMON
+from init.settings import OPENAPI, VECTOR_DB_COMMON, RETRIEVAL
 from bella_rag.llm.openapi import OpenAPIEmbedding
 
 ak = OPENAPI["AK"]
@@ -16,4 +16,12 @@ embed_model = OpenAPIEmbedding(
     embedding_batch_size=VECTOR_DB_COMMON["EMBEDDING_BATCH_SIZE"],
     api_key=ak,
     model_dimension=int(VECTOR_DB_COMMON["DIMENSION"])
+)
+
+retrieval_embed_model = OpenAPIEmbedding(
+    model=VECTOR_DB_COMMON.get("EMBEDDING_MODEL"),
+    embedding_batch_size=VECTOR_DB_COMMON["EMBEDDING_BATCH_SIZE"],
+    api_key=ak,
+    model_dimension=int(VECTOR_DB_COMMON["DIMENSION"]),
+    timeout=RETRIEVAL["EMBEDDING_TIMEOUT"]
 )

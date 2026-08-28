@@ -15,7 +15,13 @@ warnings.filterwarnings('ignore')
 
 class S3(object):
     def __init__(self, config: Dict[str, Any]):
-        user_logger.info(f'init s3 client. config: {config}')
+        # S3 客户端会在并行归档工作线程内分别创建，初始化日志不得输出 AK/SK。
+        user_logger.info(
+            'init s3 client. endpoint=%s, bucket=%s, region=%s',
+            config.get('endpoint'),
+            config.get('bucket_name'),
+            config.get('region_name'),
+        )
         self.access_key = config.get('ak')
         self.secret_access_key = config.get('sk')
         self.region_name = config.get('region_name')
@@ -136,5 +142,5 @@ class S3(object):
             user_logger.info(f'Dict content exists: {file_key}')
             return True
         except Exception as e:
-            user_logger.info(f'Dict content not exists: {file_key}')
-            return False 
+            user_logger.info(f'Dict content not exists: {file_key}: {repr(e)}')
+            return False

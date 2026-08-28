@@ -9,7 +9,8 @@ from typing_extensions import Optional
 
 from app.plugin.plugins import Plugin, Completer, Reranker, PluginStatus, ImageRecognizer
 from app.plugin.plugins import RetrievePlugin
-from app.services import chunk_vector_index_structure, es_index_structure, question_vector_index_structure
+from app.services import chunk_vector_index_structure, es_index_structure, question_vector_index_structure, \
+    retrieval_embed_model
 from app.strategy import index, question_index, empty_retriever
 from common.helper.exception import UnsupportedTypeError
 # 直接导入IndexExtend（这些是数据库相关的，不属于向量存储）
@@ -137,6 +138,7 @@ def _create_base_vector_retriever(vector_store_index: VectorStoreIndex,
                            "index_extends": index_extends, 'index_extend': index_extend}
     return VectorIndexRetriever(
         index=vector_store_index,
+        embed_model=retrieval_embed_model,
         similarity_top_k=int(RETRIEVAL['RETRIEVAL_NUM']),
         filters=MetadataFilters(filters=filters),
         vector_store_kwargs=vector_store_kwargs,

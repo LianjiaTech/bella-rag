@@ -1,0 +1,3 @@
+# Use file-level vector index state for archive discovery
+
+Archive discovery uses a materialized, one-row-per-file `file_vector_index_state` table instead of repeatedly grouping the 100-million-row chunk table. The state is maintained when a main chunk vector index completes and is initially populated by a resumable, keyset-paginated backfill; archive discovery pages this table and filters recent access in memory, deliberately avoiding cross-table archive-candidate joins. This adds projection maintenance and an operational backfill, but bounds routine archive work by file count rather than chunk count and avoids a production-risking full aggregation.
