@@ -1,3 +1,4 @@
+import os
 from threading import Lock
 
 from django.apps import AppConfig as DjangoAppConfig
@@ -20,6 +21,11 @@ class AppConfig(DjangoAppConfig):
             if AppConfig.ready_called:
                 return
             AppConfig.ready_called = True  # 标记ready方法已被调用
+
+            # 测试环境跳过所有启动副作用（kafka消费者/定时任务/ES索引），
+            # 使单元测试无需外部服务即可导入应用。
+            if os.environ.get('RAG_TESTING') == '1':
+                return
 
             from app.workers import start_workers
             from app.tasks import start_schedulers
