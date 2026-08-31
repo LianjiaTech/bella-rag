@@ -218,7 +218,8 @@ class TraceRecordCallbackHandler(BaseCallbackHandler):
                 self.log_trace(step, trace_id,
                                payload.get('cost', 0), payload.get('start', 0), payload.get('result'),
                                payload.get('message', ''), payload.get('args', []), payload.get('kwargs', {}),
-                               api_key=payload.get('api_key', ''))
+                               api_key=payload.get('api_key', ''),
+                               model_request_ids=payload.get('model_request_ids', {}))
 
     def start_trace(self, trace_id: Optional[str] = None) -> None:
         """
@@ -235,7 +236,7 @@ class TraceRecordCallbackHandler(BaseCallbackHandler):
         pass
 
     def log_trace(self, step, trace_id, cost, start_time, result, error_msg,
-                  *args, api_key='', **kwargs):
+                  *args, api_key='', model_request_ids=None, **kwargs):
         try:
             trace_log = dict()
             params = []
@@ -255,6 +256,8 @@ class TraceRecordCallbackHandler(BaseCallbackHandler):
             if api_key:
                 # 该值必须由调用层预先脱敏，禁止在此处接收原始密钥。
                 trace_log['api_key'] = api_key
+            if model_request_ids:
+                trace_log['model_request_ids'] = model_request_ids
             log_json = json.dumps(trace_log, cls=RagEncoder, ensure_ascii=False)
             trace_logger.info(log_json)
         except Exception:

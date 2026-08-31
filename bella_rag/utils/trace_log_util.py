@@ -45,6 +45,8 @@ def trace(step, log_enabled=True, progress=''):
                 from app.common.contexts import TraceContext
                 if TraceContext.api_key:
                     payload["api_key"] = TraceContext.api_key
+                if TraceContext.model_request_ids:
+                    payload["model_request_ids"] = dict(TraceContext.model_request_ids)
                 # event不支持自定义，在payload传递真正的step
                 # todo 此处有个坑，源码内部as_trace会清空callback_manager的上下文，导致出栈失败
                 callback_manager.on_event_end(CBEventType.AGENT_STEP, payload)
@@ -52,6 +54,7 @@ def trace(step, log_enabled=True, progress=''):
             from app.common.contexts import TraceContext
             # 每条 trace 链路独立记录失败调用的脱敏 Key，避免复用上一次请求的值。
             TraceContext.api_key = ""
+            TraceContext.clear_model_request_ids()
             if progress:
                 TraceContext.progress = progress
 
