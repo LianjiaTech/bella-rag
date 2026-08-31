@@ -79,19 +79,42 @@ def mask_api_key(api_key: str) -> str:
 
 def get_request_id(value) -> Optional[str]:
     """从 OpenAI SDK 响应或异常中提取上游 request id。"""
+    if value is None:
+        return None
+
+    # OpenAPI 网关使用自定义响应头，优先读取该 header。
+    for headers in (
+        getattr(value, "headers", None),
+        getattr(getattr(value, "response", None), "headers", None),
+        getattr(getattr(value, "_response", None), "headers", None),
+    ):
+        if headers:
+            for key in ("X-BELLA-REQUEST-ID", "x-bella-request-id"):
+                request_id = headers.get(key)
+                if request_id:
+                    return str(request_id)
+
     if isinstance(value, dict):
-        for key in ("_request_id", "request_id", "id"):
+        for key in ("X-BELLA-REQUEST-ID", "x-bella-request-id", "_request_id", "request_id", "id"):
             request_id = value.get(key)
             if request_id:
                 return str(request_id)
-        return None
-    if value is None:
         return None
     for attr in ("_request_id", "request_id", "id"):
         request_id = getattr(value, attr, None)
         if request_id:
             return str(request_id)
+    body = getattr(value, "body", None)
+    if isinstance(body, dict):
+        return body.get("X-BELLA-REQUEST-ID") or body.get("request_id")
     return None
+
+
+def create_embedding_response(client, **kwargs):
+    """发送 embedding 请求并返回解析后的响应及上游 request id。"""
+    raw_response = client.with_raw_response.embeddings.create(**kwargs)
+    request_id = get_request_id(raw_response)
+    return raw_response.parse(), request_id
 
 
 class OpenAI(LlamaOpenAI):
@@ -134,8 +157,14 @@ def get_embeddings(client: OpenAI, texts: List[str], model: str) -> List[Embeddi
         extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
 
     try:
-        response = client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
-        TraceContext.set_model_request_id("embedding", get_request_id(response))
+        response, request_id = create_embedding_response(
+            client,
+            input=texts,
+            model=model,
+            user=get_user_info(),
+            extra_headers=extra_headers,
+        )
+        TraceContext.set_model_request_id("embedding", request_id)
     except Exception as error:
         TraceContext.set_model_request_id("embedding", get_request_id(error))
         TraceContext.api_key = mask_api_key(getattr(client, "api_key", ""))
@@ -159,8 +188,14 @@ async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> 
         extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
 
     try:
-        response = await client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
-        TraceContext.set_model_request_id("embedding", get_request_id(response))
+        raw_response = await client.with_raw_response.embeddings.create(
+            input=texts,
+            model=model,
+            user=get_user_info(),
+            extra_headers=extra_headers,
+        )
+        TraceContext.set_model_request_id("embedding", get_request_id(raw_response))
+        response = raw_response.parse()
     except Exception as error:
         TraceContext.set_model_request_id("embedding", get_request_id(error))
         TraceContext.api_key = mask_api_key(getattr(client, "api_key", ""))
