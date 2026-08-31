@@ -31,7 +31,12 @@ def get_vector_db_type() -> str:
 def init_vector_stores():
     """初始化向量存储"""
     global vector_store, master_vector_store, questions_vector_store, master_questions_vector_store, summary_question_vector_store
-    
+
+    # 测试环境（RAG_TESTING=1）不连接真实向量库：vector_db_tool 在 import 期
+    # 即调用本函数，若连接外部服务，单元测试便无法在无基础设施的环境运行。
+    if os.environ.get('RAG_TESTING') == '1':
+        return
+
     if get_vector_db_type() == 'qdrant':
         qdrant_manager.init_stores()
         vector_store = qdrant_manager.get_chunk_store()

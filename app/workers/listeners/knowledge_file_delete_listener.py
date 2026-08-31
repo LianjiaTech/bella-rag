@@ -16,6 +16,8 @@ knowledge_file_delete_listener_config = {
 
 
 class KnowledgeFileDeleteListener(BaseListener):
+    # 删除主 chunk 向量索引，索引重建期间必须暂停消费
+    consume_switch_key = 'VECTOR_INDEX_CONSUME_ENABLED'
 
     def __init__(self, instance_num):
         super().__init__(instance_num, **knowledge_file_delete_listener_config)

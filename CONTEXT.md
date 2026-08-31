@@ -1,6 +1,6 @@
 # Vector Archive Context
 
-This context defines the language used when identifying and archiving inactive file vectors.
+This context defines the language used when identifying and archiving inactive file vectors, and for the store-level maintenance of the same index.
 
 ## Language
 
@@ -49,3 +49,11 @@ A file that currently satisfies the inactivity and archive-status rules for vect
 **Archive Preview**:
 A point-in-time, read-only view of all current Archive Candidates. It neither reserves candidates nor guarantees that a later archive run will process the same files.
 _Avoid_: Simulation, reservation
+
+**Vector Index Rebuild**:
+The store-level operation that rebuilds the vector index of the Main Chunk Vector Index collection in the vector store. While it runs, the collection does not accept vector writes or deletes, so no file can reach Index Completion and no vector deletion can take effect until it finishes. It is distinct from per-file re-indexing and from Index Completion.
+_Avoid_: Reindex, per-file rebuild, Index Completion
+
+**Ingestion Suspension**:
+The operational state, entered before a Vector Index Rebuild and exited after it completes, in which new Main Chunk Vector Index vector writes and deletions are not applied. Changes requested while suspended are deferred in the message queue and applied after the suspension ends; they are never silently dropped.
+_Avoid_: consumer switch, env flag, maintenance mode

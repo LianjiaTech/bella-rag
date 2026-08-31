@@ -539,6 +539,10 @@ KAFKA = {
     'KNOWLEDGE_FILE_DELETE_BOOTSTRAP_SERVERS': config.get('KAFKA', 'knowledge_file_delete_bootstrap_servers', ''),
     'KNOWLEDGE_FILE_DELETE_TOPIC': config.get('KAFKA', 'knowledge_file_delete_topic', ''),
     'KNOWLEDGE_FILE_DELETE_GROUP_ID': config.get('KAFKA', 'knowledge_file_delete_group_id', ''),
+
+    # 向量索引重建期间暂停受影响监听器的开关；false 时声明了
+    # consume_switch_key 的监听器在启动时不会被创建。默认 true 保持现状。
+    'VECTOR_INDEX_CONSUME_ENABLED': config.get('KAFKA', 'vector_index_consume_enabled', True, bool),
 }
 
 # 重排序配置
