@@ -7,6 +7,7 @@ from common.helper.exception import CheckError
 _user_context = contextvars.ContextVar("user_context", default={})
 query_embedding_context = contextvars.ContextVar("query_embedding", default=[])
 _trace_progress_context = contextvars.ContextVar("trace_progress", default="")
+_trace_api_key_context = contextvars.ContextVar("trace_api_key", default="")
 _openapi_key_context = contextvars.ContextVar("ak", default="")
 
 class _UserContext(object):
@@ -65,6 +66,15 @@ class TraceContext(OpenApiTraceContext):
     @progress.setter
     def progress(self, value):
         _trace_progress_context.set(value)
+
+    @property
+    def api_key(self) -> str:
+        """当前链路中最近一次调用使用的脱敏 API Key。"""
+        return _trace_api_key_context.get()
+
+    @api_key.setter
+    def api_key(self, value):
+        _trace_api_key_context.set(value or "")
 
 
 class _OpenapiContext(object):

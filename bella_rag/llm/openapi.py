@@ -67,6 +67,16 @@ def strip_bearer_token(ak: str) -> str:
     return ak
 
 
+def mask_api_key(api_key: str) -> str:
+    """脱敏 API Key，仅保留首尾各 4 个字符。"""
+    key = strip_bearer_token(api_key)
+    if not key:
+        return "<empty>"
+    if len(key) <= 8:
+        return "***"
+    return f"{key[:4]}***{key[-4:]}"
+
+
 class OpenAI(LlamaOpenAI):
     @property
     def auth_headers(self) -> dict[str, str]:
@@ -106,7 +116,18 @@ def get_embeddings(client: OpenAI, texts: List[str], model: str) -> List[Embeddi
     if UserContext.usage_ak_code:
         extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
 
-    response = client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
+    try:
+        response = client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
+    except Exception:
+        TraceContext.api_key = mask_api_key(getattr(client, "api_key", ""))
+        logger.error(
+            "OpenAPI embedding request failed: model=%s, api_key=%s, batch_size=%s",
+            model,
+            mask_api_key(getattr(client, "api_key", "")),
+            len(texts),
+            exc_info=True,
+        )
+        raise
     embeddings = [data.embedding for data in response.data]
     return embeddings
 
@@ -118,7 +139,18 @@ async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> 
     if UserContext.usage_ak_code:
         extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
 
-    response = await client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
+    try:
+        response = await client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
+    except Exception:
+        TraceContext.api_key = mask_api_key(getattr(client, "api_key", ""))
+        logger.error(
+            "OpenAPI async embedding request failed: model=%s, api_key=%s, batch_size=%s",
+            model,
+            mask_api_key(getattr(client, "api_key", "")),
+            len(texts),
+            exc_info=True,
+        )
+        raise
     embeddings = [data.embedding for data in response.data]
     return embeddings
 
