@@ -67,6 +67,56 @@ def strip_bearer_token(ak: str) -> str:
     return ak
 
 
+def mask_api_key(api_key: str) -> str:
+    """脱敏 API Key，仅保留首尾各 4 个字符。"""
+    key = strip_bearer_token(api_key)
+    if not key:
+        return "<empty>"
+    if len(key) <= 8:
+        return "***"
+    return f"{key[:4]}***{key[-4:]}"
+
+
+def get_request_id(value) -> Optional[str]:
+    """从 OpenAI SDK 响应或异常中提取上游 request id。"""
+    if value is None:
+        return None
+
+    # OpenAPI 网关使用自定义响应头，优先读取该 header。
+    for headers in (
+        getattr(value, "headers", None),
+        getattr(getattr(value, "response", None), "headers", None),
+        getattr(getattr(value, "_response", None), "headers", None),
+    ):
+        if headers:
+            for key in ("X-BELLA-REQUEST-ID", "x-bella-request-id"):
+                request_id = headers.get(key)
+                if request_id:
+                    return str(request_id)
+
+    if isinstance(value, dict):
+        for key in ("X-BELLA-REQUEST-ID", "x-bella-request-id", "_request_id", "request_id", "id"):
+            request_id = value.get(key)
+            if request_id:
+                return str(request_id)
+        return None
+    for attr in ("_request_id", "request_id", "id"):
+        request_id = getattr(value, attr, None)
+        if request_id:
+            return str(request_id)
+    body = getattr(value, "body", None)
+    if isinstance(body, dict):
+        return body.get("X-BELLA-REQUEST-ID") or body.get("request_id")
+    return None
+
+
+def create_embedding_response(client, **kwargs):
+    """发送 embedding 请求并返回解析后的响应及上游 request id。"""
+    raw_response = client.with_raw_response.embeddings.create(**kwargs)
+    request_id = get_request_id(raw_response)
+    return raw_response.parse(), request_id
+
+
 class OpenAI(LlamaOpenAI):
     @property
     def auth_headers(self) -> dict[str, str]:
@@ -106,7 +156,26 @@ def get_embeddings(client: OpenAI, texts: List[str], model: str) -> List[Embeddi
     if UserContext.usage_ak_code:
         extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
 
-    response = client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
+    try:
+        response, request_id = create_embedding_response(
+            client,
+            input=texts,
+            model=model,
+            user=get_user_info(),
+            extra_headers=extra_headers,
+        )
+        TraceContext.set_model_request_id("embedding", request_id)
+    except Exception as error:
+        TraceContext.set_model_request_id("embedding", get_request_id(error))
+        TraceContext.api_key = mask_api_key(getattr(client, "api_key", ""))
+        logger.error(
+            "OpenAPI embedding request failed: model=%s, api_key=%s, batch_size=%s",
+            model,
+            mask_api_key(getattr(client, "api_key", "")),
+            len(texts),
+            exc_info=True,
+        )
+        raise
     embeddings = [data.embedding for data in response.data]
     return embeddings
 
@@ -118,7 +187,26 @@ async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> 
     if UserContext.usage_ak_code:
         extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
 
-    response = await client.embeddings.create(input=texts, model=model, user=get_user_info(), extra_headers=extra_headers)
+    try:
+        raw_response = await client.with_raw_response.embeddings.create(
+            input=texts,
+            model=model,
+            user=get_user_info(),
+            extra_headers=extra_headers,
+        )
+        TraceContext.set_model_request_id("embedding", get_request_id(raw_response))
+        response = raw_response.parse()
+    except Exception as error:
+        TraceContext.set_model_request_id("embedding", get_request_id(error))
+        TraceContext.api_key = mask_api_key(getattr(client, "api_key", ""))
+        logger.error(
+            "OpenAPI async embedding request failed: model=%s, api_key=%s, batch_size=%s",
+            model,
+            mask_api_key(getattr(client, "api_key", "")),
+            len(texts),
+            exc_info=True,
+        )
+        raise
     embeddings = [data.embedding for data in response.data]
     return embeddings
 
@@ -390,6 +478,7 @@ class OpenAPI(Llama_OpenAI):
                         **self._get_model_kwargs(**kwargs),
                 ):
                     response = cast(ChatCompletionChunk, response)
+                    TraceContext.set_model_request_id("llm", get_request_id(response))
                     sensitives = response.dict().get('sensitives', [])
                     if sensitives:
                         yield ChatResponse(
@@ -442,6 +531,7 @@ class OpenAPI(Llama_OpenAI):
                     )
 
             except APIError as e:
+                TraceContext.set_model_request_id("llm", get_request_id(e))
                 logger.error(f'rag stream request llm error.{e}\\n{traceback.format_exc()}')
                 increment_counter_with_tag('rag', 'error_code', e.code)
                 yield ChatResponse(
@@ -464,6 +554,7 @@ class OpenAPI(Llama_OpenAI):
             kwargs['extra_headers'] = extra_headers
 
         chat_response = super()._chat(messages, **kwargs)
+        TraceContext.set_model_request_id("llm", get_request_id(getattr(chat_response, "raw", None)))
 
         # 提取敏感信息
         if chat_response.message and chat_response.raw:
