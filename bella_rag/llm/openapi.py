@@ -37,11 +37,14 @@ from bella_rag.utils.trace_log_util import trace
 from bella_rag.utils.user_util import get_user_info
 from common.helper.exception import FileNotFoundException
 from init.settings import user_logger, OPENAPI
+from bella_rag.llm.api_call_mode import (
+    DIRECT_CALL_MODE,
+    build_api_call_headers,
+)
 
 ChatResponseGen = Generator[ChatResponse, None, None]
 TokenGen = Generator[Union[str, APIError, List[Sensitive]], None, None]
 COMPLETION_ERROR_KEY = 'completion_error'
-OPENAPI_USER_AK_CODE_KEY = 'X-BELLA-USER-AK-CODE'
 embedding_retry_decorator = create_retry_decorator(
     max_retries=2,
     random_exponential=True,
@@ -149,12 +152,16 @@ class AsyncOpenAI(LlamaAsyncOpenAI):
         }
 
 @embedding_retry_decorator
-def get_embeddings(client: OpenAI, texts: List[str], model: str) -> List[Embedding]:
+def get_embeddings(client: OpenAI, texts: List[str], model: str,
+                   call_mode: str = DIRECT_CALL_MODE,
+                   service_client: Optional[str] = None) -> List[Embedding]:
     assert len(texts) <= 2048, "The batch size should not be larger than 2048."
 
-    extra_headers = {}
-    if UserContext.usage_ak_code:
-        extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
+    extra_headers = build_api_call_headers(
+        call_mode=call_mode,
+        service_client=service_client,
+        effective_api_key_code=UserContext.usage_ak_code,
+    )
 
     try:
         response, request_id = create_embedding_response(
@@ -180,12 +187,16 @@ def get_embeddings(client: OpenAI, texts: List[str], model: str) -> List[Embeddi
     return embeddings
 
 @embedding_retry_decorator
-async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> List[Embedding]:
+async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str,
+                         call_mode: str = DIRECT_CALL_MODE,
+                         service_client: Optional[str] = None) -> List[Embedding]:
     assert len(texts) <= 2048, "The batch size should not be larger than 2048."
 
-    extra_headers = {}
-    if UserContext.usage_ak_code:
-        extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
+    extra_headers = build_api_call_headers(
+        call_mode=call_mode,
+        service_client=service_client,
+        effective_api_key_code=UserContext.usage_ak_code,
+    )
 
     try:
         raw_response = await client.with_raw_response.embeddings.create(
@@ -211,12 +222,16 @@ async def aget_embeddings(client: AsyncOpenAI, texts: List[str], model: str) -> 
     return embeddings
 
 
-def get_embedding(client: OpenAI, texts: List[str], model: str) -> List[Embedding]:
-    return get_embeddings(client, texts, model)
+def get_embedding(client: OpenAI, texts: List[str], model: str,
+                  call_mode: str = DIRECT_CALL_MODE,
+                  service_client: Optional[str] = None) -> List[Embedding]:
+    return get_embeddings(client, texts, model, call_mode, service_client)
 
 
-async def aget_embedding(client: AsyncOpenAI, texts: List[str], model: str) -> List[Embedding]:
-    return await aget_embeddings(client, texts, model)
+async def aget_embedding(client: AsyncOpenAI, texts: List[str], model: str,
+                         call_mode: str = DIRECT_CALL_MODE,
+                         service_client: Optional[str] = None) -> List[Embedding]:
+    return await aget_embeddings(client, texts, model, call_mode, service_client)
 
 
 def stream_completion_response_to_tokens(
@@ -260,6 +275,8 @@ class OpenAPIEmbedding(BaseEmbedding):
     user: str = Field(default_factory=get_user_info, description="user")
     model_dimension: int = Field(description="embedding模型维数")
     timeout: Optional[float] = Field(default=None, description="embedding请求超时时间（秒）")
+    call_mode: str = Field(default=DIRECT_CALL_MODE, description="OpenAPI调用模式")
+    service_client: Optional[str] = Field(default=None, description="计费转移发起方身份")
 
     def __init__(self, model: str, api_key: str, embedding_batch_size: int, model_dimension: int = 1024,
                  timeout: Optional[float] = None, **kwargs):
@@ -280,7 +297,9 @@ class OpenAPIEmbedding(BaseEmbedding):
             logger.info(f'mock request _get_query_embedding, query: {query}')
             return [random.uniform(0, 1) for _ in range(self.model_dimension)]
         client = self._get_client(self.api_key)
-        embedding = get_embedding(client, [query], self.model_name)[0]
+        embedding = get_embedding(
+            client, [query], self.model_name, self.call_mode, self.service_client
+        )[0]
         query_embedding_context.set(embedding)
         return embedding
 
@@ -290,7 +309,9 @@ class OpenAPIEmbedding(BaseEmbedding):
             logger.info(f'mock request _aget_query_embedding, query: {query}')
             return [random.uniform(0, 1) for _ in range(self.model_dimension)]
         aclient = self._get_aclient(self.api_key)
-        embeddings = await aget_embedding(aclient, [query], self.model_name)
+        embeddings = await aget_embedding(
+            aclient, [query], self.model_name, self.call_mode, self.service_client
+        )
         return embeddings[0]
 
     def _get_text_embedding(self, text: str) -> Embedding:
@@ -299,7 +320,9 @@ class OpenAPIEmbedding(BaseEmbedding):
             logger.info(f'mock request _get_text_embedding, query: {text}')
             return [random.uniform(0, 1) for _ in range(self.model_dimension)]
         client = self._get_client(self.api_key)
-        return get_embedding(client, [text], self.model_name)[0]
+        return get_embedding(
+            client, [text], self.model_name, self.call_mode, self.service_client
+        )[0]
 
     def _get_client(self, api_key: str) -> OpenAI:
         if self._client is None:
@@ -322,7 +345,9 @@ class OpenAPIEmbedding(BaseEmbedding):
             logger.info(f'mock request _get_text_embeddings, query size: {len(texts)}')
             [[random.uniform(0, 1) for _ in range(self.model_dimension)] for _ in range(len(texts))]
         client = self._get_client(self.api_key)
-        return get_embeddings(client, texts, self.model_name)
+        return get_embeddings(
+            client, texts, self.model_name, self.call_mode, self.service_client
+        )
 
     def _get_aclient(self, api_key: str) -> AsyncOpenAI:
         if self._aclient is None:
@@ -333,6 +358,15 @@ class OpenAPIEmbedding(BaseEmbedding):
         return self._aclient
 
 class OpenAPI(Llama_OpenAI):
+    _call_mode: str = PrivateAttr(default=DIRECT_CALL_MODE)
+    _service_client: Optional[str] = PrivateAttr(default=None)
+
+    def __init__(self, *args, call_mode: str = DIRECT_CALL_MODE,
+                 service_client: Optional[str] = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._call_mode = call_mode
+        self._service_client = service_client
+
     def _get_credential_kwargs(self, is_async: bool = False, **kwargs: Any) -> Dict[str, Any]:
         credential_kwargs = super()._get_credential_kwargs(is_async=is_async, **kwargs)
         credential_kwargs["api_key"] = strip_bearer_token(credential_kwargs.get("api_key", ""))
@@ -461,10 +495,12 @@ class OpenAPI(Llama_OpenAI):
         client = self._get_client()
         message_dicts = to_openai_message_dicts(messages)
 
-        extra_headers = kwargs.get('extra_headers', {}) or {}
-        if UserContext.usage_ak_code:
-            extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
-            kwargs['extra_headers'] = extra_headers
+        kwargs['extra_headers'] = build_api_call_headers(
+            call_mode=self._call_mode,
+            service_client=self._service_client,
+            effective_api_key_code=UserContext.usage_ak_code,
+            extra_headers=kwargs.get('extra_headers'),
+        )
 
         def gen() -> ChatResponseGen:
             content = ""
@@ -548,10 +584,12 @@ class OpenAPI(Llama_OpenAI):
 
     @llm_chat_callback()
     def chat(self, messages: Sequence[ChatMessage], **kwargs: Any) -> ChatResponse:
-        extra_headers = kwargs.get('extra_headers', {}) or {}
-        if UserContext.usage_ak_code:
-            extra_headers[OPENAPI_USER_AK_CODE_KEY] = UserContext.usage_ak_code
-            kwargs['extra_headers'] = extra_headers
+        kwargs['extra_headers'] = build_api_call_headers(
+            call_mode=self._call_mode,
+            service_client=self._service_client,
+            effective_api_key_code=UserContext.usage_ak_code,
+            extra_headers=kwargs.get('extra_headers'),
+        )
 
         chat_response = super()._chat(messages, **kwargs)
         TraceContext.set_model_request_id("llm", get_request_id(getattr(chat_response, "raw", None)))
