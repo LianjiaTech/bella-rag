@@ -446,8 +446,13 @@ CACHES = {
 
 # OpenAPI配置 - 必需
 OPENAPI = {
+    # 直接调用模式：使用服务自身的 API Key，不附加计费转移 Header。
     'URL': config.get_required('OPENAPI', 'api_base'),
     'AK': config.get_required('OPENAPI', 'ak'),
+    # 计费转移模式：使用专用 API Key，并附加 X-Service-Client 与
+    # X-Effective-Api-Key-Code。后者在请求时从 UserContext.usage_ak_code 获取。
+    'BILLING_TRANSFER_API_KEY': config.get('OPENAPI', 'billing_transfer_api_key', ''),
+    'BILLING_TRANSFER_SERVICE_CLIENT': config.get('OPENAPI', 'billing_transfer_service_client', ''),
 }
 
 # 向量数据库配置 - 支持多种类型
