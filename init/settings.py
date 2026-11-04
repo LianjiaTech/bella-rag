@@ -564,6 +564,7 @@ RETRIEVAL = {
 
 # 上下文总结配置
 CONTEXT_SUMMARY = {
+    'ENABLE': config.get('CONTEXT_SUMMARY', 'enable', True, bool),
     'SPILT_MAX_LENGTH': config.get('CONTEXT_SUMMARY', 'spilt_max_length', 1500, int),
     'MAX_BACKGROUND_LENGTH': config.get('CONTEXT_SUMMARY', 'max_background_length', 20000, int),
     'OVERLAP_LENGTH': config.get('CONTEXT_SUMMARY', 'overlap_length', 2000, int),
