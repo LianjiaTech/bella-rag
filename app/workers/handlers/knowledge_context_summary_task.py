@@ -1,7 +1,7 @@
 import redis
 
 from app.common.contexts import UserContext, TraceContext
-from init.settings import user_logger
+from init.settings import CONTEXT_SUMMARY, user_logger
 from redis_lock import Lock
 
 from common.tool.redis_tool import redis_pool
@@ -11,6 +11,9 @@ logger = user_logger
 context_extractor = ContextExtractor()
 
 def knowledge_file_context_summary_callback(payload: dict) -> bool:
+    if not CONTEXT_SUMMARY.get('ENABLE', True):
+        return True
+
     file_id = payload.get('file_id')
     ucid = payload.get('ucid')
     extractors = payload.get('extractors', [])
