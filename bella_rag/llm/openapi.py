@@ -279,13 +279,14 @@ class OpenAPIEmbedding(BaseEmbedding):
     service_client: Optional[str] = Field(default=None, description="计费转移发起方身份")
 
     def __init__(self, model: str, api_key: str, embedding_batch_size: int, model_dimension: int = 1024,
-                 timeout: Optional[float] = None, **kwargs):
+                 timeout: Optional[float] = None, call_mode: str = DIRECT_CALL_MODE, **kwargs):
         super().__init__(
             model_name=model,
             embed_batch_size=embedding_batch_size,
             api_key=strip_bearer_token(api_key),
             model_dimension=model_dimension,
             timeout=timeout,
+            call_mode=call_mode,
             **kwargs,
         )
         self._client = None
