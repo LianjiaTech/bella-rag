@@ -3,7 +3,7 @@ from typing import List
 from django.db import transaction
 from llama_index.core.indices.utils import embed_nodes
 
-from app.services import chunk_vector_index_structure, embed_model
+from app.services import chunk_vector_index_structure, direct_embed_model
 from app.services.chunk_content_attached_service import ChunkContentAttachedService
 from app.services.index_extend.db_transformation import set_node_content
 from app.strategy import es_store
@@ -42,7 +42,7 @@ def add_chunk(source_id: str, source_name: str, content_title: str, content_data
         raise Exception('unknown chunk type')
 
     try:
-        id_to_embed_map = embed_nodes([node], embed_model=embed_model)
+        id_to_embed_map = embed_nodes([node], embed_model=direct_embed_model)
         node.embedding = id_to_embed_map[node_id]
         # 更新插入位置之后节点的位置信息，为插入节点腾位置
         ChunkContentAttachedService.chunk_pos_increment(source_id, chunk_pos)
@@ -127,7 +127,7 @@ def update_chunk(chunk_id: str, content_title: str, content_data: str, extra: di
 
         set_node_content(node, extend.content_title, extend.content_data)
         node.metadata[chunk_vector_index_structure.extra_key] = _extra_data_from_dict_to_list(extra)
-        id_to_embed_map = embed_nodes([node], embed_model=embed_model)
+        id_to_embed_map = embed_nodes([node], embed_model=direct_embed_model)
         node.embedding = id_to_embed_map[node.node_id]
         vector_store.add([node])
         logger.info("update_chunk success chunk_id = %s [step=更新向量库]", chunk_id)

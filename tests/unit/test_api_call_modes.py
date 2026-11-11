@@ -57,7 +57,7 @@ class ApiCallModesTest(unittest.TestCase):
                 service_client='service-a',
             )
 
-    def test_file_index_embedding_is_configured_for_billing_transfer(self):
+    def test_embedding_models_are_configured_by_calling_context(self):
         captured = []
 
         class OpenAPIEmbedding:
@@ -92,6 +92,7 @@ class ApiCallModesTest(unittest.TestCase):
             'bella_rag.llm': self._package('bella_rag.llm'),
             'bella_rag.llm.api_call_mode': self._module(
                 'bella_rag.llm.api_call_mode',
+                DIRECT_CALL_MODE=self.modes.DIRECT_CALL_MODE,
                 BILLING_TRANSFER_MODE=self.modes.BILLING_TRANSFER_MODE,
             ),
             'bella_rag.llm.openapi': self._module(
@@ -102,13 +103,17 @@ class ApiCallModesTest(unittest.TestCase):
         with patch.dict(sys.modules, stubs):
             load_module('app_services_under_test', path)
 
-        self.assertEqual(2, len(captured))
+        self.assertEqual(3, len(captured))
         self.assertEqual('transfer-key', captured[0]['api_key'])
         self.assertEqual(self.modes.BILLING_TRANSFER_MODE, captured[0]['call_mode'])
         self.assertEqual('service-a', captured[0]['service_client'])
         self.assertEqual('direct-key', captured[1]['api_key'])
-        self.assertNotIn('call_mode', captured[1])
+        self.assertEqual(self.modes.DIRECT_CALL_MODE, captured[1]['call_mode'])
         self.assertNotIn('service_client', captured[1])
+        self.assertEqual('direct-key', captured[2]['api_key'])
+        self.assertEqual(self.modes.DIRECT_CALL_MODE, captured[2]['call_mode'])
+        self.assertEqual(5.0, captured[2]['timeout'])
+        self.assertNotIn('service_client', captured[2])
 
     @staticmethod
     def _module(name, **attributes):

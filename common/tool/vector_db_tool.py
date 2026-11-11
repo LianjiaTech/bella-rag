@@ -4,7 +4,7 @@ from typing import List, Optional
 from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend, \
     QuestionAnswerAttachedIndexExtend
 from bella_rag.schema.nodes import BaseNode
-from app.services import embed_model, chunk_vector_index_structure, question_vector_index_structure
+from app.services import chunk_vector_index_structure, question_vector_index_structure
 from bella_rag.vector_stores import qdrant_manager, tencent_manager
 from bella_rag.vector_stores.types import MetadataFilter, FilterOperator, MetadataFilters
 

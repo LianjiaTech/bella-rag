@@ -5,7 +5,7 @@ from typing import Tuple, List
 
 from llama_index.core.prompts import PromptType
 
-from app.services import chunk_vector_index_structure, embed_model
+from app.services import chunk_vector_index_structure, file_index_embed_model
 from app.services.chunk_content_attached_service import ChunkContentAttachedService
 from app.services.context_service import redis_client, redis_key_prefix, save_context_chunk
 from app.utils.llm_response_util import get_response_json_str
@@ -134,7 +134,7 @@ def context_summary(source_id: str):
 
     order = 0
     # 构建context节点
-    embeddings = embed_model.get_text_embedding_batch(context_texts)
+    embeddings = file_index_embed_model.get_text_embedding_batch(context_texts)
     for i, context_text in enumerate(context_texts):
         sub_ids = []
         extra = {}
@@ -395,4 +395,3 @@ def group_nodes_by_token_length(nodes: List[StructureNode],
         grouped_nodes.append(current_group)
 
     return grouped_nodes
-
