@@ -5,7 +5,7 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.response_synthesizers import ResponseMode
 
 from app.common.contexts import UserContext
-from app.services import embed_model
+from app.services import file_index_embed_model
 from init.settings import OPENAPI
 from bella_rag.llm.openapi import OpenAPI
 from bella_rag.transformations.factory import TransformationFactory
@@ -35,10 +35,9 @@ def test_summary():
     # 3、传入的SentenceSplitter切分器（不传也会拿个默认的切分），将文件切分成多块，然后再用换行符拼接起来。
     #    最后使用get_response_synthesizer方法传入的prompt_helper（没传入有默认的，使用llm元数据进行），进行组合，进行递归的总结，最后输出一个结果
     doc_summary_index = DocumentSummaryIndex.from_documents(llm=llm, stream=False, embed_summaries=False,
-                                                            embed_model=embed_model,
+                                                            embed_model=file_index_embed_model,
                                                             # transformations=[splitter],
                                                             documents=documents,
                                                             response_synthesizer=response_synthesizer
                                                             )
     print(doc_summary_index)
-

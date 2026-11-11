@@ -14,7 +14,12 @@ from llama_index.core.vector_stores.simple import DEFAULT_VECTOR_STORE
 
 from app.common.contexts import UserContext, TraceContext
 from app.handler.custom_error_handler import custom_exception_handler
-from app.services import chunk_vector_index_structure, embed_model, question_vector_index_structure
+from app.services import (
+    chunk_vector_index_structure,
+    direct_embed_model,
+    file_index_embed_model,
+    question_vector_index_structure,
+)
 from app.services.context_service import vector_store
 from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend, \
     QuestionAnswerAttachedIndexExtend
@@ -82,7 +87,7 @@ def run_index_file(file_id: str, file_name: str, documents: list, transforms: li
     index_options = {
         'storage_context': storage_context,
         'transformations': transforms,
-        'embed_model': embed_model,
+        'embed_model': file_index_embed_model,
         'metadata': get_document_metadata(
             file_id=file_id,
             file_name=file_name,
@@ -219,7 +224,7 @@ def update_extra(
 
 
 def get_file_summary(file_ids: List[str], query: str, top_k: int):
-    embeddings = embed_model.get_text_embedding(text=query)
+    embeddings = direct_embed_model.get_text_embedding(text=query)
     filters = [MetadataFilter(key="source_id", value=file_ids, operator=FilterOperator.IN)]
     metadata_filters = MetadataFilters(filters=filters)
     vector_query = VectorStoreQuery(query_str=query, query_embedding=embeddings, similarity_top_k=top_k,

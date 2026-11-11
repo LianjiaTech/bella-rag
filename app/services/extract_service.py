@@ -1,7 +1,7 @@
 from llama_index.core.schema import TextNode
 
 from app.models.knowledge_file_meta_model import KnowledgeFileMeta
-from app.services import embed_model
+from app.services import file_index_embed_model
 from app.services.knowledge_file_meta_service import KnowledgeMetaService
 from common.tool.vector_db_tool import summary_question_vector_store
 from init.settings import user_logger
@@ -22,13 +22,17 @@ def extract_store_summary_question(file_id: str, file_name: str, llm: OpenAPI):
         return
 
     summary_question = extract_summary_question.run(documents=documents, user=get_user_info(),
-                                                    llm=llm, embed_model=embed_model)
+                                                    llm=llm, embed_model=file_index_embed_model)
     # DB存储
     data = KnowledgeFileMeta(summary_question=summary_question, file_id=file_id)
     KnowledgeMetaService.save(data)
     # 向量库存储
-    embedding = embed_model.get_text_embedding(text=summary_question)
-    summary_question_node = TextNode(text=summary_question, embedding=embedding, embed_model=embed_model)
+    embedding = file_index_embed_model.get_text_embedding(text=summary_question)
+    summary_question_node = TextNode(
+        text=summary_question,
+        embedding=embedding,
+        embed_model=file_index_embed_model,
+    )
     summary_question_node.id_ = file_id
     summary_question_node.metadata['source_id'] = file_id
     summary_question_vector_store.add(nodes=[summary_question_node])

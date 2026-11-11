@@ -6,7 +6,7 @@ from llama_index.core.prompts.utils import is_chat_model
 from llama_index.core.response_synthesizers import ResponseMode
 
 from app.models.knowledge_file_meta_model import KnowledgeFileMeta
-from app.services import embed_model
+from app.services import file_index_embed_model
 from app.services.knowledge_file_meta_service import KnowledgeMetaService
 from app.utils.llm_response_util import get_response_json_str
 from init.settings import OPENAPI
@@ -74,7 +74,7 @@ def extract_tag_impl(file_id, documents):
                                                     summary_template=TREE_SUMMARIZE_PROMPT_SEL
                                                     )
     doc_summary_index = DocumentSummaryIndex.from_documents(llm=llm, stream=False, embed_summaries=False,
-                                                            embed_model=embed_model,
+                                                            embed_model=file_index_embed_model,
                                                             documents=documents,
                                                             response_synthesizer=response_synthesizer,
                                                             summary_query=SUMMARY_QUERY

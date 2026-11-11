@@ -3,7 +3,7 @@ from typing import List
 from django.db import transaction
 from llama_index.core.indices.utils import embed_nodes
 
-from app.services import question_vector_index_structure, embed_model
+from app.services import question_vector_index_structure, direct_embed_model
 from app.services.question_answer_attached_service import QuestionAnswerIndexAttachedService
 from app.strategy import es_store
 from app.utils.convert import extract_metadata_from_extra, convert_question_answer_attached, \
@@ -26,7 +26,7 @@ def add_qa_group(group_id: str, source_id: str, source_name: str, questions: Lis
                                answer_str=answer,
                                group_id=group_id,
                                metadata=metadata))
-    question_id_to_embed_map = embed_nodes(qa_nodes, embed_model=embed_model)
+    question_id_to_embed_map = embed_nodes(qa_nodes, embed_model=direct_embed_model)
 
     doc_ids = []
     try:

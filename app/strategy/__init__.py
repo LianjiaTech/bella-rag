@@ -25,7 +25,7 @@ def _lazy_initialize():
         
     try:
         # 延迟导入以避免Django model问题
-        from app.services import embed_model, chunk_vector_index_structure, question_vector_index_structure
+        from app.services import direct_embed_model, chunk_vector_index_structure, question_vector_index_structure
         from app.services.index_extend.db_transformation import ChunkContentAttachedIndexExtend, \
             QuestionAnswerAttachedIndexExtend
 
@@ -37,7 +37,7 @@ def _lazy_initialize():
         register_index(
             name="chunk_index",
             vector_store=vector_store,
-            embed_model=embed_model,
+            embed_model=direct_embed_model,
             index_structure=chunk_vector_index_structure,
             index_extend=chunk_index_extend,
             description="文档内容索引"
@@ -47,7 +47,7 @@ def _lazy_initialize():
         register_index(
             name="question_index",
             vector_store=questions_vector_store,
-            embed_model=embed_model,
+            embed_model=direct_embed_model,
             index_structure=question_vector_index_structure,
             index_extend=question_answer_extend,
             description="问题答案索引"
